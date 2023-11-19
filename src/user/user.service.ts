@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, HttpException, HttpStatus} from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { user } from './user.entity';
 import { createUserDto } from './dto/create-user-dto';
@@ -11,7 +11,17 @@ export class userService {
     private userRepository: Repository<user>,
   ) {}
 
-    createUser(user: createUserDto){
+    async createUser(user: createUserDto){
+      const userFound = await this.userRepository.findOne({
+        where: {
+          cpf: user.cpf
+        }
+      })
+
+      if (userFound){
+        return new HttpException('Usuário já existe', HttpStatus.CONFLICT)
+      }
+
       const newUser = this.userRepository.create(user)
       return this.userRepository.save(newUser) 
     }
@@ -20,19 +30,45 @@ export class userService {
       return this.userRepository.find()
     }
 
-    getUser (cpf: string){
-      return this.userRepository.findOne({
+    async getUser (cpf: string){
+      const userFound = await this.userRepository.findOne({
         where:{
-          cpf
+          cpf,
         }
       })
+
+      if (!userFound){
+      return new HttpException('Usuário não encontrado', HttpStatus.NOT_FOUND)
+      }
+      return userFound
     }
 
-    deleteUser (cpf: string){
-      return this.userRepository.delete({cpf});
+    async deleteUser (cpf: string){
+      const userFound = await this.userRepository.findOne({
+        where: {
+          cpf
+        }
+      });
+
+      if (!userFound){
+        return new HttpException('Usuário não encontrado', HttpStatus.NOT_FOUND)
+      }
+
+      return this.userRepository.delete({cpf})
     }
 
-    updateUser (cpf: string, user: updateUserDto){
-      return this.userRepository.update({cpf}, user)
+    async updateUser (cpf: string, user: updateUserDto){
+      const userFound = await this.userRepository.findOne({
+        where:{
+          cpf,
+        }
+      })
+      
+      if (!userFound) {
+        return new HttpException('Usuário não encontrado', HttpStatus.NOT_FOUND)
+      }
+      
+      const updateUser = Object.assign(userFound, user)
+      return this.userRepository.save (updateUser);
     }
 }

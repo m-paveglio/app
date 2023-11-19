@@ -14,14 +14,14 @@ export class userController {
     }
 
     @Get (':cpf')
-    getUser(@Param('cpf') cpf: string): Promise<user> {
+    getUser(@Param('cpf') cpf: string){
       console.log (cpf)
       console.log (typeof cpf)
       return this.userService.getUser(cpf);
     }
 
     @Post ()
-    createUser(@Body() newUser: createUserDto): Promise<user>{
+    createUser(@Body() newUser: createUserDto){
       return this.userService.createUser(newUser);
     }
 
