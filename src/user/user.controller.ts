@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Param} from '@nestjs/common';
+import { Body, Controller, Get, Post, Param, Delete} from '@nestjs/common';
 import { userService } from './user.service';
 import { user } from './user.entity';
 import { createUserDto } from './dto/create-user-dto';
@@ -24,5 +24,9 @@ export class userController {
       return this.userService.createUser(newUser);
     }
 
+    @Delete(':cpf')
+    deleteUser(@Param('cpf') cpf: string) {
+      return this.userService.deleteUser(cpf)
+    }
 }
 

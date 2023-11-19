@@ -26,4 +26,8 @@ export class userService {
         }
       })
     }
+
+    deleteUser (cpf: string){
+      return this.userRepository.delete({cpf});
+    }
 }
