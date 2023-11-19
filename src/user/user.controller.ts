@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Post, Param, Delete} from '@nestjs/common';
+import { Body, Controller, Get, Post, Param, Delete, Patch} from '@nestjs/common';
 import { userService } from './user.service';
 import { user } from './user.entity';
 import { createUserDto } from './dto/create-user-dto';
+import { updateUserDto } from './dto/update-user-dto';
 
 @Controller('user')
 export class userController {
@@ -28,5 +29,13 @@ export class userController {
     deleteUser(@Param('cpf') cpf: string) {
       return this.userService.deleteUser(cpf)
     }
+
+    @Patch(':cpf')
+    updateUser (@Param('cpf') cpf: string, @Body() user: updateUserDto) {
+      return this.userService.updateUser(cpf, user)
+    }
+
+
+
 }
 
