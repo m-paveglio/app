@@ -9,12 +9,4 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello();
   }
-
-  @Post('cadastrar')
-  cadatrar(): Promise<any>{
-    return <any> {
-      mensagem: "salvou"
-    }
-  }
-
 }

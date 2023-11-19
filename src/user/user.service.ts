@@ -15,8 +15,15 @@ export class userService {
       return this.userRepository.save(newUser) 
     }
 
-  async listar(): Promise<user[]> {
-    return this.userRepository.find();
-  }
+    getUsers (){
+      return this.userRepository.find()
+    }
 
+    getUser (cpf: string){
+      return this.userRepository.findOne({
+        where:{
+          cpf
+        }
+      })
+    }
 }
