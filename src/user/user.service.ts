@@ -1,8 +1,9 @@
-import { Injectable, Inject, HttpException, HttpStatus} from '@nestjs/common';
+import { Injectable, Inject, HttpException, HttpStatus, UnauthorizedException} from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { user } from './user.entity';
 import { createUserDto } from './dto/create-user-dto';
 import { updateUserDto } from './dto/update-user-dto';
+import { CpuInfo } from 'os';
 
 @Injectable()
 export class userService {
@@ -71,4 +72,9 @@ export class userService {
       const updateUser = Object.assign(userFound, user)
       return this.userRepository.save (updateUser);
     }
-}
+
+    findByCpf(cpf: string) {
+      return this.userRepository.findOne({ where: { cpf } });
+    }
+
+  }
