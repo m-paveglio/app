@@ -1,6 +1,6 @@
 import { Injectable, Inject, HttpException, HttpStatus, UnauthorizedException} from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { user } from './user.entity';
+import { user } from 'BACKEND/src/user/user.entity';
 import { createUserDto } from './dto/create-user-dto';
 import { updateUserDto } from './dto/update-user-dto';
 import { CpuInfo } from 'os';
