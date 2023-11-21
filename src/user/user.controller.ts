@@ -34,8 +34,5 @@ export class userController {
     updateUser (@Param('cpf') cpf: string, @Body() user: updateUserDto) {
       return this.userService.updateUser(cpf, user)
     }
-
-
-
 }
 

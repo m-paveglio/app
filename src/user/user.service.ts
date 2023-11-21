@@ -59,11 +59,7 @@ export class userService {
     }
 
     async updateUser (cpf: string, user: updateUserDto){
-      const userFound = await this.userRepository.findOne({
-        where:{
-          cpf,
-        }
-      })
+      const userFound = await this.userRepository.findOne
       
       if (!userFound) {
         return new HttpException('Usuário não encontrado', HttpStatus.NOT_FOUND)
@@ -76,5 +72,8 @@ export class userService {
     findByCpf(cpf: string) {
       return this.userRepository.findOne({ where: { cpf } });
     }
+
+    async findOne(cpf: string): Promise<user | undefined> {
+      return this.userRepository.findOne({where:{cpf}});}
 
   }
