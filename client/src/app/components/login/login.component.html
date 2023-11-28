@@ -1,1 +1,16 @@
-<p>login works!</p>
+<body>
+<div class="login-container">
+  <h2>Login</h2>
+  <form action="/auth/login">
+    <div>
+      <label for="username">Username:</label>
+      <input type="text" id="username" formControlName="username" />
+
+      <label for="password">Password:</label>
+      <input type="password" id="password" formControlName="password" />
+
+      <button (click)="login()">Login</button>
+    </div>
+  </form>
+</div>
+</body>
