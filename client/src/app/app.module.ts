@@ -16,7 +16,8 @@ import { AppRoutingModule } from './app.routes';
     BrowserModule,
     ReactiveFormsModule,
     HttpClientModule,
-    AppRoutingModule
+    AppRoutingModule,
+
   ],
   providers: [AuthService, AuthGuard],
   bootstrap: [],
