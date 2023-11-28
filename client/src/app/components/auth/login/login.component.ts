@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../../../services/auth.service';
 import { Router } from '@angular/router';
 import { FormControl, FormGroup } from '@angular/forms'; // Importe as classes necessárias
 import { CommonModule } from '@angular/common';
@@ -27,7 +27,7 @@ export class LoginComponent {
       this.authService.login(cpf, password).subscribe(
         (data) => {
           console.log('Login bem-sucedido:', data);
-          this.router.navigate(['/home']);
+          this.router.navigate(['/']);
         },
         (error) => {
           console.error('Erro no login:', error);

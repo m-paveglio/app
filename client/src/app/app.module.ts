@@ -1,25 +1,24 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { ReactiveFormsModule } from '@angular/forms'; // Importe o ReactiveFormsModule
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'; // Importe o ReactiveFormsModule
 import { HttpClientModule } from '@angular/common/http';
-import { RouterModule } from '@angular/router';
-
-import { AppComponent } from './app.component';
-import { LoginComponent } from './components/login/login.component';
 import { AuthGuard } from './services/auth.guards.service';
 import { AuthService } from './services/auth.service';
 import { AppRoutingModule } from './app.routes';
+import { AppComponent } from './app.component';
+import { UserService } from './services/user.service';
+FormsModule
 
 @NgModule({
-  declarations: [LoginComponent],
+  declarations: [],
   imports: [
     BrowserModule,
     ReactiveFormsModule,
     HttpClientModule,
     AppRoutingModule,
-
+    FormsModule,
   ],
-  providers: [AuthService, AuthGuard],
-  bootstrap: [],
+  providers: [AuthService, AuthGuard, UserService],
+  bootstrap: [AppComponent],
 })
 export class AppModule {}
