@@ -1,7 +1,0 @@
-<div>
-  <input [(ngModel)]="searchTerm" placeholder="Digite o nome ou CPF">
-  <button (click)="search()">Buscar</button>
-  <ul>
-    <li *ngFor="let user of user">{{ user.name }} - {{ user.cpf }}</li>
-  </ul>
-</div>
