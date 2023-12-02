@@ -1,0 +1,24 @@
+<div class="grid">
+    <div class="col-12">
+      <div class="card">
+        <h5>Advanced</h5>
+        <div class="p-fluid p-formgrid grid">
+          <div class="field col-12 md:col-4">
+            <label for="cpf">CPF</label>
+            <input pInputText id="cpf" type="text" [(ngModel)]="cpf" />
+          </div>
+          <div class="field col-12 md:col-7">
+            <label for="nome">NOME</label>
+            <input pInputText id="nome" type="text" [(ngModel)]="nome" />
+          </div>
+          <div class="buttonbuscar" style="display: grid; align-items: center; height: 8.4rem">
+          <button pButton icon="pi pi-search" (click)="buscarPorCpf()"></button>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="resultado">
+    Resultado da busca: {{ resultado | json }}
+  </div>
