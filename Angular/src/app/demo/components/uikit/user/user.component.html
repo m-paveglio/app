@@ -1,7 +1,7 @@
 <div class="grid">
     <div class="col-12">
       <div class="card">
-        <h5>Advanced</h5>
+        <h5>BUSCAR USUÁRIOS</h5>
         <div class="p-fluid p-formgrid grid">
           <div class="field col-12 md:col-4">
             <label for="cpf">CPF</label>
@@ -12,13 +12,54 @@
             <input pInputText id="nome" type="text" [(ngModel)]="nome" />
           </div>
           <div class="buttonbuscar" style="display: grid; align-items: center; height: 8.4rem">
-          <button pButton icon="pi pi-search" (click)="buscarPorCpf()"></button>
-        </div>
+            <button pButton icon="pi pi-search" (click)="buscarPorCpf()"></button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div *ngIf="resultado">
-    Resultado da busca: {{ resultado | json }}
+<style>
+    .col-6{
+        border-color: black
+    }    </style>
+
+    <!-- Novo container para exibir resultados -->
+    <div class="col-12" *ngIf="resultado">
+      <div class="card">
+        <h5>RESULTADO DA BUSCA</h5>
+        <div class="p-fluid p-formgrid grid">
+          <!-- Adicione aqui os campos para exibir os resultados, substitua conforme necessário -->
+
+          <div class="field col-12 md:col-4" >
+            <label>CPF</label>
+            <div style="
+            font-size: 1rem;
+            color: #495057;
+            background: #ffffff;
+            padding: 0.75rem 0.75rem;
+            border: 1px solid #ced4da;
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+            appearance: none;
+            border-radius: 6px;">
+                <span id="resultado-cpf">{{ resultado.cpf }}</span>
+            </div>
+          </div>
+
+          <div class="field col-12 md:col-7">
+            <label>NOME</label>
+                <div style="
+                font-size: 1rem;
+                color: #495057;
+                background: #ffffff;
+                padding: 0.75rem 0.75rem;
+                border: 1px solid #ced4da;
+                transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+                appearance: none;
+                border-radius: 6px;">
+                 <span id="resultado-nome">{{ resultado.nome }}</span>
+             </div>
+          </div>
+
+        </div>
+    </div>
   </div>
