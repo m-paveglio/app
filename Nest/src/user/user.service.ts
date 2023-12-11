@@ -1,5 +1,5 @@
 import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { user } from 'src/user/user.entity';
 import { createUserDto } from './dto/create-user-dto';
@@ -91,5 +91,13 @@ export class userService {
 
     async findOne(cpf: string): Promise<user | undefined> {
       return this.userRepository.findOne({where:{cpf}});}
+
+      async searchUserByName(nome: string): Promise<user[]> {
+        return this.userRepository.find({
+          where: {
+            nome: Like(`%${nome}%`),
+          },
+        });
+      }
 
   }

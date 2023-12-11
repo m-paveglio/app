@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Param, Delete, Patch} from '@nestjs/common';
+import { Body, Controller, Get, Post, Param, Delete, Patch, Query } from '@nestjs/common';
 import { userService } from './user.service';
 import { user } from './user.entity';
 import { createUserDto } from './dto/create-user-dto';
@@ -8,31 +8,33 @@ import { updateUserDto } from './dto/update-user-dto';
 export class userController {
   constructor(private readonly userService: userService) {}
 
-    @Get ()
-    getUsers(): Promise<user[]> {
-      return this.userService.getUsers();
-    }
+  @Get()
+  getUsers(): Promise<user[]> {
+    return this.userService.getUsers();
+  }
 
-    @Get (':cpf')
-    getUser(@Param('cpf') cpf: string){
-      console.log (cpf)
-      console.log (typeof cpf)
-      return this.userService.getUser(cpf);
-    }
+  @Get(':cpf')
+  getUser(@Param('cpf') cpf: string) {
+    return this.userService.getUser(cpf);
+  }
 
-    @Post ()
-    createUser(@Body() newUser: createUserDto){
-      return this.userService.createUser(newUser);
-    }
+  @Get(':nome')
+  searchUser(@Query('name') name: string) {
+    return this.userService.searchUserByName(name);
+  }
 
-    @Delete(':cpf')
-    deleteUser(@Param('cpf') cpf: string) {
-      return this.userService.deleteUser(cpf)
-    }
+  @Post()
+  createUser(@Body() newUser: createUserDto) {
+    return this.userService.createUser(newUser);
+  }
 
-    @Patch(':cpf')
-    updateUser (@Param('cpf') cpf: string, @Body() user: updateUserDto) {
-      return this.userService.updateUser(cpf, user)
-    }
+  @Delete(':cpf')
+  deleteUser(@Param('cpf') cpf: string) {
+    return this.userService.deleteUser(cpf);
+  }
+
+  @Patch(':cpf')
+  updateUser(@Param('cpf') cpf: string, @Body() user: updateUserDto) {
+    return this.userService.updateUser(cpf, user);
+  }
 }
-
