@@ -34,18 +34,6 @@ export class UserComponent {
     );
   }
 
-  adicionarUsuario() {
-    this.userService.adicionarUsuario(this.novoUsuario).subscribe(
-      (data) => {
-        this.resultado = data;
-        this.novoUsuario = {}; // Limpa os dados do novo usuário após adição
-      },
-      (error) => {
-        console.error('Erro ao adicionar usuário:', error);
-      }
-    );
-  }
-
   editarUsuario(cpf: string) {
     this.userService.editarUsuario(cpf, this.novoUsuario).subscribe(
       (data) => {

@@ -1,32 +1,27 @@
 import { Component } from '@angular/core';
+import { UserService } from '../user.service';
 
 @Component({
     templateUrl: './incluir_user.component.html'
 })
 export class IncluirUserComponent {
 
-    selectedState: any = null;
+    resultado: any;
+    novoUsuario: any
 
-    states: any[] = [
-        {name: 'Arizona', code: 'Arizona'},
-        {name: 'California', value: 'California'},
-        {name: 'Florida', code: 'Florida'},
-        {name: 'Ohio', code: 'Ohio'},
-        {name: 'Washington', code: 'Washington'}
-    ];
+      constructor(private userService: UserService) {}
 
-    dropdownItems = [
-        { name: 'Option 1', code: 'Option 1' },
-        { name: 'Option 2', code: 'Option 2' },
-        { name: 'Option 3', code: 'Option 3' }
-    ];
+      adicionarUsuario() {
+        this.userService.adicionarUsuario(this.novoUsuario).subscribe(
+            (data) => {
+                this.resultado = data;
+                this.novoUsuario = {}; // L impa os dados do novo usuário após adição
+            },
+            (error) => {
+                console.error('Erro ao adicionar usuário:', error);
+            }
+        );
+    }
 
-    cities1: any[] = [];
-
-    cities2: any[] = [];
-
-    city1: any = null;
-
-    city2: any = null;
 
 }
