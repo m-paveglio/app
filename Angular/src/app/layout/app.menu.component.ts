@@ -19,25 +19,37 @@ export class AppMenuComponent implements OnInit {
                 label: '',
                 items: [
                     {
-                        label: 'CADASTRO',
+                        label: 'PESSOAS',
                         icon: 'pi pi-fw pi-user',
                         items: [
                             {
-                                label: 'EMPRESAS',
-                                icon: 'pi pi-fw pi-id-card',
-                                routerLink: ['/']
+                                label: 'CONSULTAR',
+                                icon: 'pi pi-fw pi-search',
+                                routerLink: ['/consultar_user']
                             },
                             {
-                                label: 'PESSOAS',
-                                icon: 'pi pi-fw pi-user',
-                                routerLink: ['/']
+                                label: 'INCLUIR',
+                                icon: 'pi pi-fw pi-user-plus',
+                                routerLink: ['/incluir_user']
                             },
-                            {
-                                label: 'USUÁRIOS',
-                                icon: 'pi pi-fw pi-lock',
-                                routerLink: ['/user']
-                            }
                         ]
+                    },
+
+                    {
+                        label: 'EMPRESAS',
+                        icon: 'pi pi-fw pi-id-card',
+                        items: [
+                            {
+                                label: 'CONSULTAR',
+                                icon: 'pi pi-fw pi-search',
+                                routerLink: ['/consultar_empresa']
+                            },
+                            {
+                                label: 'INCLUIR',
+                                icon: 'pi pi-fw pi-lock',
+                                routerLink: ['/incluir_empresa']
+                            },
+                         ]
                     },
 
                     { label: 'Form Layout', icon: 'pi pi-fw pi-id-card', routerLink: ['/uikit/formlayout'] },

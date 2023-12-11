@@ -16,7 +16,9 @@ import { AppLayoutComponent } from "./layout/app.layout.component";
                     { path: 'documentation', loadChildren: () => import('./demo/components/documentation/documentation.module').then(m => m.DocumentationModule) },
                     { path: 'blocks', loadChildren: () => import('./demo/components/primeblocks/primeblocks.module').then(m => m.PrimeBlocksModule) },
                     { path: 'pages', loadChildren: () => import('./demo/components/pages/pages.module').then(m => m.PagesModule) },
-                    { path: 'user', loadChildren: () => import('./demo/components/uikit/user/user.module').then(m => m.UserModule) },
+                    { path: 'consultar_user', loadChildren: () => import('./demo/components/uikit/user/consultar_user/user.module').then(m => m.UserModule) },
+                    { path: 'incluir_user', loadChildren: () => import('./demo/components/uikit/user/incluir_user/incluir_user.module').then(m => m.IncluirUserModule) },
+
                 ]
             },
             { path: 'auth', loadChildren: () => import('./demo/components/auth/auth.module').then(m => m.AuthModule) },

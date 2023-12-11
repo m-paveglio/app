@@ -1,9 +1,9 @@
-import { Injectable, Inject, HttpException, HttpStatus, UnauthorizedException} from '@nestjs/common';
+import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 import { user } from 'src/user/user.entity';
 import { createUserDto } from './dto/create-user-dto';
 import { updateUserDto } from './dto/update-user-dto';
-import { CpuInfo } from 'os';
 
 @Injectable()
 export class userService {
@@ -12,20 +12,26 @@ export class userService {
     private userRepository: Repository<user>,
   ) {}
 
-    async createUser(user: createUserDto){
-      const userFound = await this.userRepository.findOne({
-        where: {
-          cpf: user.cpf
-        }
-      })
+  async createUser(userDto: createUserDto) {
+    const userFound = await this.userRepository.findOne({
+      where: {
+        cpf: userDto.cpf,
+      },
+    });
 
-      if (userFound){
-        return new HttpException('Usuário já existe', HttpStatus.CONFLICT)
-      }
-
-      const newUser = this.userRepository.create(user)
-      return this.userRepository.save(newUser) 
+    if (userFound) {
+      throw new HttpException('Usuário já existe', HttpStatus.CONFLICT);
     }
+
+    const hashedPassword = await bcrypt.hash(userDto.password, 10);
+
+    const newUser = this.userRepository.create({
+      ...userDto,
+      password: hashedPassword,
+    });
+
+    return this.userRepository.save(newUser);
+  }
 
     getUsers (){
       return this.userRepository.find()
@@ -58,16 +64,26 @@ export class userService {
       return this.userRepository.delete({cpf})
     }
 
-    async updateUser (cpf: string, user: updateUserDto){
-      const userFound = await this.userRepository.findOne
-      
+    async updateUser(cpf: string, userDto: updateUserDto) {
+      const userFound = await this.userRepository.findOne({
+        where: {
+          cpf,
+        },
+      });
+  
       if (!userFound) {
-        return new HttpException('Usuário não encontrado', HttpStatus.NOT_FOUND)
+        throw new HttpException('Usuário não encontrado', HttpStatus.NOT_FOUND);
       }
-      
-      const updateUser = Object.assign(userFound, user)
-      return this.userRepository.save (updateUser);
+  
+      // Adicione aqui a lógica de hash para a senha, se necessário
+      if (userDto.password) {
+        userDto.password = await bcrypt.hash(userDto.password, 10);
+      }
+  
+      const updatedUser = Object.assign(userFound, userDto);
+      return this.userRepository.save(updatedUser);
     }
+  
 
     findByCpf(cpf: string) {
       return this.userRepository.findOne({ where: { cpf } });
