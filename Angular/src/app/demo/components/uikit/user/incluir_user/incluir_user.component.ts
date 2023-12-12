@@ -6,6 +6,7 @@ import { UserService } from '../user.service';
 })
 export class IncluirUserComponent {
 
+    mask: String;
     resultado: any;
     novoUsuario: any = {};
 
@@ -24,4 +25,7 @@ export class IncluirUserComponent {
           }
         );
         }
+
+       
+
     }

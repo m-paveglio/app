@@ -3,6 +3,7 @@ import { UserService } from '../user.service';
 
 @Component({
   templateUrl: './user.component.html',
+
 })
 export class UserComponent {
   cpf: string;
@@ -56,4 +57,5 @@ export class UserComponent {
       }
     );
   }
+
 }

@@ -204,7 +204,7 @@
           </div>
 
 
-          <div class="field col-12 md:col-7" >
+          <div class="field col-12 md:col-5" >
             <label>COMPLEMENTO</label>
             <div style="
             font-size: 1rem;
@@ -247,7 +247,12 @@
                 <span id="resultado-UF">{{ resultado.UF }}</span>
             </div>
           </div>
-
+          <div class="p-button-success mr-2" style="display: grid; align-items: center; height: 8.4rem">
+            <button pButton pRipple label="" icon="pi pi-pencil" (click)="editarUsuario()"></button>
+          </div>
+          <div class="p-button-warning mr-2" style="display: grid; align-items: center; height: 8.4rem">
+            <button pButton label="" icon="pi pi-trash" (click)="excluirUsuario()"></button>
+          </div>
         </div>
     </div>
   </div>
