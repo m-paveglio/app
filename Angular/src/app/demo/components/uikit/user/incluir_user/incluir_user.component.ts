@@ -7,21 +7,21 @@ import { UserService } from '../user.service';
 export class IncluirUserComponent {
 
     resultado: any;
-    novoUsuario: any
+    novoUsuario: any = {};
 
       constructor(private userService: UserService) {}
 
       adicionarUsuario() {
         this.userService.adicionarUsuario(this.novoUsuario).subscribe(
-            (data) => {
-                this.resultado = data;
-                this.novoUsuario = {}; // L impa os dados do novo usuário após adição
-            },
-            (error) => {
-                console.error('Erro ao adicionar usuário:', error);
-            }
+          (data) => {
+            this.resultado = data;
+            this.novoUsuario = {};
+          },
+          (error) => {
+            console.error('Erro ao adicionar usuário:', error);
+            // Adicione esta linha para imprimir o erro detalhado no console
+            console.error('Detalhes do erro:', error.error);
+          }
         );
+        }
     }
-
-
-}

@@ -1,78 +1,76 @@
-<div class="grid">
+<div class="grid" *ngIf="novoUsuario">
     <div class="col-12">
-        <div class="card">
-            <h5>CADASTRAR</h5>
-            <div class="p-fluid p-formgrid grid">
-                <div class="field col-12 md:col-4">
-                    <label htmlFor="cpf">CPF</label>
-                    <input pInputText id="cpf" type="text" />
-                </div>
-                <div class="field col-12 md:col-8">
-                    <label htmlFor="nome">Nome</label>
-                    <input pInputText id="nome" type="text" />
-                </div>
-                <div class="field col-12 md:col-6">
-                    <label htmlFor="email">Email</label>
-                    <input pInputText id="email" type="text" />
-                </div>
-                <div class="field col-12 md:col-1">
-                    <label htmlFor="ddd">DDD</label>
-                    <input pInputText id="ddd" type="text" />
-                </div>
-                <div class="field col-12 md:col-3">
-                    <label htmlFor="telefone">Telefone/Celular</label>
-                    <input pInputText id="telefone" type="text" />
-                </div>
-                <div class="field col-12 md:col-2">
-                    <label htmlFor="dt_nascimento">Data de Nascimento</label>
-                    <input pInputText id="dt_nascimento" type="text" />
-                </div>
-
-                <div class="field col-12 md:col-3">
-                    <label htmlFor="permissao">Permissao</label>
-                    <input pInputText id="permissao" type="text" />
-                </div>
-                <div class="field col-12 md:col-3">
-                    <label htmlFor="cargo">Cargo</label>
-                    <input pInputText id="cargo" type="text" />
-                </div>
-                <div class="field col-12 md:col-6">
-                    <label htmlFor="password">Password</label>
-                    <input pInputText id="password" type="password" />
-                </div>
-                <div class="field col-12 md:col-3">
-                    <label htmlFor="cep">CEP</label>
-                    <input pInputText id="cep" type="text" />
-                </div>
-                <div class="field col-9">
-                    <label htmlFor="rua_logradouro">Rua/Logradouro</label>
-                    <input pInputText id="rua_logradouro" type="text" />
-                </div>
-                <div class="field col-12 md:col-2">
-                    <label htmlFor="numero_logradouro">Número Logradouro</label>
-                    <input pInputText id="numero_logradouro" type="text" />
-                </div>
-                <div class="field col-6 md:col-6">
-                    <label htmlFor="bairro_logradouro">Bairro Logradouro</label>
-                    <input pInputText id="bairro_logradouro" type="text" />
-                </div>
-                <div class="field col-4">
-                    <label htmlFor="complemento_logradouro">Complemento Logradouro</label>
-                    <input pInputText id="complemento_logradouro" type="text" />
-                </div>
-                <div class="field col-12 md:col-6">
-                    <label htmlFor="cidade">Cidade</label>
-                    <input pInputText id="cidade" type="text" />
-                </div>
-                <div class="field col-12 md:col-3">
-                    <label htmlFor="uf">UF</label>
-                    <input pInputText id="uf" type="text" />
-                </div>
-                <div class="buttonincluir" style="display: grid; align-items: center; height: 8.4rem">
-                    <button pButton pRipple label="SALVAR" icon="pi pi-save" (click)="adicionarUsuario()"></button>
-                </div>
-
-            </div>
+      <div class="card">
+        <h5>CADASTRAR</h5>
+        <div class="p-fluid p-formgrid grid">
+          <div class="field col-12 md:col-4">
+            <label htmlFor="cpf">CPF</label>
+            <input pInputText id="cpf" type="text" [(ngModel)]="novoUsuario.cpf" name="cpf" />
+          </div>
+          <div class="field col-12 md:col-8">
+            <label htmlFor="nome">Nome</label>
+            <input pInputText id="nome" type="text" [(ngModel)]="novoUsuario.nome" name="nome" />
+          </div>
+          <div class="field col-12 md:col-6">
+            <label htmlFor="email">Email</label>
+            <input pInputText id="email" type="text" [(ngModel)]="novoUsuario.email" name="email" />
+          </div>
+          <div class="field col-12 md:col-1">
+            <label htmlFor="ddd">DDD</label>
+            <input pInputText id="ddd" type="text" [(ngModel)]="novoUsuario.DDD" name="ddd" />
+          </div>
+          <div class="field col-12 md:col-3">
+            <label htmlFor="telefone">Telefone/Celular</label>
+            <input pInputText id="telefone" type="text" [(ngModel)]="novoUsuario.TELEFONE_CELULAR" name="telefone" />
+          </div>
+          <div class="field col-12 md:col-2">
+            <label htmlFor="dt_nascimento">Data de Nascimento</label>
+            <input pInputText id="dt_nascimento" type="text" [(ngModel)]="novoUsuario.DT_NASCIMENTO" name="dt_nascimento" />
+          </div>
+          <div class="field col-12 md:col-3">
+            <label htmlFor="permissao">Permissao</label>
+            <input pInputText id="permissao" type="text" [(ngModel)]="novoUsuario.PERMISSAO" name="permissao" />
+          </div>
+          <div class="field col-12 md:col-3">
+            <label htmlFor="cargo">Cargo</label>
+            <input pInputText id="cargo" type="text" [(ngModel)]="novoUsuario.CARGO" name="cargo" />
+          </div>
+          <div class="field col-12 md:col-6">
+            <label htmlFor="password">Password</label>
+            <input pInputText id="password" type="password" [(ngModel)]="novoUsuario.password" name="password" />
+          </div>
+          <div class="field col-12 md:col-3">
+            <label htmlFor="cep">CEP</label>
+            <input pInputText id="cep" type="text" [(ngModel)]="novoUsuario.CEP" name="cep" />
+          </div>
+          <div class="field col-9">
+            <label htmlFor="rua_logradouro">Rua/Logradouro</label>
+            <input pInputText id="rua_logradouro" type="text" [(ngModel)]="novoUsuario.RUA_LOGRADOURO" name="rua_logradouro" />
+          </div>
+          <div class="field col-12 md:col-2">
+            <label htmlFor="numero_logradouro">Número Logradouro</label>
+            <input pInputText id="numero_logradouro" type="text" [(ngModel)]="novoUsuario.NUMERO_LOGRADOURO" name="numero_logradouro" />
+          </div>
+          <div class="field col-6 md:col-6">
+            <label htmlFor="bairro_logradouro">Bairro Logradouro</label>
+            <input pInputText id="bairro_logradouro" type="text" [(ngModel)]="novoUsuario.BAIRRO_LOGRADOURO" name="bairro_logradouro" />
+          </div>
+          <div class="field col-4">
+            <label htmlFor="complemento_logradouro">Complemento Logradouro</label>
+            <input pInputText id="complemento_logradouro" type="text" [(ngModel)]="novoUsuario.COMPLEMENTO_LOGRADOURO" name="complemento_logradouro" />
+          </div>
+          <div class="field col-12 md:col-6">
+            <label htmlFor="cidade">Cidade</label>
+            <input pInputText id="cidade" type="text" [(ngModel)]="novoUsuario.CIDADE" name="cidade" />
+          </div>
+          <div class="field col-12 md:col-3">
+            <label htmlFor="uf">UF</label>
+            <input pInputText id="uf" type="text" [(ngModel)]="novoUsuario.UF" name="uf" />
+          </div>
+          <div class="buttonincluir" style="display: grid; align-items: center; height: 8.4rem">
+            <button pButton pRipple label="SALVAR" icon="pi pi-save" (click)="adicionarUsuario()"></button>
+          </div>
         </div>
+      </div>
     </div>
-</div>
+  </div>
