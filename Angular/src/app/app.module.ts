@@ -13,6 +13,11 @@ import { NodeService } from './demo/service/node.service';
 import { PhotoService } from './demo/service/photo.service';
 import { HttpClientModule } from '@angular/common/http';
 
+import { IConfig, provideEnvironmentNgxMask } from 'ngx-mask'
+
+const maskConfig: Partial<IConfig> = {
+  validation: false,
+};
 
 @NgModule({
     declarations: [
@@ -21,12 +26,14 @@ import { HttpClientModule } from '@angular/common/http';
     imports: [
         HttpClientModule,
         AppRoutingModule,
-        AppLayoutModule
+        AppLayoutModule,
+
+
     ],
     providers: [
         { provide: LocationStrategy, useClass: HashLocationStrategy },
         CountryService, CustomerService, EventService, IconService, NodeService,
-        PhotoService, ProductService
+        PhotoService, ProductService, provideEnvironmentNgxMask(maskConfig)
     ],
     bootstrap: [AppComponent]
 })

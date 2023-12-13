@@ -5,7 +5,7 @@
         <div class="p-fluid p-formgrid grid">
           <div class="field col-12 md:col-4">
             <label for="cpf">CPF</label>
-            <input pInputText id="cpf" type="text" [(ngModel)]="cpf" />
+            <input pInputText id="cpf" type="text" mask='000.000.000-00'[(ngModel)]="cpf" />
           </div>
           <div class="field col-12 md:col-7">
             <label for="nome">NOME</label>
@@ -52,7 +52,7 @@
             transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
             appearance: none;
             border-radius: 6px;">
-                <span id="resultado-cpf">{{ resultado.cpf }}</span>
+                <span id="resultado-cpf" mask='000.000.000-00'>{{ resultado.cpf }}</span>
             </div>
           </div>
 

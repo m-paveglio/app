@@ -14,6 +14,7 @@ import { MultiSelectModule } from "primeng/multiselect";
 import { InputTextareaModule } from "primeng/inputtextarea";
 import { InputTextModule } from "primeng/inputtext";
 import { ButtonModule } from 'primeng/button';
+import { NgxMaskDirective, NgxMaskPipe } from 'ngx-mask';
 
 @NgModule({
 	imports: [
@@ -30,7 +31,8 @@ import { ButtonModule } from 'primeng/button';
 		MultiSelectModule,
 		InputTextareaModule,
 		InputTextModule,
-        ButtonModule
+        ButtonModule,
+        NgxMaskPipe, NgxMaskDirective
 	],
 	declarations: [UserComponent]
 })

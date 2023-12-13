@@ -5,7 +5,7 @@
         <div class="p-fluid p-formgrid grid">
           <div class="field col-12 md:col-4">
             <label htmlFor="cpf">CPF</label>
-            <input pInputText id="cpf" type="text" [(ngModel)]="novoUsuario.cpf" name="cpf" />
+            <input pInputText id="cpf" type="text" mask='000.000.000-00'[(ngModel)]="novoUsuario.cpf" name="cpf" />
           </div>
           <div class="field col-12 md:col-8">
             <label htmlFor="nome">Nome</label>
@@ -21,11 +21,11 @@
           </div>
           <div class="field col-12 md:col-3">
             <label htmlFor="telefone">Telefone/Celular</label>
-            <input pInputText id="telefone" type="text" [(ngModel)]="novoUsuario.TELEFONE_CELULAR" name="telefone" />
+            <input pInputText id="telefone" type="text" mask='0 0000-0000'[(ngModel)]="novoUsuario.TELEFONE_CELULAR" name="telefone" />
           </div>
           <div class="field col-12 md:col-2">
             <label htmlFor="dt_nascimento">Data de Nascimento</label>
-            <input pInputText id="dt_nascimento" type="text" [(ngModel)]="novoUsuario.DT_NASCIMENTO" name="dt_nascimento" />
+            <input pInputText id="dt_nascimento" type="text" mask='00/00/0000'[(ngModel)]="novoUsuario.DT_NASCIMENTO" name="dt_nascimento" />
           </div>
           <div class="field col-12 md:col-3">
             <label htmlFor="permissao">Permissao</label>
@@ -41,7 +41,7 @@
           </div>
           <div class="field col-12 md:col-3">
             <label htmlFor="cep">CEP</label>
-            <input pInputText id="cep" type="text" [(ngModel)]="novoUsuario.CEP" name="cep" />
+            <input pInputText id="cep" type="text" mask='00000-000'[(ngModel)]="novoUsuario.CEP" name="cep" />
           </div>
           <div class="field col-9">
             <label htmlFor="rua_logradouro">Rua/Logradouro</label>
