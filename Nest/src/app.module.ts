@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { userModule } from './user/user.module';
-import { AuthModule } from './auth/auth.module';
-import { CepModule } from './cep/cep.module';
+import { userModule } from './login/user/user.module';
+import { AuthModule } from './login/auth/auth.module';
+import { CepModule } from './geral/endereco/cep/cep.module';
 
 
 @Module({
