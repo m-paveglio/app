@@ -6,18 +6,25 @@ export const databaseProviders = [
     useFactory: async () => {
       const dataSource = new DataSource({
         type: 'mysql',
-        host: 'localhost',
+        host: 'mysql.railway.internal',
         port: 3306,
-        username: 'root',
-        password: '081099',
-        database: 'mydb',
+        username: 'root', // Alterado para 'root' conforme as credenciais fornecidas
+        password: 'UjbaHHhVKbzuEWYqauWhsZmAblJHbcfD', // Alterado para a senha fornecida
+        database: 'railway',
         entities: [
-            __dirname + '/../**/*.entity{.ts,.js}',
+          __dirname + '/../**/*.entity{.ts,.js}',
         ],
         synchronize: true,
       });
 
-      return dataSource.initialize();
+      try {
+        await dataSource.connect(); // Adjusted to connect()
+        console.log("Conexão ao banco de dados MySQL estabelecida com sucesso!");
+      } catch (error) {
+        console.error("Erro ao conectar ao banco de dados MySQL:", error);
+      }
+
+      return dataSource;
     },
   },
 ];
