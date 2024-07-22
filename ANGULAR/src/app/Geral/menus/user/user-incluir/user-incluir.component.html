@@ -1,0 +1,62 @@
+<div class="grid" *ngIf="novoUsuario">
+    <div class="col-12">
+      <div class="p-inputtext p-component p-element" >
+
+        <h5 class="text-center" [ngStyle]="{backgroundColor:'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}">INCLUIR USUÁRIO</h5>
+
+    <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
+          <div class="field col-12 md:col-4">
+            <span class="p-float-label">
+              <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled" mask='000.000.000-00'[(ngModel)]="novoUsuario.CPF" name="CPF">
+              <label for="float-input">CPF</label>
+            </span>
+          </div>
+
+          <div class="field col-12 md:col-8">
+            <span class="p-float-label">
+              <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled" [(ngModel)]="novoUsuario.NOME" name="NOME">
+              <label for="float-input">Nome</label>
+            </span>
+          </div>
+
+          <div class="field col-12 md:col-4">
+            <span class="p-float-label">
+              <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled" [(ngModel)]="novoUsuario.EMAIL" name="email">
+              <label for="float-input">E-mail</label>
+            </span>
+          </div>
+
+          <div class="field col-12 md:col-2">
+            <span class="p-float-label">
+              <p-dropdown id="float-input" [(ngModel)]="novoUsuario.COD_PERMISSAO" name="permissao" [options]="permissoes" optionLabel="nome" optionValue="codigo"></p-dropdown>
+              <label for="float-input">Permissão</label>
+            </span>
+          </div>
+
+          <div class="field col-12 md:col-2">
+            <span class="p-float-label">
+              <input id="float-input" type="password" pinputtext="" class="p-inputtext p-component p-element p-filled"  [(ngModel)]="novoUsuario.SENHA" name="SENHA" >
+              <label for="float-input">Senha</label>
+            </span>
+          </div>
+    
+        <div class="field col-12 md:col-2">
+            <span class="p-float-label">
+              <p-dropdown id="float-input" [ngStyle]="{'padding': '0px'}" [(ngModel)]="novoUsuario.USER_SIS" name="USER_SIS" [options]="USER_SIS" optionLabel="nome" optionValue="codigo"></p-dropdown>
+              <label for="float-input">USUÁRIO</label>
+            </span>
+          </div>
+
+          <div class="btn-group field col-12 md:col-1 flex flex-wrap gap-3 justify-content-center" role="group" aria-label="Third group">
+            <p-button icon="pi pi-save" severity="success" (click)="adicionarUsuario()"/>
+          </div>
+        
+          <div class="mensagem" [ngClass]="{ 'success': isCadastroSucesso, 'error': !isCadastroSucesso }" *ngIf="exibirMensagem">
+            {{ mensagem }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  

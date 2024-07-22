@@ -1,0 +1,101 @@
+<div class="grid" *ngIf="novoUsuario">
+    <div class="col-12">
+      <div class="p-inputtext p-component p-element" >
+
+        <h5 class="text-center" [ngStyle]="{backgroundColor:'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}"> CONSULTAR USUÁRIO</h5>
+
+    <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
+          <div class="field col-12 md:col-4">
+            <span class="p-float-label">
+              <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled" mask='000.000.000-00'[(ngModel)]="cpf" name="CPF">
+              <label for="float-input">CPF</label>
+            </span>
+          </div>
+
+          <div class="field col-12 md:col-7">
+            <span class="p-float-label">
+              <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled" [(ngModel)]="nome" name="NOME">
+              <label for="float-input">Nome</label>
+            </span>
+          </div>
+
+          <div class="btn-group field col-12 md:col-1 flex flex-wrap gap-3 justify-content-center" role="group" aria-label="Third group">
+            <p-button icon="pi pi-search" severity="success" (click)="buscarPorCpf()"/>
+          </div>
+                
+    </div>
+
+
+  <div *ngIf="resultado">
+          <h5 class="text-center" [ngStyle]="{backgroundColor:'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}"> DADOS PRELIMINARES</h5>
+  
+        <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
+            <div class="field col-12 md:col-4">
+            <span class="p-float-label">
+              <input id="resultado-cpf" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled" mask='000.000.000-00' [(ngModel)]="resultado.CPF" name="CPF" readonly>
+              <label for="resultado-cpf">CPF</label>
+            </span>
+          </div>
+
+
+        <div class="field col-12 md:col-8">
+          <span class="p-float-label">
+            <input id="resultado-nome" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled" [(ngModel)]="resultado.NOME" name="Nome" readonly>
+            <label for="resultado-nome">Nome</label>
+          </span>
+        </div>
+        
+        <div class="field col-12 md:col-4">
+          <span class="p-float-label">
+            <input id="resultado-email" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled" [(ngModel)]="resultado.EMAIL" name="E-mail" readonly>
+            <label for="resultado-email">E-mail</label>
+          </span>
+        </div>
+        
+        <div class="field col-12 md:col-2">
+          <span class="p-float-label">
+            <input id="resultado-permissao" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled" [(ngModel)]="nomePermissao" name="Permissão" readonly>
+            <label for="resultado-permissao">Permissão</label>
+          </span>
+        </div>
+
+        
+        <div class="field col-12 md:col-2">
+          <span class="p-float-label">
+            <input id="resultado-senha" type="password" pinputtext="" class="p-inputtext p-component p-element p-filled" [(ngModel)]="resultado.SENHA" name="Senha" readonly>
+            <label for="resultado-senha">Senha</label>
+          </span>
+        </div>
+        
+        <div class="field col-12 md:col-1">
+          <span class="p-float-label">
+            <input id="resultado-user_sis" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled" [(ngModel)]="user_sis_nome" name="ATIVO" readonly>
+            <label for="resultado-user_sis">ATIVO</label>
+          </span>
+        </div>
+
+          <div class="btn-group field col-12 md:col-1 flex flex-wrap gap-3 justify-content-center" role="group" aria-label="Third group">
+            <button type="button" class="btn btn-primary" (click)="editarUsuario(resultado.CPF)">
+                <i class="pi pi-pencil"></i> 
+            </button>
+          </div>
+          <div class="btn-group field col-12 md:col-1 flex flex-wrap gap-3 justify-content-center" role="group" aria-label="Third group">
+            <button type="button" class="btn btn-danger" (click)="excluirUsuario(resultado.CPF)">
+                <i class="pi pi-trash"></i> 
+            </button>
+          </div>
+          <div class="btn-group field col-12 md:col-1 flex flex-wrap gap-3 justify-content-center" role="group" aria-label="Third group">
+            <button type="button" class="btn btn-success" (click)="novoUsuario(resultado.CPF)">
+              <i class="pi pi-check"></i> 
+            </button>
+          </div>
+          
+          
+                  
+        </div>
+             
+      </div>
+    </div>
+  </div>
+
+
