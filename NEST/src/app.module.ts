@@ -9,12 +9,12 @@ import { PaisModule } from './Geral/Outros/Endereco/Pais/pais.module';
 import { CidadesModule } from './Geral/Outros/Endereco/Cidades/cidades.module';
 import { LogradouroModule } from './Geral/Outros/Endereco/Logradouro/logradouro.module';
 import { ProfissoesModule } from './Geral/Outros/Profissoes/profissoes.module';
-import { ItemLc116Module } from './Geral/NFS-E/Nfse-itens/Item_LC_116/item_lc_116.module';
-import { CnaeModule } from './Geral/NFS-E/Nfse-itens/Cnae/cnae.module';
-import { AtividadesMunicipaisModule } from './Geral/NFS-E//Nfse-itens/Atividades_Municipais/atividades_municipais.module';
-import { NbsModule } from './Geral/NFS-E/Nfse-itens/nbs/nbs.module';
+import { ItemLc116Module } from './Geral/NFSE/Nfse-itens/Item_LC_116/item_lc_116.module';
+import { CnaeModule } from './Geral/NFSE/Nfse-itens/Cnae/cnae.module';
+import { AtividadesMunicipaisModule } from './Geral/NFSE/Nfse-itens/Atividades_Municipais/atividades_municipais.module';
+import { NbsModule } from './Geral/NFSE/Nfse-itens/nbs/nbs.module';
 import { pessoasModule } from './Geral/Pessoas/pessoas.module';
-import { nfseModule } from './Geral/NFS-E/nfse/nfse.module';
+import { nfseModule } from './Geral/NFSE/nfse/nfse.module';
 
 
 @Module({
