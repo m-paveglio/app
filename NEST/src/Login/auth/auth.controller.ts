@@ -1,6 +1,5 @@
-import { Body, Controller, Post, HttpCode, HttpStatus, Request, UseGuards, Get } from '@nestjs/common';
+import { Body, Controller, Post, HttpCode, HttpStatus, Request } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
@@ -10,5 +9,15 @@ export class AuthController {
   @Post('login')
   async login(@Body('CPF') CPF: string, @Body('SENHA') SENHA: string): Promise<any> {
     return this.authService.signIn(CPF, SENHA);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('logout')
+  async logout(@Request() req): Promise<any> {
+    const token = req.headers.authorization?.split(' ')[1]; // Obter o token do header
+    if (token) {
+      await this.authService.logout(token);
+    }
+    return { message: 'Logout successful' };
   }
 }

@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+  styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
   credentials = { CPF: '', SENHA: '' };
@@ -16,24 +16,28 @@ export class LoginComponent {
   constructor(private loginService: LoginService, private router: Router) { }
 
   onCPFInputChange(event: any) {
-      this.credentials.CPF = event.target.value;
+    // Atualiza o CPF removendo pontos e hífens enquanto o usuário digita
+    this.credentials.CPF = event.target.value.replace(/[.\-]/g, '');
   }
 
   onPasswordInputChange(event: any) {
-      this.credentials.SENHA = event.target.value;
+    this.credentials.SENHA = event.target.value;
   }
 
   onLogin() {
-      this.loginService.login(this.credentials).subscribe(
-        (response) => {
-          console.log('Login bem-sucedido!', response);
-          this.router.navigate(['/dashboard']);
-        },
-        (error) => {
-          console.error('Erro no login:', error);
-          this.processarErro(error);
-        }
-      );
+    // Remove os pontos e hífens do CPF antes de fazer login
+    this.credentials.CPF = this.credentials.CPF.replace(/[.\-]/g, '');
+
+    this.loginService.login(this.credentials).subscribe(
+      (response) => {
+        console.log('Login bem-sucedido!', response);
+        this.router.navigate(['/dashboard']);
+      },
+      (error) => {
+        console.error('Erro no login:', error);
+        this.processarErro(error);
+      }
+    );
   }
 
   processarErro(mensagemErro: string) {

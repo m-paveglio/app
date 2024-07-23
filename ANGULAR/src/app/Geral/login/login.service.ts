@@ -1,31 +1,67 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, BehaviorSubject, throwError } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
+import { isPlatformBrowser } from '@angular/common';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LoginService {
   private apiUrl = 'http://localhost:3000/auth/login';
+  private tokenKey = 'authToken';
+  private userNameKey = 'userName'; // Novo item para armazenar o nome do usuário
+  private isLoggedInSubject = new BehaviorSubject<boolean>(this.hasToken());
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {}
 
   login(credentials: { CPF: string, SENHA: string }): Observable<any> {
-    return this.http.post(`${this.apiUrl}`, credentials).pipe(
+    return this.http.post<{ access_token: string, user: { nome: string } }>(this.apiUrl, credentials).pipe(
+      tap(response => this.handleLoginSuccess(response.access_token, response.user.nome)),
       catchError(this.handleError)
     );
   }
 
+  logout(): void {
+    if (this.isBrowser()) {
+      localStorage.removeItem(this.tokenKey);
+      localStorage.removeItem(this.userNameKey); // Remover o nome do usuário
+    }
+    this.isLoggedInSubject.next(false);
+  }
+
+  isAuthenticated(): Observable<boolean> {
+    return this.isLoggedInSubject.asObservable();
+  }
+
+  getUserName(): string | null {
+    return this.isBrowser() ? localStorage.getItem(this.userNameKey) : null;
+  }
+
+  private handleLoginSuccess(token: string, userName: string): void {
+    if (this.isBrowser()) {
+      localStorage.setItem(this.tokenKey, token);
+      localStorage.setItem(this.userNameKey, userName); // Armazenar o nome do usuário
+    }
+    this.isLoggedInSubject.next(true);
+  }
+
+  private hasToken(): boolean {
+    return this.isBrowser() && !!localStorage.getItem(this.tokenKey);
+  }
+
+  private isBrowser(): boolean {
+    return isPlatformBrowser(this.platformId);
+  }
+
   private handleError(error: HttpErrorResponse) {
     if (error.status === 401) {
-      // Credenciais inválidas
       return throwError('Credenciais inválidas. Verifique seu CPF e senha.');
     } else {
-      // Outros erros
       return throwError('Erro ao tentar fazer login. Tente novamente mais tarde.');
     }
   }
-
-  
 }

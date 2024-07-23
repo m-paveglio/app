@@ -1,5 +1,5 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
-import { BrowserModule, provideClientHydration } from '@angular/platform-browser';
+import { BrowserModule, provideClientHydration} from '@angular/platform-browser';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -7,7 +7,7 @@ import { PagInicialComponent } from './pag-inicial/pag-inicial.component';
 import { LoginComponent } from './Geral/login/login.component';
 import { DashboardComponent } from './Geral/dashboard/dashboard.component';
 import { FormsModule, NgModel, ReactiveFormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, provideHttpClient, withFetch } from '@angular/common/http';
 import { NgxMaskModule } from 'ngx-mask';
 import { AppLayoutModule } from './layout/app.layout.module';
 import { UserConsultarComponent } from './Geral/menus/user/user-consultar/user-consultar.component';
@@ -54,6 +54,7 @@ import { GerarNfseComponent } from './Geral/menus/nfse/enviar/gerar-nfse.compone
   providers: [
     provideClientHydration(),
     provideAnimationsAsync(),
+    provideHttpClient(withFetch())
   ],
   bootstrap: [AppComponent]
 })

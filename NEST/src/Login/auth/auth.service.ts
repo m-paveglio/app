@@ -1,13 +1,13 @@
 import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { user } from '../user/user.entity';
-import { cpf } from 'cpf-cnpj-validator';
 
 @Injectable()
 export class AuthService {
+  private revokedTokens: Set<string> = new Set(); // Lista de tokens revogados
+
   constructor(
     @Inject('USER_REPOSITORY')
     private userRepository: Repository<user>,
@@ -18,11 +18,10 @@ export class AuthService {
     // Garantir que o CPF não tenha espaços extras
     CPF = CPF.trim();
 
-
     const user = await this.userRepository.findOne({ where: { CPF } });
 
     if (!user) {
-      throw new UnauthorizedException('USUÁRIO NÃO AUTORIZADDO');
+      throw new UnauthorizedException('USUÁRIO NÃO AUTORIZADO');
     }
 
     // Verificar se o campo USER_SIS está correto
@@ -39,8 +38,24 @@ export class AuthService {
 
     // Gerar e retornar o token JWT
     const payload = { sub: user.CPF };
+    const accessToken = await this.Jwtservice.signAsync(payload);
+
     return {
-      access_token: await this.Jwtservice.signAsync(payload),
+      access_token: accessToken,
+      user: {
+        nome: user.NOME, // Certifique-se de que o campo 'nome' está presente no modelo de usuário
+        CPF: user.CPF,
+      },
     };
+  }
+
+  async logout(token: string): Promise<void> {
+    // Adicionar o token à lista de revogados
+    this.revokedTokens.add(token);
+  }
+
+  isTokenRevoked(token: string): boolean {
+    // Verificar se o token está na lista de revogados
+    return this.revokedTokens.has(token);
   }
 }
