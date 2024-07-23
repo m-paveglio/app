@@ -13,6 +13,7 @@ export class UserConsultarComponent {
   nome: string ='';
   resultado: any;
   novoUsuario: any = {}; // Dados do novo usuário a serem adicionados ou editados
+  editMode = false;
   permissoes = [
     {nome: 'Administrador', codigo: '1'},
     {nome: 'Suporte', codigo: '2'},
@@ -66,6 +67,7 @@ export class UserConsultarComponent {
     this.userService.editarUsuario(cpf, this.novoUsuario).subscribe(
       (data) => {
         this.resultado = data;
+        this.editMode = true;
         this.novoUsuario = {}; // Limpa os dados do novo usuário após edição
         this.isEditing = true;
       },
@@ -107,5 +109,10 @@ export class UserConsultarComponent {
   getUserSisNome(codigo: string) {
     let USER_SIS = this.USER_SIS.find(u => u.codigo === codigo);
     return USER_SIS ? USER_SIS.nome : '';
+  }
+
+  salvarUsuario(cpf: string) {
+    this.editMode = false;
+    // Lógica adicional para salvar o usuário
   }
 }

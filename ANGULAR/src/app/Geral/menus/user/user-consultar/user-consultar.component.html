@@ -19,7 +19,7 @@
             </span>
           </div>
 
-          <div class="btn-group field col-12 md:col-1 flex flex-wrap gap-3 justify-content-center" role="group" aria-label="Third group">
+          <div class="btn-group field col-12 md:col-1 flex flex-wrap gap-3" role="group" aria-label="Third group">
             <p-button icon="pi pi-search" severity="success" (click)="buscarPorCpf()"/>
           </div>
                 
@@ -73,27 +73,13 @@
             <label for="resultado-user_sis">ATIVO</label>
           </span>
         </div>
-
-          <div class="btn-group field col-12 md:col-1 flex flex-wrap gap-3 justify-content-center" role="group" aria-label="Third group">
-            <button type="button" class="btn btn-primary" (click)="editarUsuario(resultado.CPF)">
-                <i class="pi pi-pencil"></i> 
-            </button>
-          </div>
-          <div class="btn-group field col-12 md:col-1 flex flex-wrap gap-3 justify-content-center" role="group" aria-label="Third group">
-            <button type="button" class="btn btn-danger" (click)="excluirUsuario(resultado.CPF)">
-                <i class="pi pi-trash"></i> 
-            </button>
-          </div>
-          <div class="btn-group field col-12 md:col-1 flex flex-wrap gap-3 justify-content-center" role="group" aria-label="Third group">
-            <button type="button" class="btn btn-success" (click)="novoUsuario(resultado.CPF)">
-              <i class="pi pi-check"></i> 
-            </button>
-          </div>
-          
-          
-                  
-        </div>
-             
+        <div class="btn-group field col-12 md:col-1 flex flex-wrap gap-3" role="group" aria-label="Third group">
+          <p-button *ngIf="!editMode" icon="pi pi-pencil" severity="info" (click)="editarUsuario(resultado.CPF)">
+          </p-button>
+          <p-button *ngIf="editMode" icon="pi pi-save" severity="success" (click)="salvarUsuario(resultado.CPF)">
+          </p-button>
+        </div>   
+        </div>   
       </div>
     </div>
   </div>
