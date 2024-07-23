@@ -14,7 +14,7 @@ import { CnaeModule } from './Geral/NFSE/Nfse-itens/Cnae/cnae.module';
 import { AtividadesMunicipaisModule } from './Geral/NFSE/Nfse-itens/Atividades_Municipais/atividades_municipais.module';
 import { NbsModule } from './Geral/NFSE/Nfse-itens/nbs/nbs.module';
 import { pessoasModule } from './Geral/Pessoas/pessoas.module';
-import { nfseModule } from './Geral/NFSE/nfse/nfse.module';
+import { nfseModule } from './Geral/NFSE/nfse/gerar/nfse.module';
 
 
 @Module({

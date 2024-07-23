@@ -1,11 +1,9 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class  user {
-  @PrimaryGeneratedColumn()
-  ID: number;
 
-  @Column({ length: 11, unique: true })
+  @PrimaryColumn({ length: 11, unique: true })
   CPF: string;
 
   @Column({ type: 'varchar', length: 100 })
