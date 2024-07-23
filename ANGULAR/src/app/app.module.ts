@@ -18,6 +18,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { MatDialogContent, MatDialogModule } from '@angular/material/dialog';
 import { ConfirmationDialog } from './Geral/menus/user/user-consultar/confirmacao.component';
 import { UserRelatorioComponent } from './Geral/menus/user/user-relatorio/user-relatorio.component';
+import { GerarNfseComponent } from './Geral/menus/nfse/enviar/gerar-nfse.component';
 
 
 
@@ -32,7 +33,8 @@ import { UserRelatorioComponent } from './Geral/menus/user/user-relatorio/user-r
     UserConsultarComponent,
     UserIncluirComponent,
     UserRelatorioComponent,
-    ConfirmationDialog
+    ConfirmationDialog,
+    GerarNfseComponent
         ],
   imports: [
     BrowserModule,

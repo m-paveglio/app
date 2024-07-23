@@ -8,6 +8,7 @@ import path from 'path';
 import { UserIncluirComponent } from './Geral/menus/user/user-incluir/user-incluir.component';
 import { UserConsultarComponent } from './Geral/menus/user/user-consultar/user-consultar.component';
 import { UserRelatorioComponent } from './Geral/menus/user/user-relatorio/user-relatorio.component';
+import { GerarNfseComponent } from './Geral/menus/nfse/enviar/gerar-nfse.component';
 
 const routes: Routes = [
 {path: '', component: PagInicialComponent},
@@ -22,8 +23,15 @@ const routes: Routes = [
                           {path: 'userrelatorio', component: UserRelatorioComponent}
                         ]
                     },
-                  ]}
-];
+                    { path: 'nfse', children:
+                      [
+                        {path: 'gerar', component: GerarNfseComponent},
+                        {path: 'consultar', component: UserConsultarComponent},
+                      ]
+                    },
+                          ]
+  }
+]
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],

@@ -36,6 +36,19 @@ export class AppMenuComponent implements OnInit {
                         },
                         ],
                      },  
+                     { label: 'Nota Eletrônica', icon: 'pi pi-fw pi-dollar', items: [
+                        {
+                            label: 'Nova Nota',
+                            icon: 'pi pi-fw pi-file-export',
+                            routerLink: ['nfse/gerar']
+                        },
+                        {
+                            label: 'Consultar',
+                            icon: 'pi pi-fw pi-search',
+                            routerLink: ['user/consultar']
+                        },
+                        ],
+                     },  
                         ]
             },
 

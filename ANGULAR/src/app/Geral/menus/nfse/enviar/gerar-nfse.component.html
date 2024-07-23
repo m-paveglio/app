@@ -1,0 +1,66 @@
+<div class="grid" *ngIf="nfseData">
+  <div class="col-12">
+    <div class="p-inputtext p-component p-element">
+
+      <h5 class="text-center" [ngStyle]="{backgroundColor:'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}">EMISSÃO DE NOTA FISCAL</h5>
+
+      <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
+        <div class="field col-12 md:col-1">
+          <span class="p-float-label">
+            <input id="float-input" type="text" pinputtext class="p-inputtext p-component p-element p-filled" [(ngModel)]="nfseData.numero" name="numero">
+            <label for="float-input">Número</label>
+          </span>
+        </div>
+
+        <div class="field col-12 md:col-1">
+          <span class="p-float-label">
+            <input id="float-input" type="text" pinputtext class="p-inputtext p-component p-element p-filled" [(ngModel)]="nfseData.serie" name="serie">
+            <label for="float-input">Série</label>
+          </span>
+        </div>
+
+        <div class="field col-12 md:col-1">
+          <span class="p-float-label">
+            <input id="float-input" type="text" pinputtext class="p-inputtext p-component p-element p-filled" [(ngModel)]="nfseData.tipo" name="tipo">
+            <label for="float-input">Tipo</label>
+          </span>
+        </div>
+
+        <div class="field col-12 md:col-2">
+          <span class="p-float-label">
+            <input id="float-input" type="date" pinputtext class="p-inputtext p-component p-element p-filled" [(ngModel)]="nfseData.dataEmissao" name="dataEmissao">
+            <label for="float-input">Data de Emissão</label>
+          </span>
+        </div>
+
+        <div class="field col-12 md:col-1">
+          <span class="p-float-label">
+            <input id="float-input" type="text" pinputtext class="p-inputtext p-component p-element p-filled" [(ngModel)]="nfseData.status" name="status">
+            <label for="float-input">Status</label>
+          </span>
+        </div>
+
+        <div class="field col-12 md:col-2">
+          <span class="p-float-label">
+            <input id="float-input" type="date" pinputtext class="p-inputtext p-component p-element p-filled" [(ngModel)]="nfseData.competencia" name="competencia">
+            <label for="float-input">Competência</label>
+          </span>
+        </div>
+
+        <div class="field col-12 md:col-4">
+          <span class="p-float-label">
+            <input id="float-input" type="text" pinputtext class="p-inputtext p-component p-element p-filled" [(ngModel)]="nfseData.valorServicos" name="valorServicos">
+            <label for="float-input">Valor dos Serviços</label>
+          </span>
+        </div>
+
+        <!-- Adicione os demais campos conforme necessário -->
+
+        <div class="btn-group field col-12 md:col-1 flex flex-wrap gap-3 justify-content-center" role="group" aria-label="Third group">
+          <p-button icon="pi pi-check" severity="success" (click)="onSubmit()"/>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

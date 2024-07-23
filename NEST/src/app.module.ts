@@ -14,10 +14,11 @@ import { CnaeModule } from './Geral/NFS-E/Nfse-itens/Cnae/cnae.module';
 import { AtividadesMunicipaisModule } from './Geral/NFS-E//Nfse-itens/Atividades_Municipais/atividades_municipais.module';
 import { NbsModule } from './Geral/NFS-E/Nfse-itens/nbs/nbs.module';
 import { pessoasModule } from './Geral/Pessoas/pessoas.module';
+import { nfseModule } from './Geral/NFS-E/nfse/nfse.module';
 
 
 @Module({
-  imports: [userModule, AuthModule, pessoasModule,PermissoesModule, UfModule, PaisModule, CidadesModule, LogradouroModule, ProfissoesModule, ItemLc116Module, CnaeModule, AtividadesMunicipaisModule, NbsModule],
+  imports: [userModule, AuthModule, nfseModule, pessoasModule,PermissoesModule, UfModule, PaisModule, CidadesModule, LogradouroModule, ProfissoesModule, ItemLc116Module, CnaeModule, AtividadesMunicipaisModule, NbsModule],
   controllers: [AppController],
   providers: [AppService],
 })
