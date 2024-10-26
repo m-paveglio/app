@@ -6,5 +6,6 @@
             "name": "sqlite",
             "database": "${workspaceFolder:app}/NEST/database.sqlite"
         }
-    ]
+    ],
+    "sqltools.useNodeRuntime": true
 }

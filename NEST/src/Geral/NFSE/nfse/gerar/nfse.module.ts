@@ -1,11 +1,10 @@
+// src/nfse/nfse.module.ts
 import { Module } from '@nestjs/common';
-import { NfseController } from './nfse.controller';
 import { NfseService } from './nfse.service';
+import { NfseController } from './nfse.controller';
 
 @Module({
-  imports: [],
   controllers: [NfseController],
-  providers: [NfseService,
-  ],
+  providers: [NfseService],
 })
 export class nfseModule {}

@@ -1,14 +1,13 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { NfseService } from './nfse.service';
+import { NfseDto } from './nfse.dto';
 
-@Controller('nfse')
+@Controller('nfs')
 export class NfseController {
-  constructor(private readonly nfseService: NfseService) {}
+  constructor(private readonly nfsService: NfseService) {}
 
-  @Post()
-  async generateNfse(@Body() nfseData: any) {
-    const xml = this.nfseService.generateXml(nfseData);
-    const response = await this.nfseService.sendXmlToWebService(xml);
-    return response;
+  @Post('gerar')
+  async gerarNfse(@Body() nfsDto: NfseDto) {
+    return this.nfsService.gerarNfse(nfsDto);
   }
 }

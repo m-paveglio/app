@@ -1,141 +1,127 @@
-// src/nfse/nfse.service.ts
 import { Injectable } from '@nestjs/common';
-import * as xmlbuilder from 'xmlbuilder';
-import axios from 'axios';
+import { NfseDto } from './nfse.dto';
+import * as xml2js from 'xml2js'; // Para manipulação de XML
+import { SignedXml } from 'xml-crypto';
+import * as fs from 'fs';
+import * as forge from 'node-forge'; // Importando node-forge
 
 @Injectable()
 export class NfseService {
-  generateXml(nfseData: any): string {
-    const xml = xmlbuilder.create('soap:Envelope', { encoding: 'UTF-8' })
-      .att('xmlns:soap', 'http://schemas.xmlsoap.org/soap/envelope/')
-      .att('xmlns:svc', 'http://nfse.abrasf.org.br')
-      .ele('soap:Body')
-        .ele('svc:GerarNfse')
-          .ele('nfseCabecMsg')
-            .ele('cabecalho', { versao: '1.00' })
-              .ele('versaoDados', '2.04').up()
-            .up()
-          .up()
-          .ele('nfseDadosMsg')
-            .ele('GerarNfseEnvio', { xmlns: 'http://www.abrasf.org.br/nfse.xsd' })
-              .ele('Rps')
-                .ele('InfDeclaracaoPrestacaoServico')
-                  .ele('Rps')
-                    .ele('IdentificacaoRps')
-                      .ele('Numero', nfseData.numero).up()
-                      .ele('Serie', nfseData.serie).up()
-                      .ele('Tipo', nfseData.tipo).up()
-                    .up()
-                    .ele('DataEmissao', nfseData.dataEmissao).up()
-                    .ele('Status', nfseData.status).up()
-                  .up()
-                  .ele('Competencia', nfseData.competencia).up()
-                  .ele('Servico')
-                    .ele('Valores')
-                      .ele('ValorServicos', nfseData.valorServicos).up()
-                      .ele('ValorDeducoes', nfseData.valorDeducoes).up()
-                      .ele('ValorPis', nfseData.valorPis).up()
-                      .ele('ValorCofins', nfseData.valorCofins).up()
-                      .ele('ValorInss', nfseData.valorInss).up()
-                      .ele('ValorIr', nfseData.valorIr).up()
-                      .ele('ValorCsll', nfseData.valorCsll).up()
-                      .ele('OutrasRetencoes', nfseData.outrasRetencoes).up()
-                      .ele('ValTotTributos', nfseData.valTotTributos).up()
-                      .ele('ValorIss', nfseData.valorIss).up()
-                      .ele('Aliquota', nfseData.aliquota).up()
-                      .ele('DescontoIncondicionado', nfseData.descontoIncondicionado).up()
-                      .ele('DescontoCondicionado', nfseData.descontoCondicionado).up()
-                    .up()
-                    .ele('IssRetido', nfseData.issRetido).up()
-                    .ele('ResponsavelRetencao', nfseData.responsavelRetencao).up()
-                    .ele('ItemListaServico', nfseData.itemListaServico).up()
-                    .ele('CodigoCnae', nfseData.codigoCnae).up()
-                    .ele('CodigoTributacaoMunicipio', nfseData.codigoTributacaoMunicipio).up()
-                    .ele('CodigoNbs', nfseData.codigoNbs).up()
-                    .ele('Discriminacao', nfseData.discriminacao).up()
-                    .ele('CodigoMunicipio', nfseData.codigoMunicipio).up()
-                    .ele('ExigibilidadeISS', nfseData.exigibilidadeISS).up()
-                    .ele('MunicipioIncidencia', nfseData.municipioIncidencia).up()
-                  .up()
-                  .ele('Prestador')
-                    .ele('CpfCnpj')
-                      .ele('Cnpj', nfseData.prestadorCnpj).up()
-                      .ele('Cpf', nfseData.prestadorCpf).up()
-                    .up()
-                    .ele('InscricaoMunicipal', nfseData.prestadorInscricaoMunicipal).up()
-                  .up()
-                  .ele('TomadorServico')
-                    .ele('IdentificacaoTomador')
-                      .ele('CpfCnpj')
-                        .ele('Cnpj', nfseData.tomadorCnpj).up()
-                        .ele('Cpf', nfseData.tomadorCpf).up()
-                      .up()
-                      .ele('InscricaoMunicipal', nfseData.tomadorInscricaoMunicipal).up()
-                    .up()
-                    .ele('NifTomador', nfseData.nifTomador).up()
-                    .ele('RazaoSocial', nfseData.razaoSocial).up()
-                    .ele('Endereco')
-                      .ele('Endereco', nfseData.endereco).up()
-                      .ele('Numero', nfseData.numero).up()
-                      .ele('Complemento', nfseData.complemento).up()
-                      .ele('Bairro', nfseData.bairro).up()
-                      .ele('CodigoMunicipio', nfseData.codigoMunicipio).up()
-                      .ele('Uf', nfseData.uf).up()
-                      .ele('Cep', nfseData.cep).up()
-                    .up()
-                    .ele('EnderecoExterior')
-                      .ele('CodigoPais', nfseData.codigoPais).up()
-                      .ele('EnderecoCompletoExterior', nfseData.enderecoCompletoExterior).up()
-                    .up()
-                    .ele('Contato')
-                      .ele('Telefone', nfseData.telefone).up()
-                      .ele('Email', nfseData.email).up()
-                    .up()
-                  .up()
-                  .ele('RegimeEspecialTributacao', nfseData.regimeEspecialTributacao).up()
-                  .ele('OptanteSimplesNacional', nfseData.optanteSimplesNacional).up()
-                  .ele('IncentivoFiscal', nfseData.incentivoFiscal).up()
-                  .ele('Evento')
-                    .ele('IdentificacaoEvento', nfseData.identificacaoEvento).up()
-                    .ele('DescricaoEvento', nfseData.descricaoEvento).up()
-                  .up()
-                  .ele('InformacoesComplementares', nfseData.informacoesComplementares).up()
-                .up()
-                .ele('Signature', { xmlns: 'http://www.w3.org/2000/09/xmldsig#' })
-                  .ele('SignedInfo')
-                    .ele('CanonicalizationMethod', { Algorithm: 'http://www.w3.org/TR/2001/REC-xml-c14n-20010315' }).up()
-                    .ele('SignatureMethod', { Algorithm: 'http://www.w3.org/2000/09/xmldsig#rsa-sha1' }).up()
-                    .ele('Reference', { URI: '' })
-                      .ele('Transforms')
-                        .ele('Transform', { Algorithm: 'http://www.w3.org/2000/09/xmldsig#enveloped-signature' }).up()
-                      .up()
-                      .ele('DigestMethod', { Algorithm: 'http://www.w3.org/2000/09/xmldsig#sha1' }).up()
-                      .ele('DigestValue', nfseData.digestValue).up()
-                    .up()
-                  .up()
-                  .ele('SignatureValue', nfseData.signatureValue).up()
-                  .ele('KeyInfo')
-                    .ele('X509Data')
-                      .ele('X509Certificate', nfseData.x509Certificate).up()
-                    .up()
-                  .up()
-                .up()
-              .up()
-            .up()
-          .up()
-        .up()
-      .up()
-    .end({ pretty: true });
-
-    return xml;
-  }
-
-  async sendXmlToWebService(xml: string) {
-    const response = await axios.post('https://www.issnetonline.com.br/homologaabrasf/webservicenfse204/nfse.asmx', xml, {
-      headers: {
-        'Content-Type': 'application/xml',
+  async gerarNfse(nfsDto: NfseDto) {
+    const builder = new xml2js.Builder();
+    // Montando o XML
+    const nfseXml = {
+      'soap:Envelope': {
+        '$': {
+          'xmlns:soap': 'http://schemas.xmlsoap.org/soap/envelope/',
+          'xmlns:svc': 'http://nfse.abrasf.org.br',
+        },
+        'soap:Body': {
+          'svc:GerarNfse': {
+            nfseCabecMsg: {
+              cabecalho: {
+                $: { versao: '1.00' },
+                versaoDados: '2.04',
+              },
+            },
+            nfseDadosMsg: {
+              'GerarNfseEnvio': {
+                $: { 'xmlns': 'http://www.abrasf.org.br/nfse.xsd' },
+                Rps: {
+                  InfDeclaracaoPrestacaoServico: {
+                    $: { Id: 'declaracao_1' },
+                    Rps: {
+                      $: { Id: 'rps_1' },
+                      IdentificacaoRps: {
+                        Numero: nfsDto.numeroRps,
+                        Serie: nfsDto.serieRps,
+                        Tipo: nfsDto.tipoRps,
+                      },
+                      DataEmissao: nfsDto.dataEmissao,
+                      Status: nfsDto.status,
+                    },
+                    Competencia: nfsDto.competencia,
+                    Servico: {
+                      Valores: {
+                        ValorServicos: nfsDto.valorServicos,
+                        Aliquota: nfsDto.aliquota,
+                        ValorIss: nfsDto.valorIss,
+                      },
+                      IssRetido: nfsDto.issRetido,
+                      ItemListaServico: nfsDto.itemListaServico,
+                      CodigoCnae: nfsDto.codigoCnae,
+                      CodigoTributacaoMunicipio: nfsDto.codigoTributacaoMunicipio,
+                      Discriminacao: nfsDto.discriminacao,
+                      CodigoMunicipio: nfsDto.codigoMunicipio,
+                      ExigibilidadeISS: nfsDto.exigibilidadeIss,
+                      MunicipioIncidencia: nfsDto.municipioIncidencia,
+                    },
+                    Prestador: {
+                      CpfCnpj: {
+                        Cnpj: nfsDto.cnpjPrestador,
+                      },
+                      InscricaoMunicipal: nfsDto.inscricaoMunicipal,
+                    },
+                    TomadorServico: {
+                      IdentificacaoTomador: {
+                        CpfCnpj: {
+                          Cpf: nfsDto.cpfTomador,
+                        },
+                      },
+                      RazaoSocial: nfsDto.razaoSocial,
+                      Endereco: {
+                        Endereco: nfsDto.endereco,
+                        Numero: nfsDto.numero,
+                        Complemento: nfsDto.complemento,
+                        Bairro: nfsDto.bairro,
+                        CodigoMunicipio: nfsDto.codigoMunicipio,
+                        Uf: nfsDto.uf,
+                        Cep: nfsDto.cep,
+                      },
+                    },
+                    OptanteSimplesNacional: nfsDto.optanteSimplesNacional,
+                    IncentivoFiscal: nfsDto.incentivoFiscal,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
-    });
-    return response.data;
+    };
+    const xmlString = builder.buildObject(nfseXml);
+
+    // Gerando a assinatura digital
+    try {
+      // Lendo o arquivo PFX
+      const pfxBuffer = fs.readFileSync("./src/Certificados/ASSOCIACAO CANNABICA MEDICINAL ASCAMED-46368439000172.pfx");
+      const pfxAsn1 = forge.asn1.fromDer(forge.util.createBuffer(pfxBuffer.toString('binary'), 'binary'));
+      const pfx = forge.pkcs12.pkcs12FromAsn1(pfxAsn1, false, '1234'); // Substitua pela sua senha
+
+      // Extraindo o certificado e a chave privada
+      const keyObj = pfx.getBags({ bagType: forge.pki.oids.pkcs8ShroudedKeyBag })[forge.pki.oids.pkcs8ShroudedKeyBag][0];
+      const certObj = pfx.getBags({ bagType: forge.pki.oids.certBag })[forge.pki.oids.certBag][0];
+
+      const privateKey = forge.pki.privateKeyToAsn1(keyObj.key);
+      const certificate = forge.pki.certificateToAsn1(certObj.cert);
+
+      // Convertendo a chave privada para PEM
+      const privateKeyPem = forge.pki.privateKeyToPem(privateKey);
+      const signedXml = new SignedXml({ privateKey: privateKeyPem });
+      signedXml.addReference({
+        xpath: "//*[local-name(.)='Rps']", // Ajuste o XPath para o nó correto
+        digestAlgorithm: "http://www.w3.org/2000/09/xmldsig#sha1",
+        transforms: ["http://www.w3.org/2001/10/xml-exc-c14n#"],
+      });
+      signedXml.canonicalizationAlgorithm = "http://www.w3.org/2001/10/xml-exc-c14n#";
+      signedXml.signatureAlgorithm = "http://www.w3.org/2000/09/xmldsig#rsa-sha1";
+      signedXml.computeSignature(xmlString);
+
+      // Retornando o XML assinado
+      return signedXml.getSignedXml();
+    } catch (error) {
+      console.error("Erro ao assinar o XML:", error);
+      throw new Error("Falha na assinatura do XML.");
+    }
   }
 }
