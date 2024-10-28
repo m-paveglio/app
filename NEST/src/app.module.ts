@@ -9,16 +9,12 @@ import { PaisModule } from './Geral/Outros/Endereco/Pais/pais.module';
 import { CidadesModule } from './Geral/Outros/Endereco/Cidades/cidades.module';
 import { LogradouroModule } from './Geral/Outros/Endereco/Logradouro/logradouro.module';
 import { ProfissoesModule } from './Geral/Outros/Profissoes/profissoes.module';
-import { ItemLc116Module } from './Geral/NFSE/Nfse-itens/Item_LC_116/item_lc_116.module';
-import { CnaeModule } from './Geral/NFSE/Nfse-itens/Cnae/cnae.module';
-import { AtividadesMunicipaisModule } from './Geral/NFSE/Nfse-itens/Atividades_Municipais/atividades_municipais.module';
-import { NbsModule } from './Geral/NFSE/Nfse-itens/nbs/nbs.module';
 import { pessoasModule } from './Geral/Pessoas/pessoas.module';
-import { nfseModule } from './Geral/NFSE/nfse/gerar/nfse.module';
+
 
 
 @Module({
-  imports: [userModule, AuthModule, nfseModule, pessoasModule,PermissoesModule, UfModule, PaisModule, CidadesModule, LogradouroModule, ProfissoesModule, ItemLc116Module, CnaeModule, AtividadesMunicipaisModule, NbsModule],
+  imports: [userModule, AuthModule, pessoasModule,PermissoesModule, UfModule, PaisModule, CidadesModule, LogradouroModule, ProfissoesModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -10,7 +10,7 @@ export const databaseProviders = [
         entities: [
           __dirname + '/../**/*.entity{.ts,.js}',
         ],
-        synchronize: true, // Em desenvolvimento, true para sincronizar o schema
+        synchronize: false, // Em desenvolvimento, true para sincronizar o schema
       });
 
       return dataSource.initialize();

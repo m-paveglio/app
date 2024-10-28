@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity()
+@Entity('PERMISSOES')
 export class Permissoes {
   @PrimaryGeneratedColumn()
   COD_PERMISSAO: string;
