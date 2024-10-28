@@ -21,7 +21,7 @@ export class pessoas {
   TELEFONE_CELULAR: string;
   
   @Column({ length: 2 })
-  COD_CARGO: string;
+  COD_PROFISSAO: string;
 
   @Column({ length: 15 })
   DT_NASCIMENTO: string;
