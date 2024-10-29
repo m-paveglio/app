@@ -36,7 +36,7 @@ export class AppMenuComponent implements OnInit {
                         },
                         ],
                      },  
-                     { label: 'Nota Eletrônica', icon: 'pi pi-fw pi-dollar', items: [
+                     /*{ label: 'Nota Eletrônica', icon: 'pi pi-fw pi-dollar', items: [
                         {
                             label: 'Nova Nota',
                             icon: 'pi pi-fw pi-file-export',
@@ -48,18 +48,18 @@ export class AppMenuComponent implements OnInit {
                             routerLink: ['user/consultar']
                         },
                         ],
-                     },  
+                     },*/  
                         ]
             },
 
             {
                 label: 'Relatórios',
                 items: [
-                    { label: 'Usuários', icon: 'pi pi-fw pi-id-card', routerLink: ['user/userrelatorio']}
+                    /*{ label: 'Usuários', icon: 'pi pi-fw pi-id-card', routerLink: ['user/userrelatorio']}*/
                 
                 ]},
 
-            {
+            /*{
                 label: 'Tabelas',
                 items: [
                           
@@ -146,7 +146,7 @@ export class AppMenuComponent implements OnInit {
                             ]
                             }
                         ]
-            },
+            },*/
 
 
             

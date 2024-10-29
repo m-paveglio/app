@@ -6,7 +6,8 @@ import { ConfirmationDialog } from './confirmacao.component';
 
 @Component({
   selector: 'app-user-consultar',
-  templateUrl: './user-consultar.component.html'
+  templateUrl: './user-consultar.component.html',
+  styleUrls: ['./user-consultar.component.css']
 })
 export class UserConsultarComponent {
   cpf: string ='';
@@ -14,6 +15,10 @@ export class UserConsultarComponent {
   resultado: any;
   novoUsuario: any = {}; // Dados do novo usuário a serem adicionados ou editados
   editMode = false;
+  erroMessage: string = ''; // Adiciona mensagem de erro
+  mensagem: string = '';
+  exibirMensagem: boolean = false;
+  isCadastroSucesso: boolean = false;
   permissoes = [
     {nome: 'Administrador', codigo: '1'},
     {nome: 'Suporte', codigo: '2'},
@@ -39,18 +44,68 @@ export class UserConsultarComponent {
 
   ) {}
 
+  isCpfValido(cpf: string): boolean {
+    if (!cpf || cpf.length !== 11) return false;
+
+    // Lógica de validação básica de CPF (exemplo simples)
+    let soma = 0;
+    let resto;
+    if (cpf === '00000000000') return false;
+    
+    for (let i = 1; i <= 9; i++) soma = soma + parseInt(cpf.substring(i - 1, i)) * (11 - i);
+    resto = (soma * 10) % 11;
+
+    if ((resto === 10) || (resto === 11)) resto = 0;
+    if (resto !== parseInt(cpf.substring(9, 10))) return false;
+
+    soma = 0;
+    for (let i = 1; i <= 10; i++) soma = soma + parseInt(cpf.substring(i - 1, i)) * (12 - i);
+    resto = (soma * 10) % 11;
+
+    if ((resto === 10) || (resto === 11)) resto = 0;
+    if (resto !== parseInt(cpf.substring(10, 11))) return false;
+
+    return true;
+  }
+
   buscarPorCpf() {
+    // Limpa a mensagem de erro
+    this.erroMessage = '';
+  
+    // Verifica se o CPF é válido antes de fazer a consulta
+    if (!this.isCpfValido(this.cpf)) {
+      this.erroMessage = 'CPF inválido!';
+      this.removerMensagemErro(); // Inicia o timer para remover a mensagem de erro
+      return;
+    }
+  
     this.userService.buscarPorCpf(this.cpf).subscribe(
       (data) => {
-        this.resultado = data;
-        this.nomePermissao = this.getPermissaoNome(this.resultado.COD_PERMISSAO);
-        this.user_sis_nome = this.getUserSisNome(this.resultado.USER_SIS);
+        if (data) {
+          this.resultado = data;
+          this.nomePermissao = this.getPermissaoNome(this.resultado.COD_PERMISSAO);
+          this.user_sis_nome = this.getUserSisNome(this.resultado.USER_SIS);
+        } else {
+          // Exibe a mensagem se o CPF não for encontrado
+          this.erroMessage = 'CPF não encontrado no banco de dados.';
+          this.removerMensagemErro(); // Inicia o timer para remover a mensagem de erro
+        }
       },
       (error) => {
         console.error('Erro ao buscar por CPF:', error);
+        this.erroMessage = 'Erro ao buscar CPF. Por favor, tente novamente.';
+        this.removerMensagemErro(); // Inicia o timer para remover a mensagem de erro
       }
     );
   }
+  
+  // Função para remover a mensagem de erro após 3 segundos
+  removerMensagemErro() {
+    setTimeout(() => {
+      this.erroMessage = '';
+    }, 3000); // 3000 milissegundos = 3 segundos
+  }
+  
 
   buscarPorNome() {
     this.userService.buscarPorNome(this.nome).subscribe(
@@ -115,4 +170,11 @@ export class UserConsultarComponent {
     this.editMode = false;
     // Lógica adicional para salvar o usuário
   }
+
+  confirmarExclusao() {
+    const confirmacao = confirm("Tem certeza que deseja excluir o usuário?");
+    if (confirmacao) {
+        this.excluirUsuario(this.resultado.CPF);
+    }
+}
 }
