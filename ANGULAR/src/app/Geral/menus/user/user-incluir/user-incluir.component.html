@@ -39,7 +39,7 @@
               <label for="float-input">Senha</label>
             </span>
           </div>
-    
+
         <div class="field col-12 md:col-2">
             <span class="p-float-label">
               <p-dropdown id="float-input" [ngStyle]="{'padding': '0px'}" [(ngModel)]="novoUsuario.USER_SIS" name="USER_SIS" [options]="USER_SIS" optionLabel="nome" optionValue="codigo"></p-dropdown>
@@ -50,7 +50,9 @@
           <div class="btn-group field col-12 md:col-1 flex flex-wrap gap-3" role="group" aria-label="Third group">
             <p-button icon="pi pi-save" severity="success" (click)="adicionarUsuario()"/>
           </div>
-        
+
+          <div></div>
+
           <div class="mensagem" [ngClass]="{ 'success': isCadastroSucesso, 'error': !isCadastroSucesso }" *ngIf="exibirMensagem">
             {{ mensagem }}
           </div>
@@ -59,4 +61,3 @@
     </div>
   </div>
 
-  
