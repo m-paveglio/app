@@ -13,9 +13,9 @@ import { MessageService } from 'primeng/api';
 export class UserConsultarComponent {
   cpf: string = '';
   nome: string = '';
-  resultado: any;
-  novoUsuario: any = {}; // Dados do novo usuário a serem adicionados ou editados
-  editMode = false; // Controla se os campos estão em modo de edição
+  resultado: any = null; // Definindo como null inicialmente
+  novoUsuario: any = {};
+  editMode = false;
   permissoes = [
     { nome: 'Administrador', codigo: '1' },
     { nome: 'Suporte', codigo: '2' },
@@ -59,29 +59,30 @@ export class UserConsultarComponent {
 
   buscarPorCpf() {
     if (!this.isCpfValido(this.cpf)) {
-      this.showError('CPF inválido!');
-      return;
+        this.showError('CPF inválido!');
+        return;
     }
 
     this.userService.buscarPorCpf(this.cpf).subscribe(
-      (data) => {
-        if (data) {
-          this.resultado = data;
-          this.nomePermissao = this.getPermissaoNome(this.resultado.COD_PERMISSAO);
-          this.user_sis_nome = this.getUserSisNome(this.resultado.USER_SIS);
-        } else {
-          // Exibe toast de erro se o CPF não for encontrado
-          this.showError('Usuário não existe no banco de dados.');
+        (data) => {
+            if (data && Object.keys(data).length > 0) {
+                this.resultado = data;
+                this.nomePermissao = this.getPermissaoNome(this.resultado.COD_PERMISSAO);
+                this.user_sis_nome = this.getUserSisNome(this.resultado.USER_SIS);
+            } else {
+                this.showError('Usuário não existe no banco de dados.');
+                this.resultado = null; // Limpa o resultado se não encontrado
+            }
+        },
+        (error) => {
+            console.error('Erro ao buscar por CPF:', error);
+            this.showError('Erro ao buscar CPF. Por favor, tente novamente.');
+            this.resultado = null; // Limpa o resultado em caso de erro
         }
-      },
-      (error) => {
-        console.error('Erro ao buscar por CPF:', error);
-        this.showError('Erro ao buscar CPF. Por favor, tente novamente.');
-      }
     );
 }
 
-editarUsuario(cpf: string) {
+  editarUsuario(cpf: string) {
   this.userService.buscarPorCpf(cpf).subscribe(
       (data) => {
           this.resultado = data;
@@ -91,29 +92,50 @@ editarUsuario(cpf: string) {
           this.showSuccess('Usuário em modo de edição');
       },
       (error) => {
-          console.error('Erro ao editar usuário:', error);
-          this.showError('Erro ao editar usuário.');
+        console.error('Erro ao editar usuário:', error);
+        if (error.error && error.error.message) {
+          this.processarErro(error.error.message);
+        } else {
+          this.showError('Erro ao cadastrar usuário');
+        }
       }
-  );
-}
+    );
+  }
 
-salvarUsuario() {
-  // Supondo que 'resultado' tenha as propriedades 'codigoPermissao' e 'ativo'
+  salvarUsuario() {
   const updatePayload = {
-      codigoPermissao: this.resultado.COD_PERMISSAO,
-      ativo: this.resultado.USER_SIS,
+    COD_PERMISSAO: this.resultado.COD_PERMISSAO,
+    USER_SIS: this.resultado.USER_SIS,
+    CPF: this.resultado.CPF,
+    NOME: this.resultado.NOME,
+    EMAIL: this.resultado.EMAIL,
+    SENHA: this.resultado.SENHA
   };
 
   this.userService.atualizarUsuario(this.resultado.CPF, updatePayload).subscribe(
-      () => {
-          this.editMode = false; // Desativa o modo de edição
-          this.showSuccess('Usuário atualizado com sucesso!');
-      },
-      (error) => {
-          console.error('Erro ao salvar o usuário:', error);
-          this.showError('Erro ao salvar o usuário. Por favor, tente novamente.');
+    () => {
+      this.editMode = false;
+      this.showSuccess('Usuário atualizado com sucesso!');
+    },
+    (error) => {
+      console.error('Erro ao atualizar usuário:', error);
+      if (error.error && error.error.message) {
+        this.processarErro(error.error.message);
+      } else {
+        this.showError('Erro ao atualizar usuário');
       }
+    }
   );
+}
+
+  processarErro(mensagemErro: string) {
+  if (mensagemErro.includes('usuário já existe')) {
+    this.showError('Erro: o usuário já existe.');
+  } else if (mensagemErro.includes('campos obrigatórios')) {
+    this.showError('Erro: preencha todos os campos obrigatórios.');
+  } else {
+    this.showError('Erro ao cadastrar usuário');
+  }
 }
 
   excluirUsuario(cpf: string) {

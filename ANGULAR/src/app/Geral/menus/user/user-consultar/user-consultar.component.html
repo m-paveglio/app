@@ -28,7 +28,7 @@
                 </div>
             </div>
         </div>
-  
+
         <div *ngIf="resultado" class="p-inputtext p-component p-element">
             <h3 class="text-center" [ngStyle]="{backgroundColor:'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}"> DADOS PRELIMINARES</h3>
             <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
@@ -92,6 +92,7 @@
                         [options]="permissoes"
                         [(ngModel)]="resultado.COD_PERMISSAO"
                         optionLabel="nome"
+                        optionValue="codigo"
                         placeholder="Selecione uma permissão"
                         (onChange)="nomePermissao = getPermissaoNome(resultado.COD_PERMISSAO)">
                     </p-dropdown>
@@ -133,7 +134,8 @@
                         [options]="USER_SIS"
                         [(ngModel)]="resultado.USER_SIS"
                         optionLabel="nome"
-                        placeholder="Selecione um estado"
+                        optionValue="codigo"
+                        placeholder="Selecione"
                         (onChange)="user_sis_nome = getUserSisNome(resultado.USER_SIS)">
                     </p-dropdown>
                 </div>
@@ -142,13 +144,12 @@
                 <div class="btn-group field col-12 md:col-2 flex flex-wrap gap-3" role="group" aria-label="Edit group">
                     <label for=""></label>
                     <p-button *ngIf="!editMode" icon="pi pi-pencil" severity="info" (click)="editarUsuario(resultado.CPF)"></p-button>
-                    <p-button *ngIf="editMode" icon="pi pi-save" severity="success" (click)="salvarUsuario(resultado.CPF)"></p-button>
+                    <p-button *ngIf="editMode" icon="pi pi-save" severity="success" (click)="salvarUsuario()"></p-button>
                     <p-button icon="pi pi-trash" severity="danger" (click)="confirmarExclusao()"></p-button>
                 </div>
-
-
             </div>
         </div>
+
     </div>
   </div>
   
