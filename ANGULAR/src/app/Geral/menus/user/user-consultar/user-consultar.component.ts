@@ -2,11 +2,13 @@ import { Component } from '@angular/core';
 import { UserService } from '../user.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialog } from './confirmacao.component';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-user-consultar',
   templateUrl: './user-consultar.component.html',
-  styleUrls: ['./user-consultar.component.css']
+  styleUrls: ['./user-consultar.component.css'],
+  providers: [MessageService] // Adicione o MessageService como provedor
 })
 export class UserConsultarComponent {
   cpf: string = '';
@@ -14,10 +16,6 @@ export class UserConsultarComponent {
   resultado: any;
   novoUsuario: any = {}; // Dados do novo usuário a serem adicionados ou editados
   editMode = false; // Controla se os campos estão em modo de edição
-  erroMessage: string = ''; // Adiciona mensagem de erro
-  mensagem: string = '';
-  exibirMensagem: boolean = false;
-  isCadastroSucesso: boolean = false;
   permissoes = [
     { nome: 'Administrador', codigo: '1' },
     { nome: 'Suporte', codigo: '2' },
@@ -37,39 +35,31 @@ export class UserConsultarComponent {
 
   nomePermissao: string = '';
   user_sis_nome: string = '';
-  isEditing: boolean = false;
 
-  constructor(private userService: UserService, public dialog: MatDialog) {}
+  constructor(
+    private userService: UserService,
+    public dialog: MatDialog,
+    private messageService: MessageService
+  ) {}
 
   isCpfValido(cpf: string): boolean {
+    // Validação de CPF
     if (!cpf || cpf.length !== 11) return false;
-
-    let soma = 0;
-    let resto;
+    let soma = 0, resto;
     if (cpf === '00000000000') return false;
-
     for (let i = 1; i <= 9; i++) soma += parseInt(cpf.substring(i - 1, i)) * (11 - i);
     resto = (soma * 10) % 11;
-
     if (resto === 10 || resto === 11) resto = 0;
     if (resto !== parseInt(cpf.substring(9, 10))) return false;
-
     soma = 0;
     for (let i = 1; i <= 10; i++) soma += parseInt(cpf.substring(i - 1, i)) * (12 - i);
     resto = (soma * 10) % 11;
-
-    if (resto === 10 || resto === 11) resto = 0;
-    if (resto !== parseInt(cpf.substring(10, 11))) return false;
-
-    return true;
+    return resto === parseInt(cpf.substring(10, 11));
   }
 
   buscarPorCpf() {
-    this.erroMessage = '';
-
     if (!this.isCpfValido(this.cpf)) {
-      this.erroMessage = 'CPF inválido!';
-      this.removerMensagemErro();
+      this.showError('CPF inválido!');
       return;
     }
 
@@ -80,86 +70,65 @@ export class UserConsultarComponent {
           this.nomePermissao = this.getPermissaoNome(this.resultado.COD_PERMISSAO);
           this.user_sis_nome = this.getUserSisNome(this.resultado.USER_SIS);
         } else {
-          this.erroMessage = 'CPF não encontrado no banco de dados.';
-          this.removerMensagemErro();
+          // Exibe toast de erro se o CPF não for encontrado
+          this.showError('Usuário não existe no banco de dados.');
         }
       },
-      (error: any) => {
+      (error) => {
         console.error('Erro ao buscar por CPF:', error);
-        this.erroMessage = 'Erro ao buscar CPF. Por favor, tente novamente.';
-        this.removerMensagemErro();
+        this.showError('Erro ao buscar CPF. Por favor, tente novamente.');
       }
     );
-  }
+}
 
-  removerMensagemErro() {
-    setTimeout(() => {
-      this.erroMessage = '';
-    }, 3000);
-  }
-
-  buscarPorNome() {
-    this.userService.buscarPorNome(this.nome).subscribe(
+editarUsuario(cpf: string) {
+  this.userService.buscarPorCpf(cpf).subscribe(
       (data) => {
-        this.resultado = data;
+          this.resultado = data;
+          this.nomePermissao = this.getPermissaoNome(this.resultado.COD_PERMISSAO);
+          this.user_sis_nome = this.getUserSisNome(this.resultado.USER_SIS);
+          this.editMode = true; // Ativando o modo de edição
+          this.showSuccess('Usuário em modo de edição');
       },
-      (error: any) => {
-        console.error('Erro ao buscar por nome:', error);
+      (error) => {
+          console.error('Erro ao editar usuário:', error);
+          this.showError('Erro ao editar usuário.');
       }
-    );
-  }
+  );
+}
 
-  editarUsuario(cpf: string) {
-    this.userService.editarUsuario(cpf, this.novoUsuario).subscribe(
-      (data) => {
-        this.resultado = data;
-        this.editMode = true;
-        this.novoUsuario = {};
-        this.isEditing = true;
-      },
-      (error: any) => {
-        console.error('Erro ao editar usuário:', error);
-      }
-    );
-  }
-
-  salvarUsuario(cpf: string) {
-    this.userService.atualizarUsuario(this.resultado).subscribe(
+salvarUsuario(cpf: string) {
+  this.userService.atualizarUsuario(this.resultado).subscribe(
       () => {
-        this.erroMessage = 'Usuário atualizado com sucesso!';
-        this.editMode = false;
-        this.removerMensagemErro();
+          this.editMode = false; // Desativa o modo de edição
+          this.showSuccess('Usuário atualizado com sucesso!');
       },
-      (error: any) => {
-        console.error('Erro ao salvar o usuário:', error);
-        this.erroMessage = 'Erro ao salvar o usuário. Por favor, tente novamente.';
-        this.removerMensagemErro();
+      (error) => {
+          console.error('Erro ao salvar o usuário:', error);
+          this.showError('Erro ao salvar o usuário. Por favor, tente novamente.');
       }
-    );
-  }
+  );
+}
 
   excluirUsuario(cpf: string) {
     this.userService.excluirUsuario(cpf).subscribe(
-      (data) => {
-        this.resultado = data;
+      () => {
+        this.resultado = null;
+        this.showSuccess('Usuário excluído com sucesso!');
       },
-      (error: any) => {
+      (error) => {
         console.error('Erro ao excluir usuário:', error);
+        this.showError('Erro ao excluir o usuário.');
       }
     );
   }
 
-  openDialog(cpf: string): void {
-    const dialogRef = this.dialog.open(ConfirmationDialog, {
-      width: '350px',
-      data: 'Você realmente quer excluir este usuário?'
-    });
+  showSuccess(mensagem: string) {
+    this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: mensagem });
+  }
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.excluirUsuario(cpf);
-      }
-    });
+  showError(mensagem: string) {
+    this.messageService.add({ severity: 'error', summary: 'Erro', detail: mensagem });
   }
 
   getPermissaoNome(codigo: string) {

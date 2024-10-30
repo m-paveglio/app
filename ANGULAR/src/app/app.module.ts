@@ -19,6 +19,8 @@ import { MatDialogContent, MatDialogModule } from '@angular/material/dialog';
 import { ConfirmationDialog } from './Geral/menus/user/user-consultar/confirmacao.component';
 import { UserRelatorioComponent } from './Geral/menus/user/user-relatorio/user-relatorio.component';
 import { GerarNfseComponent } from './Geral/menus/nfse/enviar/gerar-nfse.component';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
 
 
 
@@ -48,13 +50,16 @@ import { GerarNfseComponent } from './Geral/menus/nfse/enviar/gerar-nfse.compone
     ButtonModule,
     DropdownModule,
     MatDialogModule,
+    ToastModule
+  
     
         
   ],
   providers: [
     provideClientHydration(),
     provideAnimationsAsync(),
-    provideHttpClient(withFetch())
+    provideHttpClient(withFetch()),
+    MessageService
   ],
   bootstrap: [AppComponent]
 })

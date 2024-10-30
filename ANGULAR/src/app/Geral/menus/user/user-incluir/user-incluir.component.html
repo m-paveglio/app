@@ -2,8 +2,8 @@
     <div class="col-12">
       <div class="p-inputtext p-component p-element" >
 
-        <h5 class="text-center" [ngStyle]="{backgroundColor:'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}">INCLUIR USUÁRIO</h5>
-
+        <h3 class="text-center" [ngStyle]="{backgroundColor:'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}">INCLUIR USUÁRIO</h3>
+        <p-toast></p-toast>
     <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
           <div class="field col-12 md:col-4">
             <span class="p-float-label">
@@ -48,14 +48,11 @@
           </div>
 
           <div class="btn-group field col-12 md:col-1 flex flex-wrap gap-3" role="group" aria-label="Third group">
-            <p-button icon="pi pi-save" severity="success" (click)="adicionarUsuario()"/>
-          </div>
+            <p-button icon="pi pi-save" severity="success" (click)="adicionarUsuario()"></p-button>
+        </div>
 
           <div></div>
 
-          <div class="mensagem" [ngClass]="{ 'success': isCadastroSucesso, 'error': !isCadastroSucesso }" *ngIf="exibirMensagem">
-            {{ mensagem }}
-          </div>
         </div>
       </div>
     </div>

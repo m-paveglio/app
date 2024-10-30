@@ -1,20 +1,4 @@
-.mensagem {
-    position: absolute; /* Fixa a posição */
-    top: 50%; /* Centraliza verticalmente */
-    left: 60%; /* Centraliza horizontalmente */
-    transform: translate(-50%, -50%); /* Ajusta a posição centralizada */
-    width: 300px;
-    height: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 15px; /* Cantos arredondados */
-    color: white; /* Cor do texto */
-    font-size: 16px; /* Tamanho da fonte */
-    font-family: 'Arial', sans-serif; /* Família de fonte */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Sombra */
-    text-align: center; /* Centraliza o texto */
-    padding: 10px; /* Espaçamento interno */
-    z-index: 1000; /* Garante que o balão fique sobreposto a outros elementos */
-    background-color: #dc3545
-  }
+.float-label-fixed label {
+  top: -0.75rem !important;
+  font-size: 0.75rem !important;
+}
