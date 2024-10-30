@@ -58,16 +58,16 @@ export class UserService {
     );
   }
 
-  atualizarUsuario(cpf: string): Observable<any> {
+  atualizarUsuario(cpf: string, usuario: any): Observable<any> {
     const url = `${this.apiUrl}/user/${cpf}`;
-    return this.http.patch(url, cpf).pipe(
-      map(response => {
-        this.handleSuccess('Usuário atualizado com sucesso!');
-        return response;
-      }),
-      catchError(this.handleError)
+    return this.http.patch(url, usuario).pipe(
+        map(response => {
+            this.handleSuccess('Usuário atualizado com sucesso!');
+            return response;
+        }),
+        catchError(this.handleError)
     );
-  }
+}
 
   private handleError(error: any): Observable<never> {
     let errorMessage = 'Erro desconhecido';

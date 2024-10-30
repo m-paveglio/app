@@ -97,8 +97,14 @@ editarUsuario(cpf: string) {
   );
 }
 
-salvarUsuario(cpf: string) {
-  this.userService.atualizarUsuario(this.resultado).subscribe(
+salvarUsuario() {
+  // Supondo que 'resultado' tenha as propriedades 'codigoPermissao' e 'ativo'
+  const updatePayload = {
+      codigoPermissao: this.resultado.COD_PERMISSAO,
+      ativo: this.resultado.USER_SIS,
+  };
+
+  this.userService.atualizarUsuario(this.resultado.CPF, updatePayload).subscribe(
       () => {
           this.editMode = false; // Desativa o modo de edição
           this.showSuccess('Usuário atualizado com sucesso!');
