@@ -19,7 +19,7 @@ export class UserService {
   }
   
   buscarPorNome(nome: string): Observable<any> {
-    const url = `${this.apiUrl}/user/${nome}`;
+    const url = `${this.apiUrl}/user/nome/${nome}`;
     return this.http.get(url).pipe(
       catchError(this.handleError)
     );

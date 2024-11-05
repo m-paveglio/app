@@ -16,7 +16,6 @@ import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { MatDialogModule } from '@angular/material/dialog';
-import { ConfirmationDialog } from './Geral/menus/user/user-consultar/confirmacao.component';
 import { UserRelatorioComponent } from './Geral/menus/user/user-relatorio/user-relatorio.component';
 import { GerarNfseComponent } from './Geral/menus/nfse/enviar/gerar-nfse.component';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -36,7 +35,6 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
     UserConsultarComponent,
     UserIncluirComponent,
     UserRelatorioComponent,
-    ConfirmationDialog,
     GerarNfseComponent
         ],
   imports: [

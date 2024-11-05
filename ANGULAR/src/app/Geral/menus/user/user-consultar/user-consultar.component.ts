@@ -57,30 +57,74 @@ export class UserConsultarComponent {
     return resto === parseInt(cpf.substring(10, 11));
   }
 
+  buscarUsuario() {
+    // Verifica se o CPF está preenchido e válido para busca por CPF
+    if (this.cpf && this.isCpfValido(this.cpf)) {
+      this.buscarPorCpf();
+    } 
+    // Caso CPF esteja vazio, tenta buscar por nome
+    else if (this.nome) {
+      this.buscarPorNome();
+    } 
+    // Mensagem de erro caso ambos estejam inválidos
+    else {
+      this.showError('Preencha um CPF válido ou Nome para realizar a busca.');
+    }
+  }
+
   buscarPorCpf() {
     if (!this.isCpfValido(this.cpf)) {
-        this.showError('CPF inválido!');
-        return;
+      this.showError('CPF inválido!');
+      return;
     }
-
+  
     this.userService.buscarPorCpf(this.cpf).subscribe(
-        (data) => {
-            if (data && Object.keys(data).length > 0) {
-                this.resultado = data;
-                this.nomePermissao = this.getPermissaoNome(this.resultado.COD_PERMISSAO);
-                this.user_sis_nome = this.getUserSisNome(this.resultado.USER_SIS);
-            } else {
-                this.showError('Usuário não existe no banco de dados.');
-                this.resultado = null; // Limpa o resultado se não encontrado
-            }
-        },
-        (error) => {
-            console.error('Erro ao buscar por CPF:', error);
-            this.showError('Erro ao buscar CPF. Por favor, tente novamente.');
-            this.resultado = null; // Limpa o resultado em caso de erro
+      (data) => {
+        if (data && Object.keys(data).length > 0) {
+          this.resultado = data;
+          console.log(this.resultado); // Log para verificar estrutura
+          this.nomePermissao = this.getPermissaoNome(this.resultado.COD_PERMISSAO);
+          this.user_sis_nome = this.getUserSisNome(this.resultado.USER_SIS);
+        } else {
+          this.showError('Usuário não existe no banco de dados.');
+          this.resultado = null;
         }
+      },
+      (error) => {
+        console.error('Erro ao buscar por CPF:', error);
+        this.showError('Erro ao buscar CPF. Por favor, tente novamente.');
+        this.resultado = null;
+      }
     );
-}
+  }
+  
+  buscarPorNome() {
+    this.userService.buscarPorNome(this.nome).subscribe(
+      (data) => {
+        // Verifica se o retorno é um array e pega o primeiro elemento
+        if (data && Array.isArray(data) && data.length > 0) {
+          this.resultado = data[0];  // Seleciona o primeiro usuário do resultado
+        } else if (data && !Array.isArray(data)) {
+          this.resultado = data;  // Caso não seja um array, atribui diretamente
+        } else {
+          this.showError('Usuário não encontrado pelo nome.');
+          this.resultado = null;
+        }
+  
+        if (this.resultado) {
+          // Log para verificar a estrutura dos dados
+          console.log(this.resultado);
+          this.nomePermissao = this.getPermissaoNome(this.resultado.COD_PERMISSAO);
+          this.user_sis_nome = this.getUserSisNome(this.resultado.USER_SIS);
+        }
+      },
+      (error) => {
+        console.error('Erro ao buscar por Nome:', error);
+        this.showError('Erro ao buscar Nome. Por favor, tente novamente.');
+        this.resultado = null;
+      }
+    );
+  }
 
   editarUsuario(cpf: string) {
   this.userService.buscarPorCpf(cpf).subscribe(
