@@ -1,14 +1,14 @@
+<p-confirmDialog></p-confirmDialog>
+<p-toast></p-toast>
 <div class="grid" *ngIf="novoUsuario">
     <div class="col-12">
         <div *ngIf="!resultado" class="p-inputtext p-component p-element">
 
-            <p-toast></p-toast>
-            
+
+    <!-- Formulário de consulta CPF e nome -->
             <h3 class="text-center" [ngStyle]="{backgroundColor:'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}">
                 CONSULTAR USUÁRIO
             </h3>
-  
-            <!-- Formulário de consulta CPF e nome -->
             <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
                 <!-- Campos de CPF e Nome -->
                 <div class="field col-12 md:col-4">

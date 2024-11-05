@@ -15,12 +15,13 @@ import { UserIncluirComponent } from './Geral/menus/user/user-incluir/user-inclu
 import { ButtonModule } from 'primeng/button';
 import { DropdownModule } from 'primeng/dropdown';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { MatDialogContent, MatDialogModule } from '@angular/material/dialog';
+import { MatDialogModule } from '@angular/material/dialog';
 import { ConfirmationDialog } from './Geral/menus/user/user-consultar/confirmacao.component';
 import { UserRelatorioComponent } from './Geral/menus/user/user-relatorio/user-relatorio.component';
 import { GerarNfseComponent } from './Geral/menus/nfse/enviar/gerar-nfse.component';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 
 
@@ -50,7 +51,8 @@ import { ToastModule } from 'primeng/toast';
     ButtonModule,
     DropdownModule,
     MatDialogModule,
-    ToastModule
+    ToastModule,
+    ConfirmDialogModule
   
     
         
@@ -59,7 +61,8 @@ import { ToastModule } from 'primeng/toast';
     provideClientHydration(),
     provideAnimationsAsync(),
     provideHttpClient(withFetch()),
-    MessageService
+    MessageService,
+    ConfirmationService
   ],
   bootstrap: [AppComponent]
 })

@@ -1,14 +1,13 @@
 import { Component } from '@angular/core';
 import { UserService } from '../user.service';
 import { MatDialog } from '@angular/material/dialog';
-import { ConfirmationDialog } from './confirmacao.component';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-user-consultar',
   templateUrl: './user-consultar.component.html',
   styleUrls: ['./user-consultar.component.css'],
-  providers: [MessageService] // Adicione o MessageService como provedor
+  providers: [MessageService, ConfirmationService] // Adicione o MessageService como provedor
 })
 export class UserConsultarComponent {
   cpf: string = '';
@@ -39,7 +38,8 @@ export class UserConsultarComponent {
   constructor(
     private userService: UserService,
     public dialog: MatDialog,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private confirmationService: ConfirmationService
   ) {}
 
   isCpfValido(cpf: string): boolean {
@@ -89,7 +89,6 @@ export class UserConsultarComponent {
           this.nomePermissao = this.getPermissaoNome(this.resultado.COD_PERMISSAO);
           this.user_sis_nome = this.getUserSisNome(this.resultado.USER_SIS);
           this.editMode = true; // Ativando o modo de edição
-          this.showSuccess('Usuário em modo de edição');
       },
       (error) => {
         console.error('Erro ao editar usuário:', error);
@@ -138,19 +137,6 @@ export class UserConsultarComponent {
   }
 }
 
-  excluirUsuario(cpf: string) {
-    this.userService.excluirUsuario(cpf).subscribe(
-      () => {
-        this.resultado = null;
-        this.showSuccess('Usuário excluído com sucesso!');
-      },
-      (error) => {
-        console.error('Erro ao excluir usuário:', error);
-        this.showError('Erro ao excluir o usuário.');
-      }
-    );
-  }
-
   showSuccess(mensagem: string) {
     this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: mensagem });
   }
@@ -169,10 +155,37 @@ export class UserConsultarComponent {
     return userSis ? userSis.nome : '';
   }
 
-  confirmarExclusao() {
-    const confirmacao = confirm('Tem certeza que deseja excluir o usuário?');
-    if (confirmacao) {
-      this.excluirUsuario(this.resultado.CPF);
-    }
+  excluirUsuario(cpf: string) {
+    this.userService.excluirUsuario(cpf).subscribe(
+      () => {
+        this.resultado = null;
+        this.showSuccess('Usuário excluído com sucesso!');
+      },
+      (error) => {
+        console.error('Erro ao excluir usuário:', error);
+        this.showError('Erro ao excluir o usuário.');
+      }
+    );
   }
+
+  confirmarExclusao() {
+    this.confirmationService.confirm({
+      message: 'Tem certeza que deseja excluir o usuário?',
+      header: 'Confirmação de Exclusão',
+      icon: 'pi pi-exclamation-triangle',
+      acceptButtonStyleClass: "p-button-danger p-button-text",
+      rejectButtonStyleClass: "p-button-text p-button-text",
+      acceptIcon: "none",
+      rejectIcon: "none",
+      acceptLabel: "Sim", // Define o rótulo do botão de aceitar
+      rejectLabel: "Não", // Define o rótulo do botão de rejeitar
+      accept: () => {
+        this.excluirUsuario(this.resultado.CPF);
+      },
+      reject: () => {
+        this.messageService.add({ severity: 'error', summary: 'Rejeição', detail: 'Usuario Não Deletado' });
+      }
+    });
+  }
+  
 }
