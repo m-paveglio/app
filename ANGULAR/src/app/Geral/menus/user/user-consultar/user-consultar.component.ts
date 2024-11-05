@@ -34,6 +34,7 @@ export class UserConsultarComponent {
 
   nomePermissao: string = '';
   user_sis_nome: string = '';
+  usuariosEncontrados: any[] = [];
 
   constructor(
     private userService: UserService,
@@ -101,19 +102,22 @@ export class UserConsultarComponent {
   buscarPorNome() {
     this.userService.buscarPorNome(this.nome).subscribe(
       (data) => {
-        // Verifica se o retorno é um array e pega o primeiro elemento
+        // Verifica se a resposta é um array com resultados
         if (data && Array.isArray(data) && data.length > 0) {
-          this.resultado = data[0];  // Seleciona o primeiro usuário do resultado
+          this.usuariosEncontrados = data;  // Armazena todos os usuários encontrados
+          this.resultado = null;  // Limpa o resultado para mostrar a lista de opções
         } else if (data && !Array.isArray(data)) {
-          this.resultado = data;  // Caso não seja um array, atribui diretamente
+          // Caso seja um único usuário e não seja array, exibe diretamente
+          this.resultado = data;
+          this.usuariosEncontrados = []; // Limpa a lista de opções
         } else {
           this.showError('Usuário não encontrado pelo nome.');
+          this.usuariosEncontrados = [];
           this.resultado = null;
         }
   
         if (this.resultado) {
-          // Log para verificar a estrutura dos dados
-          console.log(this.resultado);
+          console.log(this.resultado); // Log para verificar a estrutura dos dados
           this.nomePermissao = this.getPermissaoNome(this.resultado.COD_PERMISSAO);
           this.user_sis_nome = this.getUserSisNome(this.resultado.USER_SIS);
         }
@@ -121,9 +125,18 @@ export class UserConsultarComponent {
       (error) => {
         console.error('Erro ao buscar por Nome:', error);
         this.showError('Erro ao buscar Nome. Por favor, tente novamente.');
+        this.usuariosEncontrados = [];
         this.resultado = null;
       }
     );
+  }
+  
+  selecionarUsuario(usuario: any) {
+    // Define o usuário selecionado como o `resultado`
+    this.resultado = usuario;
+    this.usuariosEncontrados = []; // Limpa a lista de opções
+    this.nomePermissao = this.getPermissaoNome(this.resultado.COD_PERMISSAO);
+    this.user_sis_nome = this.getUserSisNome(this.resultado.USER_SIS);
   }
 
   editarUsuario(cpf: string) {

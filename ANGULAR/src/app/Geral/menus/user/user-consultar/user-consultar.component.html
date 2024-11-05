@@ -29,6 +29,30 @@
             </div>
         </div>
 
+        <div *ngIf="usuariosEncontrados.length > 0" class="p-inputtext p-component p-element" style="margin-top: 20px;">
+            <h3 class="text-center" [ngStyle]="{backgroundColor:'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}">
+                SELECIONAR USUÁRIO
+            </h3>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>CPF</th>
+                  <th>Nome</th>
+                  <th>Ação</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let usuario of usuariosEncontrados">
+                  <td>{{ usuario.CPF }}</td>
+                  <td>{{ usuario.NOME }}</td>
+                  <td>
+                    <p-button icon="pi pi-check" label="Selecionar" (click)="selecionarUsuario(usuario)"></p-button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
         <div *ngIf="resultado" class="p-inputtext p-component p-element">
             <h3 class="text-center" [ngStyle]="{backgroundColor:'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}"> DADOS PRELIMINARES</h3>
             <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
