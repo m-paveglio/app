@@ -92,7 +92,7 @@
                                [(ngModel)]="resultado.NOME" name="Nome" [readonly]="!editMode">
                                <label for="resultado-nome">Nome</label>
                     </span>
-                </div>
+                </div> 
   
                 <!-- Campo E-mail -->
                 <div class="field col-12 md:col-4">
@@ -119,8 +119,8 @@
                             [ngClass]="{ 'p-filled': true }"
                             [style.backgroundColor]="'lightgray'"
                             [value]="getPermissaoNome(resultado.COD_PERMISSAO)"
-                            readonly>  <!-- Campo somente leitura -->
-                        <label for="resultado-permissao">Permissão</label>
+                            readonly> <!-- Campo somente leitura -->
+                            <label for="resultado-permissao">Permissão</label>
                     </span>
                 
                     <!-- Dropdown que aparece somente quando editMode é verdadeiro -->
@@ -129,9 +129,8 @@
                         id="permissao-dropdown"
                         [options]="permissoes"
                         [(ngModel)]="resultado.COD_PERMISSAO"
-                        optionLabel="nome"
-                        optionValue="codigo"
-                        placeholder="Selecione uma permissão"
+                        optionLabel="DESC_PERMISSAO"
+                        optionValue="COD_PERMISSAO"
                         (onChange)="nomePermissao = getPermissaoNome(resultado.COD_PERMISSAO)">
                     </p-dropdown>
                 </div>

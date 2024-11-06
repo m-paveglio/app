@@ -93,4 +93,9 @@ export class UserService {
       catchError(this.handleError)
     );
   }
+
+  getPermissoes(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/permissoes`);
+  }
+
 }

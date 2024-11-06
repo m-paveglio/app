@@ -28,7 +28,13 @@
 
           <div class="field col-12 md:col-2">
             <span class="p-float-label">
-              <p-dropdown id="float-input" [(ngModel)]="novoUsuario.COD_PERMISSAO" name="permissao" [options]="permissoes" optionLabel="nome" optionValue="codigo"></p-dropdown>
+              <p-dropdown id="float-input" 
+                          [(ngModel)]="novoUsuario.COD_PERMISSAO" 
+                          name="permissao" 
+                          [options]="permissoes" 
+                          optionLabel="DESC_PERMISSAO" 
+                          optionValue="COD_PERMISSAO">
+              </p-dropdown>
               <label for="float-input">Permissão</label>
             </span>
           </div>

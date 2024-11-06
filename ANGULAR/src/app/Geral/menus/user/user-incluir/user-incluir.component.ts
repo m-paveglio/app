@@ -12,18 +12,7 @@ export class UserIncluirComponent {
   mask: String = '';
   resultado: any;
   novoUsuario: any = {};
-  permissoes = [
-    { nome: 'Administrador', codigo: '1' },
-    { nome: 'Suporte', codigo: '2' },
-    { nome: 'Contador', codigo: '3' },
-    { nome: 'Diretor', codigo: '4' },
-    { nome: 'Gerente', codigo: '5' },
-    { nome: 'Procurador', codigo: '6' },
-    { nome: 'Auxiliar Administrativo', codigo: '7' },
-    { nome: 'Auxiliar Contábil', codigo: '8' },
-    { nome: 'Atendente', codigo: '9' },
-    { nome: 'Estagiário', codigo: '10' }
-  ];
+  permissoes: any[] = [];
 
   USER_SIS = [
     { nome: 'Ativo', codigo: '1' },
@@ -69,5 +58,26 @@ export class UserIncluirComponent {
 
   showError(mensagem: string) {
     this.messageService.add({ severity: 'error', summary: 'Erro', detail: mensagem });
+  }
+
+  ngOnInit() {
+    this.carregarPermissoes();
+  }
+
+  carregarPermissoes() {
+    this.userService.getPermissoes().subscribe(
+      (data) => {
+        this.permissoes = data; // Carrega as permissões do backend
+      },
+      (error) => {
+        console.error('Erro ao carregar permissões:', error);
+        this.showError('Erro ao carregar permissões. Tente novamente.');
+      }
+    );
+  }
+
+  getPermissaoNome(codigo: string) {
+    let permissao = this.permissoes.find(p => p.codigo === codigo);
+    return permissao ? permissao.nome : '';
   }
 }

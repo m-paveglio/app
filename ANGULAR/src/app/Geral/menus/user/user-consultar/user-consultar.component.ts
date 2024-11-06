@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { UserService } from '../user.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { ChangeDetectorRef } from '@angular/core';
+
 
 interface Column {
   field: string;
@@ -21,18 +23,7 @@ export class UserConsultarComponent {
   resultado: any = null; // Definindo como null inicialmente
   novoUsuario: any = {};
   editMode = false;
-  permissoes = [
-    { nome: 'Administrador', codigo: '1' },
-    { nome: 'Suporte', codigo: '2' },
-    { nome: 'Contador', codigo: '3' },
-    { nome: 'Diretor', codigo: '4' },
-    { nome: 'Gerente', codigo: '5' },
-    { nome: 'Procurador', codigo: '6' },
-    { nome: 'Auxiliar Administrativo', codigo: '7' },
-    { nome: 'Auxiliar Contábil', codigo: '8' },
-    { nome: 'Atendente', codigo: '9' },
-    { nome: 'Estagiário', codigo: '10' }
-  ];
+  permissoes: any[] = [];
   USER_SIS = [
     { nome: 'Ativo', codigo: '1' },
     { nome: 'Desativado', codigo: '0' }
@@ -46,7 +37,8 @@ export class UserConsultarComponent {
     private userService: UserService,
     public dialog: MatDialog,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private cd: ChangeDetectorRef
   ) {}
 
   isCpfValido(cpf: string): boolean {
@@ -161,24 +153,23 @@ selecionarUsuario(usuario: any) {
 }
 
 
-  editarUsuario(cpf: string) {
+editarUsuario(cpf: string) {
   this.userService.buscarPorCpf(cpf).subscribe(
       (data) => {
-          this.resultado = data;
           this.nomePermissao = this.getPermissaoNome(this.resultado.COD_PERMISSAO);
           this.user_sis_nome = this.getUserSisNome(this.resultado.USER_SIS);
-          this.editMode = true; // Ativando o modo de edição
+          this.editMode = true;
       },
       (error) => {
-        console.error('Erro ao editar usuário:', error);
-        if (error.error && error.error.message) {
-          this.processarErro(error.error.message);
-        } else {
-          this.showError('Erro ao cadastrar usuário');
-        }
+          console.error('Erro ao editar usuário:', error);
+          if (error.error && error.error.message) {
+              this.processarErro(error.error.message);
+          } else {
+              this.showError('Erro ao buscar usuário para edição.');
+          }
       }
-    );
-  }
+  );
+}
 
   salvarUsuario() {
   const updatePayload = {
@@ -224,10 +215,6 @@ selecionarUsuario(usuario: any) {
     this.messageService.add({ severity: 'error', summary: 'Erro', detail: mensagem });
   }
 
-  getPermissaoNome(codigo: string) {
-    let permissao = this.permissoes.find(p => p.codigo === codigo);
-    return permissao ? permissao.nome : '';
-  }
 
   getUserSisNome(codigo: string) {
     let userSis = this.USER_SIS.find(u => u.codigo === codigo);
@@ -266,5 +253,37 @@ selecionarUsuario(usuario: any) {
       }
     });
   }
+
+carregarPermissoes() {
+  this.userService.getPermissoes().subscribe(
+      (data) => {
+          this.permissoes = data;
+          console.log('Permissões carregadas:', this.permissoes); // Adicione este log
+          this.cd.detectChanges(); // Força a atualização da UI, se necessário
+      },
+      (error) => {
+          console.error('Erro ao carregar permissões:', error);
+          this.showError('Erro ao carregar permissões. Tente novamente.');
+      }
+  );
+}
+
+getPermissaoNome(codPermissao: string): string {
+  if (!codPermissao || !this.permissoes) return '';
+  const permissaoEncontrada = this.permissoes.find(
+      p => p.COD_PERMISSAO.toString() === codPermissao.toString()
+  );
+  return permissaoEncontrada ? permissaoEncontrada.DESC_PERMISSAO : 'Permissão não encontrada';
+}
+
+ngOnInit() {
+  this.carregarPermissoes(); // Carrega permissões assim que o componente é inicializado
+
+  if (this.resultado && this.resultado.COD_PERMISSAO) {
+      setTimeout(() => {
+          this.nomePermissao = this.getPermissaoNome(this.resultado.COD_PERMISSAO);
+      }, 100); // Garante que permissões sejam carregadas antes de usar
+  }
+}
   
 }
