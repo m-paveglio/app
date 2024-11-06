@@ -10,11 +10,12 @@ import { CidadesModule } from './Geral/Endereco/Cidades/cidades.module';
 import { LogradouroModule } from './Geral/Endereco/Logradouro/logradouro.module';
 import { ProfissoesModule } from './Geral/Profissoes/profissoes.module';
 import { pessoasModule } from './Geral/Pessoas/pessoas.module';
+import { EmpresasModule } from './Login/empresas/empresas.module';
 
 
 
 @Module({
-  imports: [userModule, AuthModule, pessoasModule,PermissoesModule, UfModule, PaisModule, CidadesModule, LogradouroModule, ProfissoesModule],
+  imports: [userModule, AuthModule, pessoasModule,PermissoesModule, UfModule, PaisModule, CidadesModule, LogradouroModule, ProfissoesModule, EmpresasModule],
   controllers: [AppController],
   providers: [AppService],
 })

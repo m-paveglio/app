@@ -126,19 +126,17 @@
                   
                     <!-- Dropdown que aparece somente quando editMode é verdadeiro -->
                     <p-dropdown
-                      *ngIf="editMode"
-                      id="permissao-dropdown"
-                      [options]="permissoes"
-                      [(ngModel)]="resultado.COD_PERMISSAO"
-                      optionLabel="DESC_PERMISSAO"
-                      [autoWidth]="false"
-                      [style]="{ width: '100%' }"
-                      optionValue="COD_PERMISSAO"
-                      [defaultLabel]="nomePermissao"
-                      (ngModelChange)="nomePermissao = getPermissaoNome(resultado.COD_PERMISSAO)"
+                        *ngIf="editMode"
+                        id="permissao-dropdown"
+                        [options]="permissoes"
+                        [(ngModel)]="resultado.COD_PERMISSAO"
+                        optionLabel="DESC_PERMISSAO"
+                        optionValue="COD_PERMISSAO"
+                        [autoWidth]="false"
+                        [style]="{ width: '100%' }"
+                        (ngModelChange)="nomePermissao = getPermissaoNome(resultado.DESC_PERMISSAO)"
                     ></p-dropdown>
                   </div>
-                  
   
                 <!-- Campo Senha -->
                 <div class="field col-12 md:col-2">

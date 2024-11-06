@@ -151,8 +151,6 @@ selecionarUsuario(usuario: any) {
   );
 }
 
-
-
   salvarUsuario() {
   const updatePayload = {
     COD_PERMISSAO: this.resultado.COD_PERMISSAO,
@@ -240,9 +238,10 @@ selecionarUsuario(usuario: any) {
     this.userService.buscarPorCpf(cpf).subscribe(
       (data) => {
         this.resultado = data;
-        this.carregarPermissoes();
-        this.nomePermissao = this.getPermissaoNome(this.resultado.COD_PERMISSAO);
         this.editMode = true;
+
+        // Carrega as permissões e então define o valor do dropdown de permissão
+        this.carregarPermissoes();
       },
       (error) => {
         console.error('Erro ao editar usuário:', error);
@@ -253,18 +252,20 @@ selecionarUsuario(usuario: any) {
         }
       }
     );
-  }
-  
-  
+}
 
-  carregarPermissoes() {
+carregarPermissoes() {
     this.userService.getPermissoes().subscribe(
       (data) => {
         this.permissoes = data;
-        this.cd.detectChanges();
-         if (this.resultado && this.resultado.COD_PERMISSAO) {
+
+        // Define o nome da permissão apenas após as permissões estarem carregadas
+        if (this.resultado && this.resultado.COD_PERMISSAO) {
+          this.nomePermissao = this.getPermissaoNome(this.resultado.COD_PERMISSAO);
+          
+          // Redefine o valor do COD_PERMISSAO e força a atualização da interface
           this.resultado.COD_PERMISSAO = this.resultado.COD_PERMISSAO;
-          this.cd.detectChanges();
+          this.cd.detectChanges(); // Força atualização da view
         }
       },
       (error) => {
@@ -272,23 +273,18 @@ selecionarUsuario(usuario: any) {
         this.showError('Erro ao carregar permissões. Tente novamente.');
       }
     );
-  }
+}
 
-  getPermissaoNome(codPermissao: string): string {
+getPermissaoNome(codPermissao: string): string {
     if (!codPermissao || !this.permissoes) return '';
     const permissaoEncontrada = this.permissoes.find(
       p => p.COD_PERMISSAO.toString() === codPermissao.toString()
     );
     return permissaoEncontrada ? permissaoEncontrada.DESC_PERMISSAO : 'Permissão não encontrada';
-  }
-  
-  ngOnInit() {
+}
+
+ngOnInit() {
+    // Carrega permissões ao inicializar o componente
     this.carregarPermissoes();
-    if (this.resultado && this.resultado.COD_PERMISSAO) {
-      setTimeout(() => {
-         this.nomePermissao = this.getPermissaoNome(this.resultado.COD_PERMISSAO);
-        this.cd.detectChanges(); 
-      }, 100); 
-    }
-  }
+}
 }
