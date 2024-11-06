@@ -109,31 +109,36 @@
                 <!-- Campo Permissão -->
                 <div class="field col-12 md:col-2">
                     <span class="p-float-label float-label-fixed">
-                        <!-- Campo de entrada que aparece somente quando editMode é falso -->
-                        <input
-                            *ngIf="!editMode"
-                            id="resultado-permissao"
-                            type="text"
-                            pinputtext=""
-                            class="p-inputtext p-component p-element"
-                            [ngClass]="{ 'p-filled': true }"
-                            [style.backgroundColor]="'lightgray'"
-                            [value]="getPermissaoNome(resultado.COD_PERMISSAO)"
-                            readonly> <!-- Campo somente leitura -->
-                            <label for="resultado-permissao">Permissão</label>
+                      <!-- Campo de entrada que aparece somente quando editMode é falso -->
+                      <input
+                        *ngIf="!editMode"
+                        id="resultado-permissao"
+                        type="text"
+                        pinputtext=""
+                        class="p-inputtext p-component p-element"
+                        [ngClass]="{ 'p-filled': true }"
+                        [style.backgroundColor]="'lightgray'"
+                        [value]="getPermissaoNome(resultado.COD_PERMISSAO)"
+                        readonly
+                      />
+                      <label for="resultado-permissao">Permissão</label>
                     </span>
-                
+                  
                     <!-- Dropdown que aparece somente quando editMode é verdadeiro -->
                     <p-dropdown
-                        *ngIf="editMode"
-                        id="permissao-dropdown"
-                        [options]="permissoes"
-                        [(ngModel)]="resultado.COD_PERMISSAO"
-                        optionLabel="DESC_PERMISSAO"
-                        optionValue="COD_PERMISSAO"
-                        (onChange)="nomePermissao = getPermissaoNome(resultado.COD_PERMISSAO)">
-                    </p-dropdown>
-                </div>
+                      *ngIf="editMode"
+                      id="permissao-dropdown"
+                      [options]="permissoes"
+                      [(ngModel)]="resultado.COD_PERMISSAO"
+                      optionLabel="DESC_PERMISSAO"
+                      [autoWidth]="false"
+                      [style]="{ width: '100%' }"
+                      optionValue="COD_PERMISSAO"
+                      [defaultLabel]="nomePermissao"
+                      (ngModelChange)="nomePermissao = getPermissaoNome(resultado.COD_PERMISSAO)"
+                    ></p-dropdown>
+                  </div>
+                  
   
                 <!-- Campo Senha -->
                 <div class="field col-12 md:col-2">
