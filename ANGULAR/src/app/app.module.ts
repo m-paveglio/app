@@ -21,6 +21,7 @@ import { GerarNfseComponent } from './Geral/menus/nfse/enviar/gerar-nfse.compone
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { TableModule } from 'primeng/table';
 
 
 
@@ -50,7 +51,8 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
     DropdownModule,
     MatDialogModule,
     ToastModule,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    TableModule
   
     
         

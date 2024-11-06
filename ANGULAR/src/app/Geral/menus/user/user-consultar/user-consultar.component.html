@@ -6,52 +6,66 @@
 
 
     <!-- Formulário de consulta CPF e nome -->
-            <h3 class="text-center" [ngStyle]="{backgroundColor:'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}">
-                CONSULTAR USUÁRIO
-            </h3>
-            <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
-                <!-- Campos de CPF e Nome -->
-                <div class="field col-12 md:col-4">
-                    <span class="p-float-label">
-                        <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled" mask='000.000.000-00' [(ngModel)]="cpf" name="CPF">
-                        <label for="float-input">CPF</label>
-                    </span>
-                </div>
-                <div class="field col-12 md:col-7">
-                    <span class="p-float-label">
-                        <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled" [(ngModel)]="nome" name="NOME">
-                        <label for="float-input">Nome</label>
-                    </span>
-                </div>
-                <div class="btn-group field col-12 md:col-1 flex flex-wrap gap-3" role="group" aria-label="Third group">
-                    <p-button icon="pi pi-search" severity="success" (click)="buscarUsuario()"></p-button>
-                </div>
+    <h3 class="text-center" [ngStyle]="{backgroundColor:'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}">
+        CONSULTAR USUÁRIO
+    </h3>
+    <form (ngSubmit)="buscarUsuario()"> <!-- Envolva tudo no formulário -->
+        <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
+            <!-- Campo de CPF -->
+            <div class="field col-12 md:col-4">
+                <span class="p-float-label">
+                    <input id="cpf-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled" 
+                           mask="000.000.000-00" [(ngModel)]="cpf" name="CPF" (keydown.enter)="buscarUsuario()">
+                    <label for="cpf-input">CPF</label>
+                </span>
             </div>
+    
+            <!-- Campo de Nome -->
+            <div class="field col-12 md:col-7">
+                <span class="p-float-label">
+                    <input id="nome-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled" 
+                           [(ngModel)]="nome" name="NOME" (keydown.enter)="buscarUsuario()">
+                    <label for="nome-input">Nome</label>
+                </span>
+            </div>
+    
+            <!-- Botão de busca -->
+            <div class="btn-group field col-12 md:col-1 flex flex-wrap gap-3" role="group" aria-label="Third group">
+                <p-button icon="pi pi-search" severity="success" (click)="buscarUsuario()"></p-button>
+            </div>
+        </div>
+    </form>
         </div>
 
         <div *ngIf="usuariosEncontrados.length > 0" class="p-inputtext p-component p-element" style="margin-top: 20px;">
             <h3 class="text-center" [ngStyle]="{backgroundColor:'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}">
                 SELECIONAR USUÁRIO
             </h3>
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>CPF</th>
-                  <th>Nome</th>
-                  <th>Ação</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let usuario of usuariosEncontrados">
-                  <td>{{ usuario.CPF }}</td>
-                  <td>{{ usuario.NOME }}</td>
-                  <td>
-                    <p-button icon="pi pi-check" label="Selecionar" (click)="selecionarUsuario(usuario)"></p-button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+            <p-table
+                [value]="usuariosEncontrados"
+                [paginator]="true"
+                [rows]="5"
+                [tableStyle]="{ 'min-width': '50rem' }"
+                [rowsPerPageOptions]="[5, 10, 20]"
+            >
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th class="field col-12 md:col-4">CPF</th> <!-- Usando grid aqui -->
+                        <th class="field col-12 md:col-7">Nome</th> <!-- Ajustando com 'md:col-x' -->
+                        <th class="field col-12 md:col-1">Ação</th> <!-- Coluna menor para ação -->
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-usuario>
+                    <tr>
+                        <td>{{ usuario.CPF | mask: '000.000.000-00' }}</td>
+                        <td>{{ usuario.NOME }}</td>
+                        <td>
+                            <p-button icon="pi pi-check" severity="success" (click)="selecionarUsuario(usuario)"></p-button>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
 
         <div *ngIf="resultado" class="p-inputtext p-component p-element">
             <h3 class="text-center" [ngStyle]="{backgroundColor:'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}"> DADOS PRELIMINARES</h3>
@@ -148,7 +162,7 @@
                             [style.backgroundColor]="'lightgray'"
                             [value]="getUserSisNome(resultado.USER_SIS)"
                             readonly>  <!-- Campo somente leitura -->
-                        <label for="resultado-user_sis">Ativo</label>
+                        <label for="resultado-user_sis">Status</label>
                     </span>
                 
                     <!-- Dropdown que aparece somente quando editMode é verdadeiro -->

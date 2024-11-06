@@ -3,6 +3,11 @@ import { UserService } from '../user.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
 
+interface Column {
+  field: string;
+  header: string;
+}
+
 @Component({
   selector: 'app-user-consultar',
   templateUrl: './user-consultar.component.html',
@@ -10,6 +15,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
   providers: [MessageService, ConfirmationService] // Adicione o MessageService como provedor
 })
 export class UserConsultarComponent {
+  cols!: Column[];
   cpf: string = '';
   nome: string = '';
   resultado: any = null; // Definindo como null inicialmente
@@ -102,24 +108,27 @@ export class UserConsultarComponent {
   buscarPorNome() {
     this.userService.buscarPorNome(this.nome).subscribe(
       (data) => {
-        // Verifica se a resposta é um array com resultados
-        if (data && Array.isArray(data) && data.length > 0) {
-          this.usuariosEncontrados = data;  // Armazena todos os usuários encontrados
-          this.resultado = null;  // Limpa o resultado para mostrar a lista de opções
-        } else if (data && !Array.isArray(data)) {
-          // Caso seja um único usuário e não seja array, exibe diretamente
-          this.resultado = data;
-          this.usuariosEncontrados = []; // Limpa a lista de opções
+        if (data) {
+          // Se data for um array, mapeia para garantir estrutura de propriedades
+          if (Array.isArray(data) && data.length > 0) {
+            this.usuariosEncontrados = data.map(usuario => ({
+              CPF: usuario.CPF,
+              NOME: usuario.NOME
+            }));
+            this.resultado = null; // Limpa resultado ao exibir lista de opções
+          } 
+          // Se data não for um array, assume que é um único usuário e exibe diretamente
+          else if (!Array.isArray(data)) {
+            this.resultado = { CPF: data.CPF, NOME: data.NOME, COD_PERMISSAO: data.COD_PERMISSAO, USER_SIS: data.USER_SIS };
+            this.usuariosEncontrados = []; // Limpa a lista de opções
+            this.nomePermissao = this.getPermissaoNome(this.resultado.COD_PERMISSAO);
+            this.user_sis_nome = this.getUserSisNome(this.resultado.USER_SIS);
+          }
         } else {
+          // Caso não encontre nenhum usuário
           this.showError('Usuário não encontrado pelo nome.');
           this.usuariosEncontrados = [];
           this.resultado = null;
-        }
-  
-        if (this.resultado) {
-          console.log(this.resultado); // Log para verificar a estrutura dos dados
-          this.nomePermissao = this.getPermissaoNome(this.resultado.COD_PERMISSAO);
-          this.user_sis_nome = this.getUserSisNome(this.resultado.USER_SIS);
         }
       },
       (error) => {
@@ -129,15 +138,28 @@ export class UserConsultarComponent {
         this.resultado = null;
       }
     );
-  }
+}
   
-  selecionarUsuario(usuario: any) {
-    // Define o usuário selecionado como o `resultado`
-    this.resultado = usuario;
-    this.usuariosEncontrados = []; // Limpa a lista de opções
-    this.nomePermissao = this.getPermissaoNome(this.resultado.COD_PERMISSAO);
-    this.user_sis_nome = this.getUserSisNome(this.resultado.USER_SIS);
-  }
+selecionarUsuario(usuario: any) {
+  // Define o usuário selecionado como o `resultado`
+  this.userService.buscarPorCpf(usuario.CPF).subscribe(
+    (data) => {
+      this.resultado = data;
+      this.nomePermissao = this.getPermissaoNome(this.resultado.COD_PERMISSAO);
+      this.user_sis_nome = this.getUserSisNome(this.resultado.USER_SIS);
+      this.usuariosEncontrados = []; // Limpa a lista de opções
+    },
+    (error) => {
+      console.error('Erro ao selecionar usuário:', error);
+      if (error.error && error.error.message) {
+        this.processarErro(error.error.message);
+      } else {
+        this.showError('Erro ao selecionar usuário');
+      }
+    }
+  );
+}
+
 
   editarUsuario(cpf: string) {
   this.userService.buscarPorCpf(cpf).subscribe(
