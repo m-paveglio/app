@@ -8,27 +8,32 @@ export class UserEmpresasController {
   constructor(private readonly userEmpresasService: UserEmpresasService) {}
 
   @Post()
-  create(@Body() createUserEmpresaDto: CreateUserEmpresaDto) {
-    return this.userEmpresasService.create(createUserEmpresaDto);
+  createUserEmpresa(@Body() createUserEmpresaDto: CreateUserEmpresaDto) {
+    return this.userEmpresasService.createUserEmpresa(createUserEmpresaDto);
   }
 
   @Get()
   findAll() {
-    return this.userEmpresasService.findAll();
+    return this.userEmpresasService.getUserEmpresas();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userEmpresasService.findOne(+id);
+  @Get(':CPF')
+  findOneCpf(@Param('CPF') CPF: string) {
+    return this.userEmpresasService.getUserEmpresaCpf(CPF);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserEmpresaDto: UpdateUserEmpresaDto) {
-    return this.userEmpresasService.update(+id, updateUserEmpresaDto);
+  @Get(':CNPJ')
+  findOneCnpj(@Param('CNPJ') CNPJ: string) {
+    return this.userEmpresasService.getUserEmpresaCnpj(CNPJ);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userEmpresasService.remove(+id);
+  @Patch(':CNPJ')
+  updateUserEmpresa(@Param('CNPJ') CNPJ: string, @Body() updateUserEmpresaDto: UpdateUserEmpresaDto) {
+    return this.userEmpresasService.updateUserEmpresa(CNPJ, updateUserEmpresaDto);
+  }
+
+  @Delete(':CNPJ')
+  deleteUserEmpresa(@Param('CNPJ') CNPJ: string) {
+    return this.userEmpresasService.deleteUserEmpresa(CNPJ);
   }
 }

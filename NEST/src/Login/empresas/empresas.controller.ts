@@ -8,8 +8,8 @@ import { Repository } from 'typeorm';
 @Controller('empresa')
 export class EmpresasController {
   constructor(private readonly EmpresasService: EmpresasService, 
-  @Inject('EMPRESA_REPOSITORY')
-  private userRepository: Repository<empresa>,) {}
+  @Inject('EMPRESAS_REPOSITORY')
+  private empresaRepository: Repository<empresa>,) {}
 
   @Get()
   getEmpresas(): Promise<empresa[]> {

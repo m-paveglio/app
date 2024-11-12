@@ -13,12 +13,5 @@ export class  user {
   EMAIL: string;
 
   @Column({ length: 255 })
-  SENHA: string;
-
-  @Column({ length: 2 })
-  USER_SIS: string;
-
-  @Column({ length: 2 })
-  COD_PERMISSAO: string;
-  
+  SENHA: string;  
 }

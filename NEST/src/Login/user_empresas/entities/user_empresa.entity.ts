@@ -2,12 +2,15 @@ import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity('USER_EMPRESAS')
 export class UserEmpresa {
-  @PrimaryColumn({ type: 'text', length: 14 })
+  @PrimaryColumn({ length: 14})
   CNPJ: string;
 
-  @PrimaryColumn({ type: 'text', length: 11 })
+  @PrimaryColumn({ length: 11})
   CPF: string;
 
-  @Column({ type: 'text' })
+  @Column({ length: 2 })
   COD_PERMISSAO: string;
+
+  @Column({ length: 2 })
+  USER_STATUS: string;
 }
