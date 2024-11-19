@@ -23,7 +23,7 @@ export class AppMenuComponent implements OnInit {
             {
                 label: 'Menus',
                 items: [
-                    { label: 'Usuários', icon: 'pi pi-fw pi-id-card', items: [
+                    { label: 'Usuários', icon: 'pi pi-fw pi-users', items: [
                         {
                             label: 'Incluir',
                             icon: 'pi pi-fw pi-user-plus',
@@ -33,6 +33,35 @@ export class AppMenuComponent implements OnInit {
                             label: 'Consultar',
                             icon: 'pi pi-fw pi-search',
                             routerLink: ['user/consultar']
+                        },
+                        ],
+                     },  
+
+                     { label: 'Empresas', icon: 'pi pi-fw pi-building', items: [
+                        {
+                            label: 'Incluir',
+                            icon: 'pi pi-fw pi-plus',
+                            routerLink: ['empresas/incluir']
+                        },
+                        {
+                            label: 'Consultar',
+                            icon: 'pi pi-fw pi-search',
+                            routerLink: ['empresas/consultar']
+                        },
+                        ],
+                     },  
+
+
+                     { label: 'Usuários x Empresas', icon: 'pi pi-fw pi-id-card', items: [
+                        {
+                            label: 'Incluir',
+                            icon: 'pi pi-fw pi-plus',
+                            routerLink: ['user-empresas/incluir']
+                        },
+                        {
+                            label: 'Consultar',
+                            icon: 'pi pi-fw pi-search',
+                            routerLink: ['user-empresas/consultar']
                         },
                         ],
                      },  
