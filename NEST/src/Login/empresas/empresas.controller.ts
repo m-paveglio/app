@@ -21,7 +21,7 @@ export class EmpresasController {
     return this.EmpresasService.getEmpresa(CNPJ);
   }
 
-  @Get('NOME/:NOME')
+  @Get('nome/:NOME')
   searchEmpresaByName(@Param('NOME') NOME: string) {
     return this.EmpresasService.searchEmpresaByName(NOME);
   }
