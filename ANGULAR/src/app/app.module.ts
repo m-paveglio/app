@@ -22,6 +22,8 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TableModule } from 'primeng/table';
+import { EmpresasIncluirComponent } from './Geral/login/usuarios/empresas/empresas-incluir/empresas-incluir.component';
+import { EmpresasConsultarComponent } from './Geral/login/usuarios/empresas/empresas-consultar/empresas-consultar.component';
 
 
 
@@ -36,7 +38,9 @@ import { TableModule } from 'primeng/table';
     UserConsultarComponent,
     UserIncluirComponent,
     UserRelatorioComponent,
-    GerarNfseComponent
+    GerarNfseComponent,
+    EmpresasIncluirComponent,
+    EmpresasConsultarComponent
         ],
   imports: [
     BrowserModule,

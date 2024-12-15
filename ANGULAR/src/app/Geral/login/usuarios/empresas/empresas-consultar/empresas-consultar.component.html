@@ -1,48 +1,48 @@
 <p-confirmDialog></p-confirmDialog>
 <p-toast></p-toast>
-<div class="grid" *ngIf="novoUsuario">
+<div class="grid" *ngIf="novaEmpresa">
     <div class="col-12">
         <div *ngIf="!resultado" class="p-inputtext p-component p-element">
 
 
     <!-- Formulário de consulta CPF e nome -->
     <h3 class="text-center" [ngStyle]="{backgroundColor:'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}">
-        CONSULTAR USUÁRIO
+        CONSULTAR EMPRESA
     </h3>
-    <form (ngSubmit)="buscarUsuario()"> <!-- Envolva tudo no formulário -->
+    <form (ngSubmit)="buscarEmpresa()"> <!-- Envolva tudo no formulário -->
         <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
             <!-- Campo de CPF -->
             <div class="field col-12 md:col-4">
                 <span class="p-float-label">
-                    <input id="cpf-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled" 
-                           mask="000.000.000-00" [(ngModel)]="cpf" name="CPF" (keydown.enter)="buscarUsuario()">
-                    <label for="cpf-input">CPF</label>
+                    <input id="CNPJ-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled" 
+                           mask="00.000.000/0000-00" [(ngModel)]="CNPJ" name="CNPJ" (keydown.enter)="buscarEmpresa()">
+                    <label for="CNPJ-input">CNPJ</label>
                 </span>
             </div>
     
             <!-- Campo de Nome -->
             <div class="field col-12 md:col-7">
                 <span class="p-float-label">
-                    <input id="nome-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled" 
-                           [(ngModel)]="nome" name="NOME" (keydown.enter)="buscarUsuario()">
-                    <label for="nome-input">Nome</label>
+                    <input id="NOME-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled" 
+                           [(ngModel)]="NOME" name="NOME" (keydown.enter)="buscarEmpresa()">
+                    <label for="NOME-input">RAZÃO SOCIAL</label>
                 </span>
             </div>
     
             <!-- Botão de busca -->
             <div class="btn-group field col-12 md:col-1 flex flex-wrap gap-3" role="group" aria-label="Third group">
-                <p-button icon="pi pi-search" severity="success" (click)="buscarUsuario()"></p-button>
+                <p-button icon="pi pi-search" severity="success" (click)="buscarEmpresa()"></p-button>
             </div>
         </div>
     </form>
         </div>
 
-        <div *ngIf="usuariosEncontrados.length > 0" class="p-inputtext p-component p-element" style="margin-top: 20px;">
+        <div *ngIf="EmpresasEncontradas.length > 0" class="p-inputtext p-component p-element" style="margin-top: 20px;">
             <h3 class="text-center" [ngStyle]="{backgroundColor:'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}">
-                SELECIONAR USUÁRIO
+                SELECIONAR EMPRESA
             </h3>
             <p-table
-                [value]="usuariosEncontrados"
+                [value]="EmpresasEncontradas"
                 [paginator]="true"
                 [rows]="5"
                 [tableStyle]="{ 'min-width': '50rem' }"
@@ -50,17 +50,19 @@
             >
                 <ng-template pTemplate="header">
                     <tr>
-                        <th class="field col-12 md:col-4">CPF</th> <!-- Usando grid aqui -->
-                        <th class="field col-12 md:col-7">Nome</th> <!-- Ajustando com 'md:col-x' -->
+                        <th class="field col-12 md:col-3">CNPJ</th> <!-- Usando grid aqui -->
+                        <th class="field col-12 md:col-6">RAZÃO SOCIAL</th> <!-- Ajustando com 'md:col-x' -->
+                        <th class="field col-12 md:col-2">OPTANTE SIMPLES NACIONAL</th> <!-- Ajustando com 'md:col-x' -->
                         <th class="field col-12 md:col-1">Ação</th> <!-- Coluna menor para ação -->
                     </tr>
                 </ng-template>
-                <ng-template pTemplate="body" let-usuario>
+                <ng-template pTemplate="body" let-empresa>
                     <tr>
-                        <td>{{ usuario.CPF | mask: '000.000.000-00' }}</td>
-                        <td>{{ usuario.NOME }}</td>
+                        <td>{{ empresa.CNPJ | mask: '00.000.000/0000-00' }}</td>
+                        <td>{{ empresa.NOME }}</td>
+                        <td>{{ empresa.OPTANTE_SN }}</td>
                         <td>
-                            <p-button icon="pi pi-check" severity="success" (click)="selecionarUsuario(usuario)"></p-button>
+                            <p-button icon="pi pi-check" severity="success" (click)="selecionarEmpresa(empresa)"></p-button>
                         </td>
                     </tr>
                 </ng-template>
@@ -70,15 +72,15 @@
         <div *ngIf="resultado" class="p-inputtext p-component p-element">
             <h3 class="text-center" [ngStyle]="{backgroundColor:'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}"> DADOS PRELIMINARES</h3>
             <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
-                <!-- Campo CPF -->
+                <!-- Campo CNPJ -->
                 <div class="field col-12 md:col-2">
                     <span class="p-float-label float-label-fixed">
                         
-                        <input id="resultado-cpf" type="text" pinputtext="" class="p-inputtext p-component p-element"
+                        <input id="resultado-CNPJ" type="text" pinputtext="" class="p-inputtext p-component p-element"
                                [ngClass]="{ 'p-filled': !editMode }"
                                [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
-                               mask='000.000.000-00' [(ngModel)]="resultado.CPF" name="CPF" [readonly]="!editMode">
-                               <label for="resultado-cpf">CPF</label>
+                               mask='00.000.000/0000-00' [(ngModel)]="resultado.CNPJ" name="CNPJ" [readonly]="!editMode">
+                               <label for="resultado-CNPJ">CNPJ</label>
                     </span>
                 </div>
   
@@ -86,43 +88,31 @@
                 <div class="field col-12 md:col-4">
                     <span class="p-float-label float-label-fixed">
                         
-                        <input id="resultado-nome" type="text" pinputtext="" class="p-inputtext p-component p-element"
+                        <input id="resultado-NOME" type="text" pinputtext="" class="p-inputtext p-component p-element"
                                [ngClass]="{ 'p-filled': !editMode }"
                                [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
-                               [(ngModel)]="resultado.NOME" name="Nome" [readonly]="!editMode">
-                               <label for="resultado-nome">Nome</label>
+                               [(ngModel)]="resultado.NOME" name="NOME" [readonly]="!editMode">
+                               <label for="resultado-NOME">RAZÃO SOCIAL</label>
                     </span>
                 </div> 
-  
-                <!-- Campo E-mail -->
-                <div class="field col-12 md:col-3">
+
+
+                <div class="field col-12 md:col-4">
                     <span class="p-float-label float-label-fixed">
                         
-                        <input id="resultado-email" type="text" pinputtext="" class="p-inputtext p-component p-element"
+                        <input id="resultado-OPTANTE_SN" type="text" pinputtext="" class="p-inputtext p-component p-element"
                                [ngClass]="{ 'p-filled': !editMode }"
                                [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
-                               [(ngModel)]="resultado.EMAIL" name="E-mail" [readonly]="!editMode">
-                               <label for="resultado-email">E-mail</label>
+                               [(ngModel)]="resultado.OPTANTE_SN" name="OPTANTE_SN" [readonly]="!editMode">
+                               <label for="resultado-OPTANTE_SN">OPTANTE SIMPLES NACIONAL</label>
                     </span>
-                </div>
-  
-                <!-- Campo Senha -->
-                <div class="field col-12 md:col-1">
-                    <span class="p-float-label float-label-fixed">
-                       
-                        <input id="resultado-senha" type="password" pinputtext="" class="p-inputtext p-component p-element"
-                               [ngClass]="{ 'p-filled': !editMode }"
-                               [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
-                               [(ngModel)]="resultado.SENHA" name="Senha" [readonly]="!editMode">
-                               <label for="resultado-senha">Senha</label>
-                    </span>
-                </div>
+                </div> 
   
                 <!-- Botões Editar, Salvar e Excluir -->
                 <div class="btn-group field col-12 md:col-2 flex flex-wrap gap-3" role="group" aria-label="Edit group">
                     <label for=""></label>
-                    <p-button *ngIf="!editMode" icon="pi pi-pencil" severity="info" (click)="editarUsuario(resultado.CPF)"></p-button>
-                    <p-button *ngIf="editMode" icon="pi pi-save" severity="success" (click)="salvarUsuario()"></p-button>
+                    <p-button *ngIf="!editMode" icon="pi pi-pencil" severity="info" (click)="editarEmpresa(resultado.CNPJ)"></p-button>
+                    <p-button *ngIf="editMode" icon="pi pi-save" severity="success" (click)="salvarEmpresa()"></p-button>
                     <p-button icon="pi pi-trash" severity="danger" (click)="confirmarExclusao()"></p-button>
                 </div>
             </div>

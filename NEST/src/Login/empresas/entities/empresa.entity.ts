@@ -7,10 +7,7 @@ export class empresa {
 
   @Column({ type: 'text', length: 300 })
   NOME: string;
-
-  @Column({ type: 'text', length: 2 })
-  COD_STATUS: string;
-
+  
   @Column({ type: 'text', length: 2 })
   OPTANTE_SN: string;
 }

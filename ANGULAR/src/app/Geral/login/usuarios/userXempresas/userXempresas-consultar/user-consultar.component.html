@@ -71,7 +71,7 @@
             <h3 class="text-center" [ngStyle]="{backgroundColor:'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}"> DADOS PRELIMINARES</h3>
             <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
                 <!-- Campo CPF -->
-                <div class="field col-12 md:col-2">
+                <div class="field col-12 md:col-4">
                     <span class="p-float-label float-label-fixed">
                         
                         <input id="resultado-cpf" type="text" pinputtext="" class="p-inputtext p-component p-element"
@@ -83,7 +83,7 @@
                 </div>
   
                 <!-- Campo Nome -->
-                <div class="field col-12 md:col-4">
+                <div class="field col-12 md:col-8">
                     <span class="p-float-label float-label-fixed">
                         
                         <input id="resultado-nome" type="text" pinputtext="" class="p-inputtext p-component p-element"
@@ -95,7 +95,7 @@
                 </div> 
   
                 <!-- Campo E-mail -->
-                <div class="field col-12 md:col-3">
+                <div class="field col-12 md:col-4">
                     <span class="p-float-label float-label-fixed">
                         
                         <input id="resultado-email" type="text" pinputtext="" class="p-inputtext p-component p-element"
@@ -106,8 +106,40 @@
                     </span>
                 </div>
   
+                <!-- Campo Permissão -->
+                <div class="field col-12 md:col-2">
+                    <span class="p-float-label float-label-fixed">
+                      <!-- Campo de entrada que aparece somente quando editMode é falso -->
+                      <input
+                        *ngIf="!editMode"
+                        id="resultado-permissao"
+                        type="text"
+                        pinputtext=""
+                        class="p-inputtext p-component p-element"
+                        [ngClass]="{ 'p-filled': true }"
+                        [style.backgroundColor]="'lightgray'"
+                        [value]="getPermissaoNome(resultado.COD_PERMISSAO)"
+                        readonly
+                      />
+                      <label for="resultado-permissao">Permissão</label>
+                    </span>
+                  
+                    <!-- Dropdown que aparece somente quando editMode é verdadeiro -->
+                    <p-dropdown
+                        *ngIf="editMode"
+                        id="permissao-dropdown"
+                        [options]="permissoes"
+                        [(ngModel)]="resultado.COD_PERMISSAO"
+                        optionLabel="DESC_PERMISSAO"
+                        optionValue="COD_PERMISSAO"
+                        [autoWidth]="false"
+                        [style]="{ width: '100%' }"
+                        (ngModelChange)="nomePermissao = getPermissaoNome(resultado.DESC_PERMISSAO)"
+                    ></p-dropdown>
+                  </div>
+  
                 <!-- Campo Senha -->
-                <div class="field col-12 md:col-1">
+                <div class="field col-12 md:col-2">
                     <span class="p-float-label float-label-fixed">
                        
                         <input id="resultado-senha" type="password" pinputtext="" class="p-inputtext p-component p-element"
@@ -116,6 +148,36 @@
                                [(ngModel)]="resultado.SENHA" name="Senha" [readonly]="!editMode">
                                <label for="resultado-senha">Senha</label>
                     </span>
+                </div>
+  
+                <!-- Campo ATIVO -->
+                <div class="field col-12 md:col-2">
+                    <span class="p-float-label float-label-fixed">
+                        <!-- Campo de entrada que aparece somente quando editMode é falso -->
+                        <input
+                            *ngIf="!editMode"
+                            id="resultado-user_sis"
+                            type="text"
+                            pinputtext=""
+                            class="p-inputtext p-component p-element"
+                            [ngClass]="{ 'p-filled': true }"
+                            [style.backgroundColor]="'lightgray'"
+                            [value]="getUserSisNome(resultado.USER_SIS)"
+                            readonly>  <!-- Campo somente leitura -->
+                        <label for="resultado-user_sis">Status</label>
+                    </span>
+                
+                    <!-- Dropdown que aparece somente quando editMode é verdadeiro -->
+                    <p-dropdown
+                        *ngIf="editMode"
+                        id="user-sis-dropdown"
+                        [options]="USER_SIS"
+                        [(ngModel)]="resultado.USER_SIS"
+                        optionLabel="nome"
+                        optionValue="codigo"
+                        placeholder="Selecione"
+                        (onChange)="user_sis_nome = getUserSisNome(resultado.USER_SIS)">
+                    </p-dropdown>
                 </div>
   
                 <!-- Botões Editar, Salvar e Excluir -->

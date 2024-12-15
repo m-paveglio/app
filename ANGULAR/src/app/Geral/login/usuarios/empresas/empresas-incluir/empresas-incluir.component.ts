@@ -4,7 +4,7 @@ import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-empresas-incluir',
-  templateUrl: './user-empresas.component.html',
+  templateUrl: './empresas-incluir.component.html',
   providers: [MessageService]
 })
 export class EmpresasIncluirComponent {
@@ -13,9 +13,9 @@ export class EmpresasIncluirComponent {
   resultado: any;
   novaEmpresa: any = {};
 
-  COD_STATUS = [
-    { nome: 'Ativo', codigo: '1' },
-    { nome: 'Desativado', codigo: '0' }
+  OPTANTE_SN = [
+    { nome: 'OPTANTE', codigo: '1' },
+    { nome: 'NÃO OPTANTE', codigo: '0' }
   ];
 
   constructor(
@@ -23,31 +23,31 @@ export class EmpresasIncluirComponent {
     private messageService: MessageService
   ) {}
 
-  adicionarUsuario() {
+  adicionarEmpresa() {
     this.empresasService.adicionarEmpresa(this.novaEmpresa).subscribe(
       (data) => {
         this.resultado = data;
         this.novaEmpresa = {};
-        this.showSuccess('Usuário cadastrado com sucesso');
+        this.showSuccess('Empresa cadastrada com sucesso');
       },
       (error) => {
         console.error('Erro ao adicionar usuário:', error);
         if (error.error && error.error.message) {
           this.processarErro(error.error.message);
         } else {
-          this.showError('Erro ao cadastrar usuário');
+          this.showError('Erro ao cadastrar empresa');
         }
       }
     );
   }
 
   processarErro(mensagemErro: string) {
-    if (mensagemErro.includes('usuário já existe')) {
-      this.showError('Erro: o usuário já existe.');
+    if (mensagemErro.includes('empresa já existe')) {
+      this.showError('Erro: o empresa já existe.');
     } else if (mensagemErro.includes('campos obrigatórios')) {
       this.showError('Erro: preencha todos os campos obrigatórios.');
     } else {
-      this.showError('Erro ao cadastrar usuário');
+      this.showError('Erro ao cadastrar empresa');
     }
   }
 

@@ -18,8 +18,8 @@ export class EmpresasService {
     );
   }
   
-  buscarPorNome(nome: string): Observable<any> {
-    const url = `${this.apiUrl}/empresa/nome/${nome}`;
+  buscarPorNome(NOME: string): Observable<any> {
+    const url = `${this.apiUrl}/empresa/nome/${NOME}`;
     return this.http.get(url).pipe(
       catchError(this.handleError)
     );
