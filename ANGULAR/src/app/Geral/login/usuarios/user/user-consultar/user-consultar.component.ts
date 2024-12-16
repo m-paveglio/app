@@ -88,13 +88,12 @@ export class UserConsultarComponent {
         if (data && Object.keys(data).length > 0) {
           this.resultado = data;
   
-          // Converte TIPO_USER para o nome correspondente
+          // Converte TIPO_USER para exibir o nome correspondente em outra propriedade
           const tipoUser = this.TIPO_USER.find(t => t.codigo === this.resultado.TIPO_USER);
-          this.resultado.TIPO_USER = tipoUser ? tipoUser.nome : this.resultado.TIPO_USER;
+          this.resultado.TIPO_USER_nome = tipoUser ? tipoUser.nome : '';
   
           console.log(this.resultado);
           this.nomePermissao = this.getPermissaoNome(this.resultado.COD_PERMISSAO);
-          this.TIPO_USER_nome = this.getTipoUserNome(this.resultado.TIPO_USER);
         } else {
           this.showError('Usuário não existe no banco de dados.');
           this.resultado = null;
