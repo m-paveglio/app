@@ -23,12 +23,6 @@ export class UserConsultarComponent {
   resultado: any = null;
   novoUsuario: any = {};
   editMode = false;
-  permissoes: any[] = [];
-  USER_SIS = [
-    { nome: 'Ativo', codigo: '1' },
-    { nome: 'Desativado', codigo: '0' }
-  ];
-  nomePermissao: string = '';
   TIPO_USER_nome: string = '';
   usuariosEncontrados: any[] = [];
 
@@ -93,7 +87,6 @@ export class UserConsultarComponent {
           this.resultado.TIPO_USER_nome = tipoUser ? tipoUser.nome : '';
   
           console.log(this.resultado);
-          this.nomePermissao = this.getPermissaoNome(this.resultado.COD_PERMISSAO);
         } else {
           this.showError('Usuário não existe no banco de dados.');
           this.resultado = null;
@@ -245,8 +238,6 @@ selecionarUsuario(usuario: any) {
       (data) => {
         this.resultado = data;
         this.editMode = true;
-
-        this.carregarPermissoes();
       },
       (error) => {
         console.error('Erro ao editar usuário:', error);
@@ -257,39 +248,5 @@ selecionarUsuario(usuario: any) {
         }
       }
     );
-}
-
-carregarPermissoes() {
-    this.userService.getPermissoes().subscribe(
-      (data) => {
-        this.permissoes = data;
-
-        // Define o nome da permissão apenas após as permissões estarem carregadas
-        if (this.resultado && this.resultado.COD_PERMISSAO) {
-          this.nomePermissao = this.getPermissaoNome(this.resultado.COD_PERMISSAO);
-          
-          // Redefine o valor do COD_PERMISSAO e força a atualização da interface
-          this.resultado.COD_PERMISSAO = this.resultado.COD_PERMISSAO;
-          this.cd.detectChanges(); // Força atualização da view
-        }
-      },
-      (error) => {
-        console.error('Erro ao carregar permissões:', error);
-        this.showError('Erro ao carregar permissões. Tente novamente.');
-      }
-    );
-  }
-
-getPermissaoNome(codPermissao: string): string {
-    if (!codPermissao || !this.permissoes) return '';
-    const permissaoEncontrada = this.permissoes.find(
-      p => p.COD_PERMISSAO.toString() === codPermissao.toString()
-    );
-    return permissaoEncontrada ? permissaoEncontrada.DESC_PERMISSAO : 'Permissão não encontrada';
-}
-
-ngOnInit() {
-    // Carrega permissões ao inicializar o componente
-    this.carregarPermissoes();
 }
 }

@@ -13,6 +13,7 @@ interface Column {
 @Component({
   selector: 'app-empresas-consultar',
   templateUrl: './empresas-consultar.component.html',
+  styleUrls: ['./empresas-consultar.component.css'],
   providers: [MessageService, ConfirmationService]
 })
 export class EmpresasConsultarComponent {
@@ -27,6 +28,7 @@ export class EmpresasConsultarComponent {
     { nome: 'NÃO OPTANTE', codigo: '0' }
   ];
   EmpresasEncontradas: any[] = [];
+  OPTANTE_SN_nome: string = '';
 
   constructor(
     private EmpresasService: EmpresasService,
@@ -58,6 +60,11 @@ export class EmpresasConsultarComponent {
       (data) => {
         if (data && Object.keys(data).length > 0) {
           this.resultado = data;
+
+          // Converte TIPO_USER para exibir o nome correspondente em outra propriedade
+          const OPTANTE_SN = this.OPTANTE_SN.find(t => t.codigo === this.resultado.OPTANTE_SN);
+          this.resultado.OPTANTE_SN_nome = OPTANTE_SN ? OPTANTE_SN.nome : '';
+
           console.log(this.resultado);
         } else {
           this.showError('Empresa não existe no banco de dados.');

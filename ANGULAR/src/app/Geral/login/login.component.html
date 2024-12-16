@@ -12,11 +12,11 @@
                 
                 <span class="p-input-icon-left w-full mb-4">
                     <i class="pi pi-pencil"></i>
-                    <input id="email" type="text" pinputtext="" placeholder="CPF" class="p-inputtext p-component p-element w-full md:w-25rem" mask="000.000.000-00" [(ngModel)]="credentials.CPF" (input)="onCPFInputChange($event)" />
+                    <input id="email" type="text" pinputtext="" placeholder="CPF" class="p-inputtext p-component p-element w-full md:w-25rem" mask="000.000.000-00" [(ngModel)]="credentials.CPF" (input)="onCPFInputChange($event)" (keydown.enter)="onLogin()" />
                 </span>
                 <span class="p-input-icon-left w-full mb-4">
                     <i class="pi pi-lock"></i>
-                    <input id="password" type="password" pinputtext="" placeholder="SENHA" class="p-inputtext p-component p-element w-full md:w-25rem" [(ngModel)]="credentials.SENHA" (input)="onPasswordInputChange($event)" />
+                    <input id="password" type="password" pinputtext="" placeholder="SENHA" class="p-inputtext p-component p-element w-full md:w-25rem" [(ngModel)]="credentials.SENHA" (input)="onPasswordInputChange($event)" (keydown.enter)="onLogin()" />
                 </span>
                 <div class="mb-4 flex flex-wrap gap-3 text-center">
                     <a class="text-600 cursor-pointer">Esqueceu sua Senha?</a>
