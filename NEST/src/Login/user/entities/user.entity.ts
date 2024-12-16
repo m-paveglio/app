@@ -15,4 +15,7 @@ export class  user {
   @Column({ length: 255 })
   SENHA: string;  
 
+  @Column({length: 2 })
+  TIPO_USER: string;
+
 }

@@ -14,9 +14,10 @@ export class UserIncluirComponent {
   novoUsuario: any = {};
   permissoes: any[] = [];
 
-  USER_SIS = [
-    { nome: 'Ativo', codigo: '1' },
-    { nome: 'Desativado', codigo: '0' }
+  TIPO_USER = [
+    { nome: 'Admin', codigo: '1' },
+    { nome: 'Suporte', codigo: '2' },
+    { nome: 'Usuário', codigo: '3' }
   ];
 
   constructor(

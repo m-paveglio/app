@@ -19,13 +19,20 @@
             </span>
           </div>
 
-          <div class="field col-12 md:col-3">
+          <div class="field col-12 md:col-4">
             <span class="p-float-label">
               <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled" [(ngModel)]="novoUsuario.EMAIL" name="email">
               <label for="float-input">E-mail</label>
             </span>
           </div>
 
+          <div class="field col-12 md:col-2">
+            <span class="p-float-label">
+              <p-dropdown id="float-input" [ngStyle]="{'padding': '0px'}" [(ngModel)]="novoUsuario.TIPO_USER" name="TIPO_USER" [options]="TIPO_USER" optionLabel="nome" optionValue="codigo"></p-dropdown>
+              <label for="float-input">Tipo Usuário</label>
+            </span>
+          </div>
+          
 
           <div class="field col-12 md:col-2">
             <span class="p-float-label">

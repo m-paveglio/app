@@ -95,7 +95,7 @@
                 </div> 
   
                 <!-- Campo E-mail -->
-                <div class="field col-12 md:col-3">
+                <div class="field col-12 md:col-4">
                     <span class="p-float-label float-label-fixed">
                         
                         <input id="resultado-email" type="text" pinputtext="" class="p-inputtext p-component p-element"
@@ -105,9 +105,39 @@
                                <label for="resultado-email">E-mail</label>
                     </span>
                 </div>
+
+
+                <div class="field col-12 md:col-2">
+                    <span class="p-float-label float-label-fixed">
+                        <!-- Campo de entrada que aparece somente quando editMode é falso -->
+                        <input
+                            *ngIf="!editMode"
+                            id="resultado-TIPO_USER"
+                            type="text"
+                            pinputtext=""
+                            class="p-inputtext p-component p-element"
+                            [ngClass]="{ 'p-filled': true }"
+                            [style.backgroundColor]="'lightgray'"
+                            [value]="getTipoUserNome(resultado.TIPO_USER)"
+                            readonly>  <!-- Campo somente leitura -->
+                        <label for="resultado-TIPO_USER">Status</label>
+                    </span>
+                
+                    <!-- Dropdown que aparece somente quando editMode é verdadeiro -->
+                    <p-dropdown
+                        *ngIf="editMode"
+                        id="TIPO_USER-dropdown"
+                        [options]="TIPO_USER"
+                        [(ngModel)]="resultado.TIPO_USER"
+                        optionLabel="nome"
+                        optionValue="codigo"
+                        placeholder="Selecione"
+                        (onChange)="TIPO_USER_nome = getTipoUserNome(resultado.TIPO_USER)">
+                    </p-dropdown>
+                </div>
   
                 <!-- Campo Senha -->
-                <div class="field col-12 md:col-1">
+                <div class="field col-12 md:col-2">
                     <span class="p-float-label float-label-fixed">
                        
                         <input id="resultado-senha" type="password" pinputtext="" class="p-inputtext p-component p-element"

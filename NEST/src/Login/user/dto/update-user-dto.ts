@@ -4,6 +4,5 @@ export class updateUserDto
     NOME: string
     EMAIL: string
     SENHA: string
-    USER_SIS: string
-    COD_PERMISSAO: string 
+    TIPO_USER: string
 }

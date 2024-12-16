@@ -29,8 +29,15 @@ export class UserConsultarComponent {
     { nome: 'Desativado', codigo: '0' }
   ];
   nomePermissao: string = '';
-  user_sis_nome: string = '';
+  TIPO_USER_nome: string = '';
   usuariosEncontrados: any[] = [];
+
+  TIPO_USER = [
+    { nome: 'Admin', codigo: '1' },
+    { nome: 'Suporte', codigo: '2' },
+    { nome: 'Usuário', codigo: '3' }
+  ];
+
 
   constructor(
     private userService: UserService,
@@ -80,9 +87,14 @@ export class UserConsultarComponent {
       (data) => {
         if (data && Object.keys(data).length > 0) {
           this.resultado = data;
+  
+          // Converte TIPO_USER para o nome correspondente
+          const tipoUser = this.TIPO_USER.find(t => t.codigo === this.resultado.TIPO_USER);
+          this.resultado.TIPO_USER = tipoUser ? tipoUser.nome : this.resultado.TIPO_USER;
+  
           console.log(this.resultado);
           this.nomePermissao = this.getPermissaoNome(this.resultado.COD_PERMISSAO);
-          this.user_sis_nome = this.getUserSisNome(this.resultado.USER_SIS);
+          this.TIPO_USER_nome = this.getTipoUserNome(this.resultado.TIPO_USER);
         } else {
           this.showError('Usuário não existe no banco de dados.');
           this.resultado = null;
@@ -110,10 +122,8 @@ export class UserConsultarComponent {
           } 
           // Se data não for um array, assume que é um único usuário e exibe diretamente
           else if (!Array.isArray(data)) {
-            this.resultado = { CPF: data.CPF, NOME: data.NOME, COD_PERMISSAO: data.COD_PERMISSAO, USER_SIS: data.USER_SIS };
+            this.resultado = { CPF: data.CPF, NOME: data.NOME, TIPO_USER: data.TIPO_USER };
             this.usuariosEncontrados = []; // Limpa a lista de opções
-            this.nomePermissao = this.getPermissaoNome(this.resultado.COD_PERMISSAO);
-            this.user_sis_nome = this.getUserSisNome(this.resultado.USER_SIS);
           }
         } else {
           // Caso não encontre nenhum usuário
@@ -136,8 +146,6 @@ selecionarUsuario(usuario: any) {
   this.userService.buscarPorCpf(usuario.CPF).subscribe(
     (data) => {
       this.resultado = data;
-      this.nomePermissao = this.getPermissaoNome(this.resultado.COD_PERMISSAO);
-      this.user_sis_nome = this.getUserSisNome(this.resultado.USER_SIS);
       this.usuariosEncontrados = []; // Limpa a lista de opções
     },
     (error) => {
@@ -153,8 +161,7 @@ selecionarUsuario(usuario: any) {
 
   salvarUsuario() {
   const updatePayload = {
-    COD_PERMISSAO: this.resultado.COD_PERMISSAO,
-    USER_SIS: this.resultado.USER_SIS,
+    TIPO_USER: this.resultado.TIPO_USER,
     CPF: this.resultado.CPF,
     NOME: this.resultado.NOME,
     EMAIL: this.resultado.EMAIL,
@@ -196,9 +203,9 @@ selecionarUsuario(usuario: any) {
   }
 
 
-  getUserSisNome(codigo: string) {
-    let userSis = this.USER_SIS.find(u => u.codigo === codigo);
-    return userSis ? userSis.nome : '';
+  getTipoUserNome(codigo: string) {
+    let TIPO_USER = this.TIPO_USER.find(u => u.codigo === codigo);
+    return TIPO_USER ? TIPO_USER.nome : '';
   }
 
   excluirUsuario(cpf: string) {
@@ -240,7 +247,6 @@ selecionarUsuario(usuario: any) {
         this.resultado = data;
         this.editMode = true;
 
-        // Carrega as permissões e então define o valor do dropdown de permissão
         this.carregarPermissoes();
       },
       (error) => {
@@ -273,7 +279,7 @@ carregarPermissoes() {
         this.showError('Erro ao carregar permissões. Tente novamente.');
       }
     );
-}
+  }
 
 getPermissaoNome(codPermissao: string): string {
     if (!codPermissao || !this.permissoes) return '';
