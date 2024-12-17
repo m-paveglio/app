@@ -17,15 +17,15 @@ export class UserEmpresasController {
     return this.userEmpresasService.getUserEmpresas();
   }
 
-  @Get(':CPF')
-  findOneCpf(@Param('CPF') CPF: string) {
-    return this.userEmpresasService.getUserEmpresaCpf(CPF);
+  @Get('cpf/:CPF')
+  findOneByCpf(@Param('CPF') CPF: string) {
+  return this.userEmpresasService.getUserEmpresaCpf(CPF);
   }
 
-  @Get(':CNPJ')
-  findOneCnpj(@Param('CNPJ') CNPJ: string) {
-    return this.userEmpresasService.getUserEmpresaCnpj(CNPJ);
-  }
+@Get('cnpj/:CNPJ')
+  findOneByCnpj(@Param('CNPJ') CNPJ: string) {
+  return this.userEmpresasService.getUserEmpresaCnpj(CNPJ);
+}
 
   @Patch(':CNPJ')
   updateUserEmpresa(@Param('CNPJ') CNPJ: string, @Body() updateUserEmpresaDto: UpdateUserEmpresaDto) {

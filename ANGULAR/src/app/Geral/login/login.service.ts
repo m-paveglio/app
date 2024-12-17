@@ -3,24 +3,28 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, BehaviorSubject, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { isPlatformBrowser } from '@angular/common';
+import { ApiConfigService } from '../../api-config.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class LoginService {
-  private apiUrl = 'http://localhost:3000/auth/login';
-  private tokenKey = 'authToken';
-  private userNameKey = 'userName'; // Novo item para armazenar o nome do usuário
+  private apiUrl: string;
+  private readonly tokenKey = 'authToken';
+  private readonly userNameKey = 'userName'; // Novo item para armazenar o nome do usuário
   private isLoggedInSubject = new BehaviorSubject<boolean>(this.hasToken());
 
   constructor(
     private http: HttpClient,
-    @Inject(PLATFORM_ID) private platformId: Object
-  ) {}
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private apiConfig: ApiConfigService // Injetar ApiConfigService
+  ) {
+    this.apiUrl = `${this.apiConfig.getBaseUrl()}/auth/login`; // Construir a URL usando o ApiConfigService
+  }
 
-  login(credentials: { CPF: string, SENHA: string }): Observable<any> {
-    return this.http.post<{ access_token: string, user: { nome: string } }>(this.apiUrl, credentials).pipe(
-      tap(response => this.handleLoginSuccess(response.access_token, response.user.nome)),
+  login(credentials: { CPF: string; SENHA: string }): Observable<any> {
+    return this.http.post<{ access_token: string; user: { nome: string } }>(this.apiUrl, credentials).pipe(
+      tap((response) => this.handleLoginSuccess(response.access_token, response.user.nome)),
       catchError(this.handleError)
     );
   }
@@ -57,7 +61,7 @@ export class LoginService {
     return isPlatformBrowser(this.platformId);
   }
 
-  private handleError(error: HttpErrorResponse) {
+  private handleError(error: HttpErrorResponse): Observable<never> {
     if (error.status === 401) {
       return throwError('Credenciais inválidas. Verifique seu CPF e senha.');
     } else {

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { UserService } from '../user.service';
+import { UserXEmpresasService } from '../userXempresas.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ChangeDetectorRef } from '@angular/core';
@@ -33,7 +33,7 @@ export class UserConsultarComponent {
   usuariosEncontrados: any[] = [];
 
   constructor(
-    private userService: UserService,
+    private UserXEmpresasService: UserXEmpresasService,
     public dialog: MatDialog,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
@@ -76,7 +76,7 @@ export class UserConsultarComponent {
       return;
     }
   
-    this.userService.buscarPorCpf(this.cpf).subscribe(
+    this.UserXEmpresasService.buscarPorCpf(this.cpf).subscribe(
       (data) => {
         if (data && Object.keys(data).length > 0) {
           this.resultado = data;
@@ -96,44 +96,10 @@ export class UserConsultarComponent {
     );
   }
   
-  buscarPorNome() {
-    this.userService.buscarPorNome(this.nome).subscribe(
-      (data) => {
-        if (data) {
-          // Se data for um array, mapeia para garantir estrutura de propriedades
-          if (Array.isArray(data) && data.length > 0) {
-            this.usuariosEncontrados = data.map(usuario => ({
-              CPF: usuario.CPF,
-              NOME: usuario.NOME
-            }));
-            this.resultado = null; // Limpa resultado ao exibir lista de opções
-          } 
-          // Se data não for um array, assume que é um único usuário e exibe diretamente
-          else if (!Array.isArray(data)) {
-            this.resultado = { CPF: data.CPF, NOME: data.NOME, COD_PERMISSAO: data.COD_PERMISSAO, USER_SIS: data.USER_SIS };
-            this.usuariosEncontrados = []; // Limpa a lista de opções
-            this.nomePermissao = this.getPermissaoNome(this.resultado.COD_PERMISSAO);
-            this.user_sis_nome = this.getUserSisNome(this.resultado.USER_SIS);
-          }
-        } else {
-          // Caso não encontre nenhum usuário
-          this.showError('Usuário não encontrado pelo nome.');
-          this.usuariosEncontrados = [];
-          this.resultado = null;
-        }
-      },
-      (error) => {
-        console.error('Erro ao buscar por Nome:', error);
-        this.showError('Erro ao buscar Nome. Por favor, tente novamente.');
-        this.usuariosEncontrados = [];
-        this.resultado = null;
-      }
-    );
-}
-  
+   
 selecionarUsuario(usuario: any) {
   // Define o usuário selecionado como o `resultado`
-  this.userService.buscarPorCpf(usuario.CPF).subscribe(
+  this.UserXEmpresasService.buscarPorCpf(usuario.CPF).subscribe(
     (data) => {
       this.resultado = data;
       this.nomePermissao = this.getPermissaoNome(this.resultado.COD_PERMISSAO);
@@ -161,7 +127,7 @@ selecionarUsuario(usuario: any) {
     SENHA: this.resultado.SENHA
   };
 
-  this.userService.atualizarUsuario(this.resultado.CPF, updatePayload).subscribe(
+  this.UserXEmpresasService.atualizarVinculo(this.resultado.CPF, updatePayload).subscribe(
     () => {
       this.editMode = false;
       this.showSuccess('Usuário atualizado com sucesso!');
@@ -202,7 +168,7 @@ selecionarUsuario(usuario: any) {
   }
 
   excluirUsuario(cpf: string) {
-    this.userService.excluirUsuario(cpf).subscribe(
+    this.UserXEmpresasService.excluirVinculo(cpf).subscribe(
       () => {
         this.resultado = null;
         this.showSuccess('Usuário excluído com sucesso!');
@@ -235,7 +201,7 @@ selecionarUsuario(usuario: any) {
   }
 
   editarUsuario(cpf: string) {
-    this.userService.buscarPorCpf(cpf).subscribe(
+    this.UserXEmpresasService.buscarPorCpf(cpf).subscribe(
       (data) => {
         this.resultado = data;
         this.editMode = true;
@@ -255,7 +221,7 @@ selecionarUsuario(usuario: any) {
 }
 
 carregarPermissoes() {
-    this.userService.getPermissoes().subscribe(
+    this.UserXEmpresasService.getPermissoes().subscribe(
       (data) => {
         this.permissoes = data;
 

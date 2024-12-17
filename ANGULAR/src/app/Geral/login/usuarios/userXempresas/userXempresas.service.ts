@@ -4,73 +4,70 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { ApiConfigService } from '../../../../api-config.service';
 
+
 @Injectable({
   providedIn: 'root',
 })
-export class EmpresasService {
-  private apiUrl: string;
-  
-    constructor(private http: HttpClient, private apiConfig: ApiConfigService) {
-      this.apiUrl = this.apiConfig.getBaseUrl(); // Pegar a URL base do ApiConfigService
+export class UserXEmpresasService {
+   private apiUrl: string;
+   
+     constructor(private http: HttpClient, private apiConfig: ApiConfigService) {
+       this.apiUrl = this.apiConfig.getBaseUrl(); // Pegar a URL base do ApiConfigService
+     }
+
+     buscarPorCnpj(CNPJ: string): Observable<any> {
+      const url = `${this.apiUrl}/user-empresas/cnpj/${CNPJ}`;
+      return this.http.get(url).pipe(catchError(this.handleError));
     }
     
-  buscarPorCnpj(CNPJ: string): Observable<any> {
-    const url = `${this.apiUrl}/empresa/${CNPJ}`;
-    return this.http.get(url).pipe(
-      catchError(this.handleError)
-    );
-  }
+    buscarPorCpf(CPF: string): Observable<any> {
+      const url = `${this.apiUrl}/user-empresas/cpf/${CPF}`;
+      return this.http.get(url).pipe(catchError(this.handleError));
+    }
   
-  buscarPorNome(NOME: string): Observable<any> {
-    const url = `${this.apiUrl}/empresa/nome/${NOME}`;
-    return this.http.get(url).pipe(
-      catchError(this.handleError)
-    );
-  }
-
-  adicionarEmpresa(empresa: any): Observable<any> {
-    const url = `${this.apiUrl}/empresa`;
+  adicionarVinculo(empresa: any): Observable<any> {
+    const url = `${this.apiUrl}/user-empresa`;
     return this.http.post(url, empresa).pipe(
       map(response => {
-        this.handleSuccess('Empresa adicionada com sucesso!');
+        this.handleSuccess('Vínculo adicionado com sucesso!');
         return response;
       }),
       catchError(this.handleError)
     );
   }
 
-  editarEmpresa(CNPJ: string, empresa: any): Observable<any> {
-    const url = `${this.apiUrl}/empresa/${CNPJ}`;
+  editarVinculo(CNPJ: string, empresa: any): Observable<any> {
+    const url = `${this.apiUrl}/user-empresa/${CNPJ}`;
     return this.http.patch(url, empresa).pipe(
       map(response => {
-        this.handleSuccess('Empresa alterada com sucesso!');
+        this.handleSuccess('Vínculo alterado com sucesso!');
         return response;
       }),
       catchError(this.handleError)
     );
   }
 
-  excluirEmpresa(CNPJ: string): Observable<any> {
+  excluirVinculo(CNPJ: string): Observable<any> {
     const url = `${this.apiUrl}/empresa/${CNPJ}`;
     return this.http.delete(url).pipe(
       map(response => {
-        this.handleSuccess('Empresa excluída com sucesso!');
+        this.handleSuccess('Vínculo excluído com sucesso!');
         return response;
       }),
       catchError(this.handleError)
     );
   }
 
-  atualizarEmpresa(CNPJ: string, empresa: any): Observable<any> {
-    const url = `${this.apiUrl}/empresa/${CNPJ}`;
+  atualizarVinculo(CNPJ: string, empresa: any): Observable<any> {
+    const url = `${this.apiUrl}/user-empresas/${CNPJ}`;
     return this.http.patch(url, empresa).pipe(
         map(response => {
-            this.handleSuccess('Usuário atualizado com sucesso!');
+            this.handleSuccess('Vínculo atualizado com sucesso!');
             return response;
         }),
         catchError(this.handleError)
     );
-}
+  }
 
   private handleError(error: any): Observable<never> {
     let errorMessage = 'Erro desconhecido';
@@ -88,6 +85,10 @@ export class EmpresasService {
   private handleSuccess(message: string): void {
     console.log(message); // ou você pode exibir a mensagem de sucesso de outra forma
  
+  }
+
+  getPermissoes(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/permissoes`);
   }
 
   /*exportarRelatorio(): Observable<any> {
