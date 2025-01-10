@@ -11,4 +11,7 @@ export class CreateUserEmpresaDto {
 
   @IsString()
   COD_PERMISSAO: string;
+
+  @IsString()
+  USER_STATUS: string;
 }

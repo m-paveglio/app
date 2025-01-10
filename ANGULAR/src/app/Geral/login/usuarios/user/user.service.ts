@@ -100,6 +100,7 @@ export class UserService {
   getPermissoes(): Observable<any> {
     return this.http.get(`${this.apiUrl}/permissoes`);
   }
+  
 
   buscarPorCnpj(CNPJ: string): Observable<any> {
     const url = `${this.apiUrl}/empresa/${CNPJ}`;
@@ -108,4 +109,53 @@ export class UserService {
     );
   }
 
+
+  adicionarVinculo(empresa: any): Observable<any> {
+     const url = `${this.apiUrl}/user-empresa`;
+    return this.http.post(url, empresa).pipe(
+      map(response => {
+        this.handleSuccess('Vínculo adicionado com sucesso!');
+        return response;
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  editarVinculo(CNPJ: string, empresa: any): Observable<any> {
+    const url = `${this.apiUrl}/user-empresa/${CNPJ}`;
+    return this.http.patch(url, empresa).pipe(
+      map(response => {
+        this.handleSuccess('Vínculo alterado com sucesso!');
+        return response;
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  excluirVinculo(CNPJ: string): Observable<any> {
+    const url = `${this.apiUrl}/user-empresa/${CNPJ}`;
+    return this.http.delete(url).pipe(
+      map(response => {
+        this.handleSuccess('Vínculo excluído com sucesso!');
+        return response;
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  atualizarVinculo(CNPJ: string, empresa: any): Observable<any> {
+    const url = `${this.apiUrl}/user-empresas/${CNPJ}`;
+    return this.http.patch(url, empresa).pipe(
+        map(response => {
+            this.handleSuccess('Vínculo atualizado com sucesso!');
+            return response;
+        }),
+        catchError(this.handleError)
+    );
+  }
+  
+  buscarEmpresasVinculadas(cpf: string): Observable<any[]> {
+    const url = `${this.apiUrl}/user-empresa/${cpf}`;
+    return this.http.get<any[]>(url).pipe(catchError(this.handleError));
+  }
 }

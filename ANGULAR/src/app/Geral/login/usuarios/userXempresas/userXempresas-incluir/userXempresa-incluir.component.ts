@@ -61,9 +61,7 @@ export class UserXEmpresaIncluirComponent {
     this.messageService.add({ severity: 'error', summary: 'Erro', detail: mensagem });
   }
 
-  ngOnInit() {
-    this.carregarPermissoes();
-  }
+
 
   carregarPermissoes() {
     this.userService.getPermissoes().subscribe(

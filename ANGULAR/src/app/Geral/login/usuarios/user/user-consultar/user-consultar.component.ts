@@ -23,11 +23,16 @@ export class UserConsultarComponent {
   cpf: string = '';
   CNPJ: string = '';
   nome: string = '';
+  COD_PERMISSAO: string = '';
+  USER_STATUS: string = '';
   resultado: any = null;
   novoUsuario: any = {};
   editMode = false;
   TIPO_USER_nome: string = '';
   usuariosEncontrados: any[] = [];
+  empresasVinculadas: any[] = []; // Lista de empresas vinculadas
+  showForm: boolean = false; // Controla exibição do formulário para novo vínculo
+  permissoes: any[] = [];
 
   TIPO_USER = [
     { nome: 'Admin', codigo: '1' },
@@ -262,6 +267,13 @@ selecionarUsuario(usuario: any) {
     return cnpj.isValid(cnpjStr); // Validação usando a biblioteca
   }
 
+  buscarEmpresa() {
+    // Verifica se o CNPJ está preenchido e válido para busca por CNPJ
+    if (this.CNPJ && this.isCnpjValido(this.CNPJ)) {
+      this.buscarPorCnpj();
+    } 
+  }
+
 buscarPorCnpj() {
   if (!this.isCnpjValido(this.CNPJ)) {
     this.showError('CNPJ inválido!');
@@ -289,5 +301,94 @@ buscarPorCnpj() {
       this.resultado = null;
     }
   );
+}
+
+ngOnInit() {
+  this.carregarPermissoes();
+}
+
+carregarPermissoes() {
+  this.userService.getPermissoes().subscribe(
+    (data) => {
+      this.permissoes = data.map((item: any) => ({
+        codigo: item.COD_PERMISSAO.toString(),  // Garantir que seja string
+        nome: item.DESC_PERMISSAO   // Campo que será exibido no dropdown
+      }));
+      // Remova ou comente a linha abaixo para evitar o log no console
+      // console.log('Permissões carregadas:', this.permissoes);
+    },
+    (error) => {
+      console.error('Erro ao carregar permissões:', error);
+      this.showError('Erro ao carregar permissões. Tente novamente.');
+    }
+  );
+}
+
+getPermissaoNome(codigo: string) {
+  let permissao = this.permissoes.find(p => {
+    return p.codigo.toString() === String(codigo);
+  });
+  return permissao ? permissao.nome : '';
+}
+
+carregarEmpresasVinculadas() {
+  if (!this.cpf) return;
+
+  this.userService.buscarEmpresasVinculadas(this.cpf).subscribe({
+    next: (empresas) => {
+      this.empresasVinculadas = empresas;
+    },
+    error: () => {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Erro',
+        detail: 'Erro ao carregar empresas vinculadas.',
+      });
+    },
+  });
+}
+
+abrirFormularioVinculo() {
+  this.showForm = true;
+}
+
+adicionarVinculo() {
+  if (!this.cpf || !this.CNPJ || !this.COD_PERMISSAO || !this.USER_STATUS) {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Aviso',
+      detail: 'Todos os campos são obrigatórios.',
+    });
+    return;
+  }
+
+  const vinculo = {
+    CPF: this.cpf,
+    CNPJ: this.CNPJ,
+    COD_PERMISSAO: this.COD_PERMISSAO,
+    USER_STATUS: this.USER_STATUS,
+  };
+
+  this.userService.adicionarVinculo(vinculo).subscribe({
+    next: () => {
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Sucesso',
+        detail: 'Vínculo adicionado com sucesso!',
+      });
+      this.showForm = false;
+      this.carregarEmpresasVinculadas(); // Recarrega a tabela
+      this.CNPJ = '';
+      this.COD_PERMISSAO = '';
+      this.USER_STATUS = '';
+    },
+    error: () => {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Erro',
+        detail: 'Erro ao adicionar vínculo.',
+      });
+    },
+  });
 }
 }
