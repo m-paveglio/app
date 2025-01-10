@@ -68,94 +68,114 @@
         </div>
 
         <div *ngIf="resultado" class="p-inputtext p-component p-element">
-            <h3 class="text-center" [ngStyle]="{backgroundColor:'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}"> DADOS PRELIMINARES</h3>
-            <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
-                <!-- Campo CPF -->
-                <div class="field col-12 md:col-2">
-                    <span class="p-float-label float-label-fixed">
-                        
-                        <input id="resultado-cpf" type="text" pinputtext="" class="p-inputtext p-component p-element"
-                               [ngClass]="{ 'p-filled': !editMode }"
-                               [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
-                               mask='000.000.000-00' [(ngModel)]="resultado.CPF" name="CPF" [readonly]="!editMode">
-                               <label for="resultado-cpf">CPF</label>
-                    </span>
-                </div>
-  
-                <!-- Campo Nome -->
-                <div class="field col-12 md:col-4">
-                    <span class="p-float-label float-label-fixed">
-                        
-                        <input id="resultado-nome" type="text" pinputtext="" class="p-inputtext p-component p-element"
-                               [ngClass]="{ 'p-filled': !editMode }"
-                               [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
-                               [(ngModel)]="resultado.NOME" name="Nome" [readonly]="!editMode">
-                               <label for="resultado-nome">Nome</label>
-                    </span>
-                </div> 
-  
-                <!-- Campo E-mail -->
-                <div class="field col-12 md:col-4">
-                    <span class="p-float-label float-label-fixed">
-                        
-                        <input id="resultado-email" type="text" pinputtext="" class="p-inputtext p-component p-element"
-                               [ngClass]="{ 'p-filled': !editMode }"
-                               [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
-                               [(ngModel)]="resultado.EMAIL" name="E-mail" [readonly]="!editMode">
-                               <label for="resultado-email">E-mail</label>
-                    </span>
-                </div>
-
-
-                <div class="field col-12 md:col-2">
-                    <span class="p-float-label float-label-fixed">
-                        <!-- Campo de entrada que aparece somente quando editMode é falso -->
-                        <input
-                            *ngIf="!editMode"
-                            id="resultado-TIPO_USER"
-                            type="text"
-                            pinputtext=""
-                            class="p-inputtext p-component p-element"
-                            [ngClass]="{ 'p-filled': true }"
-                            [style.backgroundColor]="'lightgray'"
-                            [value]="getTipoUserNome(resultado.TIPO_USER)"
-                            readonly>  <!-- Campo somente leitura -->
-                        <label for="resultado-TIPO_USER">Tipo Usuário</label>
-                    </span>
+            <h3 class="text-center" [ngStyle]="{backgroundColor:'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}">
+                DADOS PRELIMINARES
+            </h3>
+            <p-tabView>
+                <p-tabPanel>
+                    <ng-template pTemplate="header">
+                        <div class="custom-tab-header">
+                            Dados do Usuário
+                        </div>
+                    </ng-template>
+                        <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
+                                <!-- Campo CPF -->
+                                <div class="field col-12 md:col-2">
+                                    <span class="p-float-label float-label-fixed">
+                                        
+                                        <input id="resultado-cpf" type="text" pinputtext="" class="p-inputtext p-component p-element"
+                                            [ngClass]="{ 'p-filled': !editMode }"
+                                            [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
+                                            mask='000.000.000-00' [(ngModel)]="resultado.CPF" name="CPF" [readonly]="!editMode">
+                                            <label for="resultado-cpf">CPF</label>
+                                    </span>
+                                </div>
                 
-                    <!-- Dropdown que aparece somente quando editMode é verdadeiro -->
-                    <p-dropdown
-                        *ngIf="editMode"
-                        id="TIPO_USER-dropdown"
-                        [options]="TIPO_USER"
-                        [(ngModel)]="resultado.TIPO_USER"
-                        optionLabel="nome"
-                        optionValue="codigo"
-                        placeholder="Selecione"
-                        (onChange)="TIPO_USER_nome = getTipoUserNome(resultado.TIPO_USER)">
-                    </p-dropdown>
-                </div>
-  
-                <!-- Campo Senha -->
-                <div class="field col-12 md:col-2">
-                    <span class="p-float-label float-label-fixed">
-                       
-                        <input id="resultado-senha" type="password" pinputtext="" class="p-inputtext p-component p-element"
-                               [ngClass]="{ 'p-filled': !editMode }"
-                               [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
-                               [(ngModel)]="resultado.SENHA" name="Senha" [readonly]="!editMode">
-                               <label for="resultado-senha">Senha</label>
-                    </span>
-                </div>
-  
-                <!-- Botões Editar, Salvar e Excluir -->
-                <div class="btn-group field col-12 md:col-2 flex flex-wrap gap-3" role="group" aria-label="Edit group">
-                    <label for=""></label>
-                    <p-button *ngIf="!editMode" icon="pi pi-pencil" severity="info" (click)="editarUsuario(resultado.CPF)"></p-button>
-                    <p-button *ngIf="editMode" icon="pi pi-save" severity="success" (click)="salvarUsuario()"></p-button>
-                    <p-button icon="pi pi-trash" severity="danger" (click)="confirmarExclusao()"></p-button>
-                </div>
-            </div>
+                                <!-- Campo Nome -->
+                                <div class="field col-12 md:col-4">
+                                    <span class="p-float-label float-label-fixed">
+                                        
+                                        <input id="resultado-nome" type="text" pinputtext="" class="p-inputtext p-component p-element"
+                                            [ngClass]="{ 'p-filled': !editMode }"
+                                            [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
+                                            [(ngModel)]="resultado.NOME" name="Nome" [readonly]="!editMode">
+                                            <label for="resultado-nome">Nome</label>
+                                    </span>
+                                </div> 
+                
+                                <!-- Campo E-mail -->
+                                <div class="field col-12 md:col-4">
+                                    <span class="p-float-label float-label-fixed">
+                                        
+                                        <input id="resultado-email" type="text" pinputtext="" class="p-inputtext p-component p-element"
+                                            [ngClass]="{ 'p-filled': !editMode }"
+                                            [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
+                                            [(ngModel)]="resultado.EMAIL" name="E-mail" [readonly]="!editMode">
+                                            <label for="resultado-email">E-mail</label>
+                                    </span>
+                                </div>
+
+
+                                <div class="field col-12 md:col-2">
+                                    <span class="p-float-label float-label-fixed">
+                                        <!-- Campo de entrada que aparece somente quando editMode é falso -->
+                                        <input
+                                            *ngIf="!editMode"
+                                            id="resultado-TIPO_USER"
+                                            type="text"
+                                            pinputtext=""
+                                            class="p-inputtext p-component p-element"
+                                            [ngClass]="{ 'p-filled': true }"
+                                            [style.backgroundColor]="'lightgray'"
+                                            [value]="getTipoUserNome(resultado.TIPO_USER)"
+                                            readonly>  <!-- Campo somente leitura -->
+                                        <label for="resultado-TIPO_USER">Tipo Usuário</label>
+                                    </span>
+                                
+                                    <!-- Dropdown que aparece somente quando editMode é verdadeiro -->
+                                    <p-dropdown
+                                        *ngIf="editMode"
+                                        id="TIPO_USER-dropdown"
+                                        [options]="TIPO_USER"
+                                        [(ngModel)]="resultado.TIPO_USER"
+                                        optionLabel="nome"
+                                        optionValue="codigo"
+                                        placeholder="Selecione"
+                                        (onChange)="TIPO_USER_nome = getTipoUserNome(resultado.TIPO_USER)">
+                                    </p-dropdown>
+                                </div>
+                
+                                <!-- Campo Senha -->
+                                <div class="field col-12 md:col-2">
+                                    <span class="p-float-label float-label-fixed">
+                                    
+                                        <input id="resultado-senha" type="password" pinputtext="" class="p-inputtext p-component p-element"
+                                            [ngClass]="{ 'p-filled': !editMode }"
+                                            [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
+                                            [(ngModel)]="resultado.SENHA" name="Senha" [readonly]="!editMode">
+                                            <label for="resultado-senha">Senha</label>
+                                    </span>
+                                </div>
+                
+                                <!-- Botões Editar, Salvar e Excluir -->
+                                <div class="btn-group field col-12 md:col-2 flex flex-wrap gap-3" role="group" aria-label="Edit group">
+                                    <label for=""></label>
+                                    <p-button *ngIf="!editMode" icon="pi pi-pencil" severity="info" (click)="editarUsuario(resultado.CPF)"></p-button>
+                                    <p-button *ngIf="editMode" icon="pi pi-save" severity="success" (click)="salvarUsuario()"></p-button>
+                                    <p-button icon="pi pi-trash" severity="danger" (click)="confirmarExclusao()"></p-button>
+                                </div>
+                            </div>
+                        </p-tabPanel>
+
+                        <p-tabPanel>
+                            <ng-template pTemplate="header">
+                                <div class="custom-tab-header">
+                                    Empresas
+                                </div>
+                            </ng-template>
+                            <p>Conteúdo adicional aqui</p>
+                        </p-tabPanel>
+                    </p-tabView>
         </div>
 
     </div>

@@ -3,6 +3,8 @@ import { UserService } from '../user.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ChangeDetectorRef } from '@angular/core';
+import { EmpresasService } from '../../empresas/empresas.service';
+import { cnpj } from 'cpf-cnpj-validator'; // Importando a biblioteca
 
 
 interface Column {
@@ -19,6 +21,7 @@ interface Column {
 export class UserConsultarComponent {
   cols!: Column[];
   cpf: string = '';
+  CNPJ: string = '';
   nome: string = '';
   resultado: any = null;
   novoUsuario: any = {};
@@ -32,8 +35,13 @@ export class UserConsultarComponent {
     { nome: 'Usuário', codigo: '3' }
   ];
 
+  OPTANTE_SN = [
+    { nome: 'OPTANTE', codigo: '1' },
+    { nome: 'NÃO OPTANTE', codigo: '0' }
+  ];
 
   constructor(
+    private EmpresasService: EmpresasService,
     private userService: UserService,
     public dialog: MatDialog,
     private messageService: MessageService,
@@ -248,5 +256,38 @@ selecionarUsuario(usuario: any) {
         }
       }
     );
+  }
+
+  isCnpjValido(cnpjStr: string): boolean {
+    return cnpj.isValid(cnpjStr); // Validação usando a biblioteca
+  }
+
+buscarPorCnpj() {
+  if (!this.isCnpjValido(this.CNPJ)) {
+    this.showError('CNPJ inválido!');
+    return;
+  }
+  
+  this.EmpresasService.buscarPorCnpj(this.CNPJ).subscribe(
+    (data) => {
+      if (data && Object.keys(data).length > 0) {
+        this.resultado = data;
+
+        // Converte TIPO_USER para exibir o nome correspondente em outra propriedade
+        const OPTANTE_SN = this.OPTANTE_SN.find(t => t.codigo === this.resultado.OPTANTE_SN);
+        this.resultado.OPTANTE_SN_nome = OPTANTE_SN ? OPTANTE_SN.nome : '';
+
+        console.log(this.resultado);
+      } else {
+        this.showError('Empresa não existe no banco de dados.');
+        this.resultado = null;
+      }
+    },
+    (error) => {
+      console.error('Erro ao buscar por CNPJ:', error);
+      this.showError('Erro ao buscar CNPJ. Por favor, tente novamente.');
+      this.resultado = null;
+    }
+  );
 }
 }

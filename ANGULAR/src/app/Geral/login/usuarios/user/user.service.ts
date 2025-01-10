@@ -101,4 +101,11 @@ export class UserService {
     return this.http.get(`${this.apiUrl}/permissoes`);
   }
 
+  buscarPorCnpj(CNPJ: string): Observable<any> {
+    const url = `${this.apiUrl}/empresa/${CNPJ}`;
+    return this.http.get(url).pipe(
+      catchError(this.handleError)
+    );
+  }
+
 }
