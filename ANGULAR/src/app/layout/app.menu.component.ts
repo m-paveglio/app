@@ -51,20 +51,6 @@ export class AppMenuComponent implements OnInit {
                         ],
                      },  
 
-
-                     { label: 'Usuários x Empresas', icon: 'pi pi-fw pi-id-card', items: [
-                        {
-                            label: 'Incluir',
-                            icon: 'pi pi-fw pi-plus',
-                            routerLink: ['user-empresas/incluir']
-                        },
-                        {
-                            label: 'Consultar',
-                            icon: 'pi pi-fw pi-search',
-                            routerLink: ['user-empresas/consultar']
-                        },
-                        ],
-                     },  
                      /*{ label: 'Nota Eletrônica', icon: 'pi pi-fw pi-dollar', items: [
                         {
                             label: 'Nova Nota',

@@ -155,7 +155,7 @@ export class UserService {
   }
   
   buscarEmpresasVinculadas(cpf: string): Observable<any[]> {
-    const url = `${this.apiUrl}/user-empresa/${cpf}`;
+    const url = `${this.apiUrl}/user-empresa/cpf/${cpf}`;
     return this.http.get<any[]>(url).pipe(catchError(this.handleError));
   }
 }

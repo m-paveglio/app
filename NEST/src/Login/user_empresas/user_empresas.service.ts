@@ -66,18 +66,18 @@ export class UserEmpresasService {
     if (!cpf.isValid(CPF)) {
       throw new HttpException('CPF inválido', HttpStatus.BAD_REQUEST);
     }
-
-    const empresa = await this.userEmpresaRepository.findOne({
+  
+    // Buscar todos os registros associados ao CPF
+    const empresas = await this.userEmpresaRepository.find({
       where: { CPF },
     });
-
-    if (!empresa) {
+  
+    if (!empresas.length) {
       throw new HttpException('Nenhum usuário-empresa encontrado para o CPF fornecido', HttpStatus.NOT_FOUND);
     }
-
-    return empresa;
+  
+    return empresas; // Retorna uma lista de empresas
   }
-
   // Atualizar usuário-empresa
   async updateUserEmpresa(CNPJ: string, userEmpresaDto: UpdateUserEmpresaDto) {
     if (!cnpjValidator.isValid(CNPJ)) {
