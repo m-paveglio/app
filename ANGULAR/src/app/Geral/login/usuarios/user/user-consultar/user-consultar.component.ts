@@ -5,6 +5,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { ChangeDetectorRef } from '@angular/core';
 import { EmpresasService } from '../../empresas/empresas.service';
 import { cnpj } from 'cpf-cnpj-validator'; // Importando a biblioteca
+import { Dialog } from 'primeng/dialog';
 
 
 interface Column {
@@ -356,7 +357,8 @@ carregarEmpresasVinculadas() {
         const nomeEmpresa = await this.EmpresasService.buscarPorCnpj(empresa.CNPJ).toPromise();
         return {
           ...empresa,
-          NOME: nomeEmpresa?.NOME || 'Não encontrada',
+          NOME: nomeEmpresa?.NOME || 'Não encontrada',    //CAMPOS DA TABELA EMPRESA
+          IM: nomeEmpresa?.IM || 'SEM IM',                //CAMPOS DA TABELA EMPRESA
         };
       });
 
@@ -562,4 +564,20 @@ cancelarEdicaoVinculo() {
   this.COD_PERMISSAO = '';
   this.USER_STATUS = '';
 }
+
+abrirDialogo() {
+  this.showForm = true;
+}
+
+fecharDialogo() {
+  this.showForm = false;
+  this.limparFormulario();
+}
+
+limparFormulario() {
+  this.CNPJ = '';
+  this.COD_PERMISSAO = '';
+  this.USER_STATUS = '';
+}
+
 }

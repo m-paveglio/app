@@ -25,6 +25,7 @@ import { TableModule } from 'primeng/table';
 import { EmpresasIncluirComponent } from './Geral/login/usuarios/empresas/empresas-incluir/empresas-incluir.component';
 import { EmpresasConsultarComponent } from './Geral/login/usuarios/empresas/empresas-consultar/empresas-consultar.component';
 import { TabViewModule } from 'primeng/tabview'
+import { DialogModule } from 'primeng/dialog';
 
 
 
@@ -58,7 +59,8 @@ import { TabViewModule } from 'primeng/tabview'
     ToastModule,
     ConfirmDialogModule,
     TableModule,
-    TabViewModule
+    TabViewModule,
+    DialogModule
   
     
         

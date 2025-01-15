@@ -51,6 +51,7 @@
                 <ng-template pTemplate="header">
                     <tr>
                         <th class="field col-12 md:col-3">CNPJ</th> <!-- Usando grid aqui -->
+                        <th class="field col-12 md:col-3">IM</th>
                         <th class="field col-12 md:col-6">RAZÃO SOCIAL</th> <!-- Ajustando com 'md:col-x' -->
                         <th class="field col-12 md:col-2">OPTANTE SIMPLES NACIONAL</th> <!-- Ajustando com 'md:col-x' -->
                         <th class="field col-12 md:col-1">Ação</th> <!-- Coluna menor para ação -->
@@ -59,6 +60,7 @@
                 <ng-template pTemplate="body" let-empresa>
                     <tr>
                         <td>{{ empresa.CNPJ | mask: '00.000.000/0000-00' }}</td>
+                        <td>{{ empresa.IM }}</td>
                         <td>{{ empresa.NOME }}</td>
                         <td>{{ empresa.OPTANTE_SN }}</td>
                         <td>
@@ -81,6 +83,17 @@
                                [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
                                mask='00.000.000/0000-00' [(ngModel)]="resultado.CNPJ" name="CNPJ" [readonly]="!editMode">
                                <label for="resultado-CNPJ">CNPJ</label>
+                    </span>
+                </div>
+
+                <div class="field col-12 md:col-2">
+                    <span class="p-float-label float-label-fixed">
+                        
+                        <input id="resultado-IM" type="text" pinputtext="" class="p-inputtext p-component p-element"
+                               [ngClass]="{ 'p-filled': !editMode }"
+                               [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
+                               [(ngModel)]="resultado.IM" name="IM" [readonly]="!editMode">
+                               <label for="resultado-IM">IM</label>
                     </span>
                 </div>
   

@@ -6,12 +6,12 @@ export class CreateEmpresaDto {
   CNPJ: string;
 
   @IsString()
-  @Length(1, 300)
-  NOME: string;
+  @Length(1, 50)
+  IM: string;
 
   @IsString()
-  @Length(2, 2)
-  COD_STATUS: string;
+  @Length(1, 300)
+  NOME: string;
 
   @IsString()
   @Length(2, 2)

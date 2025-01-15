@@ -109,6 +109,7 @@ export class EmpresasConsultarComponent {
     const updatePayload = {
       CNPJ: this.resultado.CNPJ,
       NOME: this.resultado.NOME,
+      IM: this.resultado.IM,
       OPTANTE_SN: this.resultado.OPTANTE_SN
     };
 
