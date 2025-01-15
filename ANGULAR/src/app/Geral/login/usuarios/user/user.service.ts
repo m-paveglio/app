@@ -102,17 +102,17 @@ export class UserService {
   }
   
 
-  buscarPorCnpj(CNPJ: string): Observable<any> {
-    const url = `${this.apiUrl}/empresa/${CNPJ}`;
+  buscarPorCnpj(empresa: string): Observable<any> {
+    const url = `${this.apiUrl}/empresas/${empresa}`;
     return this.http.get(url).pipe(
       catchError(this.handleError)
     );
   }
 
 
-  adicionarVinculo(empresa: any): Observable<any> {
-     const url = `${this.apiUrl}/user-empresa`;
-    return this.http.post(url, empresa).pipe(
+  adicionarVinculo(CNPJ: any): Observable<any> {
+     const url = `${this.apiUrl}/user-empresas/`;
+    return this.http.post(url, CNPJ).pipe(
       map(response => {
         this.handleSuccess('Vínculo adicionado com sucesso!');
         return response;
@@ -122,7 +122,7 @@ export class UserService {
   }
 
   editarVinculo(CNPJ: string, empresa: any): Observable<any> {
-    const url = `${this.apiUrl}/user-empresa/${CNPJ}`;
+    const url = `${this.apiUrl}/user-empresas/${CNPJ}`;
     return this.http.patch(url, empresa).pipe(
       map(response => {
         this.handleSuccess('Vínculo alterado com sucesso!');
@@ -133,7 +133,7 @@ export class UserService {
   }
 
   excluirVinculo(CNPJ: string): Observable<any> {
-    const url = `${this.apiUrl}/user-empresa/${CNPJ}`;
+    const url = `${this.apiUrl}/user-empresas/${CNPJ}`;
     return this.http.delete(url).pipe(
       map(response => {
         this.handleSuccess('Vínculo excluído com sucesso!');
@@ -155,7 +155,7 @@ export class UserService {
   }
   
   buscarEmpresasVinculadas(cpf: string): Observable<any[]> {
-    const url = `${this.apiUrl}/user-empresa/cpf/${cpf}`;
+    const url = `${this.apiUrl}/user-empresas/cpf/${cpf}`;
     return this.http.get<any[]>(url).pipe(catchError(this.handleError));
   }
 }

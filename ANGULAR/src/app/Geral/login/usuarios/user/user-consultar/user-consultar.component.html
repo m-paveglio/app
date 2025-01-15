@@ -15,7 +15,7 @@
             <div class="field col-12 md:col-4">
                 <span class="p-float-label">
                     <input id="cpf-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled" 
-                           mask="000.000.000-00" [(ngModel)]="cpf" name="CPF" (keydown.enter)="buscarUsuario()">
+                           mask="000.000.000-00" [(ngModel)]="CPF" name="CPF" (keydown.enter)="buscarUsuario()">
                     <label for="cpf-input">CPF</label>
                 </span>
             </div>
@@ -186,15 +186,76 @@
                                   <ng-template pTemplate="header">
                                     <tr>
                                       <th>CNPJ</th>
+                                      <th>RAZÃO SOCIAL</th>
                                       <th>Permissão</th>
                                       <th>Status</th>
+                                      <th></th>
                                     </tr>
                                   </ng-template>
                                   <ng-template pTemplate="body" let-empresa>
                                     <tr>
-                                      <td>{{ empresa.cnpj }}</td>
-                                      <td>{{ empresa.codPermissao }}</td>
-                                      <td>{{ empresa.userStatus }}</td>
+                                      <td>{{ empresa.CNPJ | mask:'00.000.000/0000-00' }}</td>
+                                      <td>{{ empresa.NOME }}</td>
+                                      <td *ngIf="editMode && CNPJ === empresa.CNPJ">
+                                        <p-dropdown
+                                          [(ngModel)]="COD_PERMISSAO"
+                                          [options]="permissoes"
+                                          optionLabel="nome"
+                                          optionValue="codigo"
+                                          placeholder="Selecione uma permissão"
+                                        ></p-dropdown>
+                                      </td>
+                                      <td *ngIf="editMode && CNPJ === empresa.CNPJ">
+                                        <p-dropdown
+                                          [(ngModel)]="USER_STATUS"
+                                          [options]="[
+                                            { label: 'Ativo', value: '1' },
+                                            { label: 'Inativo', value: '0' }
+                                          ]"
+                                          placeholder="Selecione o status"
+                                        ></p-dropdown>
+                                      </td>
+                                      <td *ngIf="!editMode || CNPJ !== empresa.CNPJ">
+                                        {{ getPermissaoNome(empresa.COD_PERMISSAO) }}
+                                      </td>
+                                      <td *ngIf="!editMode || CNPJ !== empresa.CNPJ">
+                                        {{ empresa.USER_STATUS === '1' ? 'Ativo' : 'Inativo' }}
+                                      </td>
+                                      <td>
+                                        <div class="btn-group field col-12 md:col-6 flex flex-wrap gap-3" role="group" aria-label="Actions group">
+                                          <!-- Botão Editar -->
+                                          <p-button 
+                                            *ngIf="!editMode || CNPJ !== empresa.CNPJ"
+                                            icon="pi pi-pencil"
+                                            severity="info"
+                                            (click)="abrirEdicaoVinculo(empresa)"
+                                          ></p-button>
+                                  
+                                          <!-- Botão Salvar -->
+                                          <p-button
+                                            *ngIf="editMode && CNPJ === empresa.CNPJ"
+                                            icon="pi pi-save"
+                                            severity="success"
+                                            (click)="salvarEdicaoVinculo()"
+                                          ></p-button>
+                                  
+                                          <!-- Botão Cancelar -->
+                                          <p-button
+                                            *ngIf="editMode && CNPJ === empresa.CNPJ"
+                                            icon="pi pi-times"
+                                            severity="danger"
+                                            (click)="cancelarEdicaoVinculo()"
+                                          ></p-button>
+                                  
+                                          <!-- Botão Excluir -->
+                                          <p-button
+                                           *ngIf="!editMode || CNPJ !== empresa.CNPJ"
+                                            icon="pi pi-trash"
+                                            severity="danger"
+                                            (click)="confirmarExclusaoVinculo(empresa.CNPJ)"
+                                          ></p-button>
+                                        </div>
+                                      </td>
                                     </tr>
                                   </ng-template>
                                 </p-table>

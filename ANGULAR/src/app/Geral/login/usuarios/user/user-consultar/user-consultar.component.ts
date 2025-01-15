@@ -20,12 +20,13 @@ interface Column {
 })
 export class UserConsultarComponent {
   cols!: Column[];
-  cpf: string = '';
+  CPF: string = '';
   CNPJ: string = '';
   nome: string = '';
   COD_PERMISSAO: string = '';
   USER_STATUS: string = '';
   resultado: any = null;
+  resultadoEmpresa: any = null;
   novoUsuario: any = {};
   editMode = false;
   TIPO_USER_nome: string = '';
@@ -54,24 +55,24 @@ export class UserConsultarComponent {
     private cd: ChangeDetectorRef
   ) {}
 
-  isCpfValido(cpf: string): boolean {
+  isCpfValido(CPF: string): boolean {
     // Validação de CPF
-    if (!cpf || cpf.length !== 11) return false;
+    if (!CPF || CPF.length !== 11) return false;
     let soma = 0, resto;
-    if (cpf === '00000000000') return false;
-    for (let i = 1; i <= 9; i++) soma += parseInt(cpf.substring(i - 1, i)) * (11 - i);
+    if (CPF === '00000000000') return false;
+    for (let i = 1; i <= 9; i++) soma += parseInt(CPF.substring(i - 1, i)) * (11 - i);
     resto = (soma * 10) % 11;
     if (resto === 10 || resto === 11) resto = 0;
-    if (resto !== parseInt(cpf.substring(9, 10))) return false;
+    if (resto !== parseInt(CPF.substring(9, 10))) return false;
     soma = 0;
-    for (let i = 1; i <= 10; i++) soma += parseInt(cpf.substring(i - 1, i)) * (12 - i);
+    for (let i = 1; i <= 10; i++) soma += parseInt(CPF.substring(i - 1, i)) * (12 - i);
     resto = (soma * 10) % 11;
-    return resto === parseInt(cpf.substring(10, 11));
+    return resto === parseInt(CPF.substring(10, 11));
   }
 
   buscarUsuario() {
     // Verifica se o CPF está preenchido e válido para busca por CPF
-    if (this.cpf && this.isCpfValido(this.cpf)) {
+    if (this.CPF && this.isCpfValido(this.CPF)) {
       this.buscarPorCpf();
     } 
     // Caso CPF esteja vazio, tenta buscar por nome
@@ -85,12 +86,12 @@ export class UserConsultarComponent {
   }
 
   buscarPorCpf() {
-    if (!this.isCpfValido(this.cpf)) {
+    if (!this.isCpfValido(this.CPF)) {
       this.showError('CPF inválido!');
       return;
     }
   
-    this.userService.buscarPorCpf(this.cpf).subscribe(
+    this.userService.buscarPorCpf(this.CPF).subscribe(
       (data) => {
         if (data && Object.keys(data).length > 0) {
           this.resultado = data;
@@ -98,6 +99,7 @@ export class UserConsultarComponent {
           // Converte TIPO_USER para exibir o nome correspondente em outra propriedade
           const tipoUser = this.TIPO_USER.find(t => t.codigo === this.resultado.TIPO_USER);
           this.resultado.TIPO_USER_nome = tipoUser ? tipoUser.nome : '';
+          this.carregarEmpresasVinculadas();
   
           console.log(this.resultado);
         } else {
@@ -146,7 +148,7 @@ export class UserConsultarComponent {
     );
 }
   
-selecionarUsuario(usuario: any) {
+ selecionarUsuario(usuario: any) {
   // Define o usuário selecionado como o `resultado`
   this.userService.buscarPorCpf(usuario.CPF).subscribe(
     (data) => {
@@ -274,37 +276,51 @@ selecionarUsuario(usuario: any) {
     } 
   }
 
-buscarPorCnpj() {
-  if (!this.isCnpjValido(this.CNPJ)) {
-    this.showError('CNPJ inválido!');
-    return;
+  buscarNomeEmpresaPorCnpj(cnpj: string) {
+    this.EmpresasService.buscarPorCnpj(cnpj).subscribe(
+      (data) => {
+        if (data && data.NOME) {
+          return data.NOME; // Retorna o nome da empresa
+        }
+        return 'Não encontrada'; // Caso não encontre, retorna uma string vazia
+      },
+      (error) => {
+        console.error('Erro ao buscar nome da empresa:', error);
+        return ''; // Retorna vazio em caso de erro
+      }
+    );
   }
+
+  buscarPorCnpj() {
+    if (!this.isCnpjValido(this.CNPJ)) {
+      this.showError('CNPJ inválido!');
+      return;
+    }
   
-  this.EmpresasService.buscarPorCnpj(this.CNPJ).subscribe(
-    (data) => {
-      if (data && Object.keys(data).length > 0) {
-        this.resultado = data;
-
-        // Converte TIPO_USER para exibir o nome correspondente em outra propriedade
-        const OPTANTE_SN = this.OPTANTE_SN.find(t => t.codigo === this.resultado.OPTANTE_SN);
-        this.resultado.OPTANTE_SN_nome = OPTANTE_SN ? OPTANTE_SN.nome : '';
-
-        console.log(this.resultado);
-      } else {
-        this.showError('Empresa não existe no banco de dados.');
+    this.EmpresasService.buscarPorCnpj(this.CNPJ).subscribe(
+      (data) => {
+        console.log('Dados da empresa:', data);  // Verifique a estrutura de dados retornados
+        if (data && Object.keys(data).length > 0) {
+          this.resultado = data;
+          const OPTANTE_SN = this.OPTANTE_SN.find(t => t.codigo === this.resultado.OPTANTE_SN);
+          this.resultado.OPTANTE_SN_nome = OPTANTE_SN ? OPTANTE_SN.nome : '';
+          console.log(this.resultado); // Verifique se a propriedade NOME está aqui
+        } else {
+          this.showError('Empresa não existe no banco de dados.');
+          this.resultado = null;
+        }
+      },
+      (error) => {
+        console.error('Erro ao buscar por CNPJ:', error);
+        this.showError('Erro ao buscar CNPJ. Por favor, tente novamente.');
         this.resultado = null;
       }
-    },
-    (error) => {
-      console.error('Erro ao buscar por CNPJ:', error);
-      this.showError('Erro ao buscar CNPJ. Por favor, tente novamente.');
-      this.resultado = null;
-    }
-  );
-}
+    );
+  }
 
-ngOnInit() {
+ ngOnInit() {
   this.carregarPermissoes();
+  this.carregarEmpresasVinculadas();
 }
 
 carregarPermissoes() {
@@ -332,11 +348,22 @@ getPermissaoNome(codigo: string) {
 }
 
 carregarEmpresasVinculadas() {
-  if (!this.cpf) return;
+  if (!this.CPF) return;
 
-  this.userService.buscarEmpresasVinculadas(this.cpf).subscribe({
+  this.userService.buscarEmpresasVinculadas(this.CPF).subscribe({
     next: (empresas) => {
-      this.empresasVinculadas = empresas;
+      const promises = empresas.map(async (empresa) => {
+        const nomeEmpresa = await this.EmpresasService.buscarPorCnpj(empresa.CNPJ).toPromise();
+        return {
+          ...empresa,
+          NOME: nomeEmpresa?.NOME || 'Não encontrada',
+        };
+      });
+
+      Promise.all(promises).then((empresasComNomes) => {
+        this.empresasVinculadas = empresasComNomes;
+        this.cd.detectChanges(); // Força a detecção de mudanças
+      });
     },
     error: () => {
       this.messageService.add({
@@ -353,7 +380,7 @@ abrirFormularioVinculo() {
 }
 
 adicionarVinculo() {
-  if (!this.cpf || !this.CNPJ || !this.COD_PERMISSAO || !this.USER_STATUS) {
+  if (!this.CPF || !this.CNPJ || !this.COD_PERMISSAO || !this.USER_STATUS) {
     this.messageService.add({
       severity: 'warn',
       summary: 'Aviso',
@@ -362,33 +389,177 @@ adicionarVinculo() {
     return;
   }
 
-  const vinculo = {
-    CPF: this.cpf,
-    CNPJ: this.CNPJ,
-    COD_PERMISSAO: this.COD_PERMISSAO,
-    USER_STATUS: this.USER_STATUS,
-  };
+  // Verifica se o CNPJ existe
+  this.EmpresasService.buscarPorCnpj(this.CNPJ).subscribe({
+    next: (empresa) => {
+      if (!empresa || !empresa.NOME) {
+        // CNPJ não encontrado
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'O CNPJ informado não existe na tabela de empresas.',
+        });
+        return;
+      }
 
-  this.userService.adicionarVinculo(vinculo).subscribe({
-    next: () => {
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Sucesso',
-        detail: 'Vínculo adicionado com sucesso!',
+      // CNPJ válido, prossegue com a adição do vínculo
+      const vinculo = {
+        CPF: this.CPF,
+        CNPJ: this.CNPJ,
+        COD_PERMISSAO: this.COD_PERMISSAO,
+        USER_STATUS: this.USER_STATUS,
+      };
+
+      this.userService.adicionarVinculo(vinculo).subscribe({
+        next: () => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Sucesso',
+            detail: 'Vínculo adicionado com sucesso!',
+          });
+          this.showForm = false;
+          this.carregarEmpresasVinculadas(); // Recarrega a tabela
+          this.CNPJ = '';
+          this.COD_PERMISSAO = '';
+          this.USER_STATUS = '';
+        },
+        error: () => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erro',
+            detail: 'Erro ao adicionar vínculo.',
+          });
+        },
       });
-      this.showForm = false;
-      this.carregarEmpresasVinculadas(); // Recarrega a tabela
-      this.CNPJ = '';
-      this.COD_PERMISSAO = '';
-      this.USER_STATUS = '';
     },
     error: () => {
       this.messageService.add({
         severity: 'error',
         summary: 'Erro',
-        detail: 'Erro ao adicionar vínculo.',
+        detail: 'Erro ao validar o CNPJ.',
       });
     },
   });
+}
+
+abrirEdicaoVinculo(empresa: any) {
+  this.editMode = true;
+  this.CNPJ = empresa.CNPJ;
+  this.COD_PERMISSAO = empresa.COD_PERMISSAO;
+  this.USER_STATUS = empresa.USER_STATUS;
+  this.showForm = true; // Mostra o formulário para edição
+}
+
+confirmarExclusaoVinculo(cnpj: string) {
+  this.confirmationService.confirm({
+    message: 'Tem certeza que deseja excluir este vínculo?',
+    header: 'Confirmação de Exclusão',
+    icon: 'pi pi-exclamation-triangle',
+    acceptButtonStyleClass: 'p-button-danger p-button-text',
+    rejectButtonStyleClass: 'p-button-text',
+    acceptIcon: 'none',
+    rejectIcon: 'none',
+    acceptLabel: 'Sim',
+    rejectLabel: 'Não',
+    accept: () => {
+      this.excluirVinculo(cnpj);
+    },
+    reject: () => {
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Cancelado',
+        detail: 'A exclusão foi cancelada.',
+      });
+    },
+  });
+}
+
+excluirVinculo(cnpj: string) {
+  this.userService.excluirVinculo(cnpj).subscribe({
+    next: () => {
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Sucesso',
+        detail: 'Vínculo excluído com sucesso!',
+      });
+      this.carregarEmpresasVinculadas(); // Recarrega a tabela
+    },
+    error: () => {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Erro',
+        detail: 'Erro ao excluir vínculo.',
+      });
+    },
+  });
+}
+
+atualizarVinculo(empresa: any) {
+  const vinculoAtualizado = {
+    COD_PERMISSAO: empresa.COD_PERMISSAO,
+    USER_STATUS: empresa.USER_STATUS,
+  };
+
+  this.userService.atualizarVinculo(empresa.CNPJ, vinculoAtualizado).subscribe({
+    next: () => {
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Sucesso',
+        detail: 'Vínculo atualizado com sucesso!',
+      });
+      this.carregarEmpresasVinculadas(); // Recarrega a tabela
+    },
+    error: () => {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Erro',
+        detail: 'Erro ao atualizar vínculo.',
+      });
+    },
+  });
+}
+
+salvarEdicaoVinculo() {
+  if (!this.CNPJ || !this.COD_PERMISSAO || !this.USER_STATUS) {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Aviso',
+      detail: 'Todos os campos são obrigatórios para salvar as alterações.',
+    });
+    return;
+  }
+
+  const vinculoAtualizado = {
+    COD_PERMISSAO: this.COD_PERMISSAO,
+    USER_STATUS: this.USER_STATUS,
+  };
+
+  this.userService.editarVinculo(this.CNPJ, vinculoAtualizado).subscribe({
+    next: () => {
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Sucesso',
+        detail: 'Vínculo atualizado com sucesso!',
+      });
+      this.editMode = false;
+      this.showForm = false;
+      this.carregarEmpresasVinculadas(); // Atualiza a tabela
+    },
+    error: () => {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Erro',
+        detail: 'Erro ao atualizar vínculo.',
+      });
+    },
+  });
+}
+
+cancelarEdicaoVinculo() {
+  this.editMode = false;
+  this.showForm = false;
+  this.CNPJ = '';
+  this.COD_PERMISSAO = '';
+  this.USER_STATUS = '';
 }
 }
