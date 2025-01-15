@@ -8,8 +8,8 @@ export class UserEmpresasController {
   constructor(private readonly userEmpresasService: UserEmpresasService) {}
 
   @Post()
-  createUserEmpresa(@Body() createUserEmpresaDto: CreateUserEmpresaDto) {
-    return this.userEmpresasService.createUserEmpresa(createUserEmpresaDto);
+  async createUserEmpresa(@Body() UserEmpresasDto: CreateUserEmpresaDto | CreateUserEmpresaDto[]) {
+    return this.userEmpresasService.createUserEmpresa(UserEmpresasDto);
   }
 
   @Get()
@@ -19,13 +19,13 @@ export class UserEmpresasController {
 
   @Get('cpf/:CPF')
   findOneByCpf(@Param('CPF') CPF: string) {
-  return this.userEmpresasService.getUserEmpresaCpf(CPF);
+    return this.userEmpresasService.getUserEmpresaCpf(CPF);
   }
 
-@Get('cnpj/:CNPJ')
+  @Get('cnpj/:CNPJ')
   findOneByCnpj(@Param('CNPJ') CNPJ: string) {
-  return this.userEmpresasService.getUserEmpresaCnpj(CNPJ);
-}
+    return this.userEmpresasService.getUserEmpresaCnpj(CNPJ);
+  }
 
   @Patch(':CNPJ')
   updateUserEmpresa(@Param('CNPJ') CNPJ: string, @Body() updateUserEmpresaDto: UpdateUserEmpresaDto) {

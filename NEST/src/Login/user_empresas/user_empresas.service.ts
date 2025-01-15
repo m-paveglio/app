@@ -1,117 +1,115 @@
 import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import * as bcrypt from 'bcrypt';
+import { cpf, cnpj as cnpjValidator } from 'cpf-cnpj-validator';
 import { UserEmpresa } from './entities/user_empresa.entity';
 import { CreateUserEmpresaDto } from './dto/create-user_empresa.dto';
 import { UpdateUserEmpresaDto } from './dto/update-user_empresa.dto';
-import { cpf, cnpj as cnpjValidator } from 'cpf-cnpj-validator';
 
 @Injectable()
 export class UserEmpresasService {
   constructor(
     @Inject('USER_EMPRESAS_REPOSITORY')
-    private UserEmpresaRepository: Repository<UserEmpresa>,
+    private userEmpresaRepository: Repository<UserEmpresa>,
   ) {}
 
-  //CRIAR user-empresa
-  async createUserEmpresa(UserEmpresaDto: CreateUserEmpresaDto) {
-    // Validar o CNPJ
-    if (!cnpjValidator.isValid(UserEmpresaDto.CNPJ)) {
-      throw new HttpException('CNPJ inválido', HttpStatus.BAD_REQUEST);
+  // Criar usuário-empresa
+  async createUserEmpresa(userEmpresasDto: CreateUserEmpresaDto | CreateUserEmpresaDto[]) {
+    const userEmpresasArray = Array.isArray(userEmpresasDto) ? userEmpresasDto : [userEmpresasDto];
+    const resultados = [];
+  
+    for (const userEmpresaDto of userEmpresasArray) {
+      // Validar CNPJ
+      if (!cnpjValidator.isValid(userEmpresaDto.CNPJ)) {
+        throw new HttpException(`CNPJ inválido: ${userEmpresaDto.CNPJ}`, HttpStatus.BAD_REQUEST);
+      }
+  
+      // Validar CPF
+      if (!cpf.isValid(userEmpresaDto.CPF)) {
+        throw new HttpException(`CPF inválido: ${userEmpresaDto.CPF}`, HttpStatus.BAD_REQUEST);
+      }
+  
+      const newUserEmpresa = this.userEmpresaRepository.create({
+        ...userEmpresaDto,
+      });
+  
+      const savedEmpresa = await this.userEmpresaRepository.save(newUserEmpresa);
+      resultados.push(savedEmpresa);
     }
   
-    // Validar o CPF
-    if (!cpf.isValid(UserEmpresaDto.CPF)) {
-      throw new HttpException('CPF inválido', HttpStatus.BAD_REQUEST);
-    }
-  
-    // Verificar se a empresa já existe
-    const empresaFound = await this.UserEmpresaRepository.findOne({
-      where: { CNPJ: UserEmpresaDto.CNPJ },
-    });
-  
-    if (empresaFound) {
-      throw new HttpException('Empresa já existe', HttpStatus.CONFLICT);
-    }
-  
-    // Criar a nova empresa
-    const newEmpresa = this.UserEmpresaRepository.create(UserEmpresaDto);
-  
-    return this.UserEmpresaRepository.save(newEmpresa);
+    return resultados.length === 1 ? resultados[0] : resultados;
   }
 
+  // Listar todos os usuários-empresa
   getUserEmpresas() {
-    return this.UserEmpresaRepository.find();
+    return this.userEmpresaRepository.find();
   }
 
-  //BUSCAR USUÁRIO PELO CNPJ
+  // Buscar usuário-empresa pelo CNPJ
   async getUserEmpresaCnpj(CNPJ: string) {
     if (!cnpjValidator.isValid(CNPJ)) {
       throw new HttpException('CNPJ inválido', HttpStatus.BAD_REQUEST);
     }
 
-    const empresaFound = await this.UserEmpresaRepository.findOne({
+    const empresas = await this.userEmpresaRepository.find({
       where: { CNPJ },
     });
 
-    if (!empresaFound) {
-      throw new HttpException('Empresa não encontrada', HttpStatus.NOT_FOUND);
+    if (!empresas.length) {
+      throw new HttpException('Nenhum usuário-empresa encontrado para o CNPJ fornecido', HttpStatus.NOT_FOUND);
     }
-    return empresaFound;
+
+    return empresas;
   }
 
-  //BUSCAR USUÁRIO PELO CPF
+  // Buscar usuário-empresa pelo CPF
   async getUserEmpresaCpf(CPF: string) {
     if (!cpf.isValid(CPF)) {
       throw new HttpException('CPF inválido', HttpStatus.BAD_REQUEST);
     }
 
-    const empresaFound = await this.UserEmpresaRepository.findOne({
+    const empresa = await this.userEmpresaRepository.findOne({
       where: { CPF },
     });
 
-    if (!empresaFound) {
-      throw new HttpException('Empresa não encontrada', HttpStatus.NOT_FOUND);
+    if (!empresa) {
+      throw new HttpException('Nenhum usuário-empresa encontrado para o CPF fornecido', HttpStatus.NOT_FOUND);
     }
-    return empresaFound;
+
+    return empresa;
   }
 
-  //DELETAR USUÁRIO
+  // Atualizar usuário-empresa
+  async updateUserEmpresa(CNPJ: string, userEmpresaDto: UpdateUserEmpresaDto) {
+    if (!cnpjValidator.isValid(CNPJ)) {
+      throw new HttpException('CNPJ inválido', HttpStatus.BAD_REQUEST);
+    }
+
+    const empresa = await this.userEmpresaRepository.findOne({
+      where: { CNPJ },
+    });
+
+    if (!empresa) {
+      throw new HttpException('Usuário-empresa não encontrado', HttpStatus.NOT_FOUND);
+    }
+
+    const updatedEmpresa = Object.assign(empresa, userEmpresaDto);
+    return this.userEmpresaRepository.save(updatedEmpresa);
+  }
+
+  // Deletar usuário-empresa
   async deleteUserEmpresa(CNPJ: string) {
     if (!cnpjValidator.isValid(CNPJ)) {
       throw new HttpException('CNPJ inválido', HttpStatus.BAD_REQUEST);
     }
 
-    const empresaFound = await this.UserEmpresaRepository.findOne({
+    const empresas = await this.userEmpresaRepository.find({
       where: { CNPJ },
     });
 
-    if (!empresaFound) {
-      throw new HttpException('Empresa não encontrada', HttpStatus.NOT_FOUND);
+    if (!empresas.length) {
+      throw new HttpException('Nenhum usuário-empresa encontrado para o CNPJ fornecido', HttpStatus.NOT_FOUND);
     }
 
-    return this.UserEmpresaRepository.delete({ CNPJ });
-  }
-
-  //EDITAR USUÁRIO
-  async updateUserEmpresa(CNPJ: string, UserEmpresaDto: UpdateUserEmpresaDto) {
-    if (!cnpjValidator.isValid(CNPJ)) {
-      throw new HttpException('CNPJ inválido', HttpStatus.BAD_REQUEST);
-    }
-
-    if (UserEmpresaDto.CPF && !cpf.isValid(UserEmpresaDto.CPF)) {
-      throw new HttpException('CPF inválido', HttpStatus.BAD_REQUEST);
-    }
-
-    const empresaFound = await this.UserEmpresaRepository.findOne({
-      where: { CNPJ },
-    });
-
-    if (!empresaFound) {
-      throw new HttpException('Empresa não encontrada', HttpStatus.NOT_FOUND);
-    }
-
-    const updateEmpresa = Object.assign(empresaFound, UserEmpresaDto);
-    return this.UserEmpresaRepository.save(updateEmpresa);
+    return this.userEmpresaRepository.delete({ CNPJ });
   }
 }
