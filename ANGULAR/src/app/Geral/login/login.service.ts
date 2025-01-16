@@ -37,6 +37,7 @@ export class LoginService {
       localStorage.removeItem(this.userNameKey); // Remover o nome do usuário
     }
     this.isLoggedInSubject.next(false);
+    sessionStorage.clear();
   }
 
   isAuthenticated(): Observable<boolean> {
@@ -71,13 +72,21 @@ export class LoginService {
     }
   }
 
-  setEmpresaSelecionada(empresa: any) {
-    this.empresaSelecionada.next(empresa);
+  setEmpresaSelecionada(empresa: any): void {
+    this.empresaSelecionada = empresa;
+    sessionStorage.setItem('empresaSelecionada', JSON.stringify(empresa));
   }
 
-  getEmpresaSelecionada() {
-    return this.empresaSelecionada.asObservable();
+  getEmpresaSelecionada(): any {
+    if (!this.empresaSelecionada) {
+      const storedEmpresa = sessionStorage.getItem('empresaSelecionada');
+      if (storedEmpresa) {
+        this.empresaSelecionada = JSON.parse(storedEmpresa);
+      }
+    }
+    return this.empresaSelecionada;
   }
+
 
   buscarPorCnpj(CNPJ: string): Observable<any> {
     // Ajusta para usar apenas o endpoint /empresa
@@ -86,4 +95,5 @@ export class LoginService {
       catchError(this.handleError)
     );
   }
+
 }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener, OnDestroy } from '@angular/core';
 import { LoginService } from './login.service';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
@@ -9,7 +9,7 @@ import { MessageService } from 'primeng/api';
   styleUrls: ['./login.component.css'],
   providers: [MessageService]
 })
-export class LoginComponent {
+export class LoginComponent implements OnDestroy {
   credentials = { CPF: '', SENHA: '' };
   empresas: any[] = [];
   empresaSelecionada: any = null;
@@ -21,6 +21,26 @@ export class LoginComponent {
     private messageService: MessageService
   ) {}
 
+  ngOnInit() {
+    this.resetLoginState(); // Limpa as credenciais ao inicializar a página.
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  beforeUnloadHandler(event: Event) {
+    this.resetLoginState(); // Garante que o cache seja limpo ao fechar ou recarregar a aba.
+  }
+
+  resetLoginState() {
+    this.credentials = { CPF: '', SENHA: '' };
+    this.empresas = [];
+    this.empresaSelecionada = null;
+    this.selecionandoEmpresa = false;
+  
+    // Verifica se o ambiente suporta sessionStorage
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.clear();
+    }
+  }
   onCPFInputChange(event: any) {
     this.credentials.CPF = event.target.value.replace(/[.\-]/g, '');
   }
@@ -62,7 +82,7 @@ export class LoginComponent {
   }
 
   selecionarEmpresa(empresa: any) {
-    this.loginService.setEmpresaSelecionada(empresa);
+    this.loginService.setEmpresaSelecionada(empresa); // Armazena a empresa selecionada
     this.router.navigate(['/dashboard']);
     this.mostrarMensagem(`Empresa ${empresa.NOME} selecionada com sucesso!`, true);
   }
@@ -82,5 +102,9 @@ export class LoginComponent {
       detail: mensagem,
       life: 3000
     });
+  }
+
+  ngOnDestroy() {
+    this.resetLoginState(); // Limpa o estado quando o componente é destruído.
   }
 }
