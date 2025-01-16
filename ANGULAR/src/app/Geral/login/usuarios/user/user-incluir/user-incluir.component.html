@@ -6,28 +6,28 @@
         <p-toast></p-toast>
     <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
           <div class="field col-12 md:col-2">
-            <span class="p-float-label">
+            <span class="p-float-label float-label-fixed">
               <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled" mask='000.000.000-00'[(ngModel)]="novoUsuario.CPF" name="CPF">
               <label for="float-input">CPF</label>
             </span>
           </div>
 
           <div class="field col-12 md:col-4">
-            <span class="p-float-label">
+            <span class="p-float-label float-label-fixed">
               <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled" [(ngModel)]="novoUsuario.NOME" name="NOME">
               <label for="float-input">Nome</label>
             </span>
           </div>
 
           <div class="field col-12 md:col-4">
-            <span class="p-float-label">
+            <span class="p-float-label float-label-fixed">
               <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled" [(ngModel)]="novoUsuario.EMAIL" name="email">
               <label for="float-input">E-mail</label>
             </span>
           </div>
 
           <div class="field col-12 md:col-2">
-            <span class="p-float-label">
+            <span class="p-float-label float-label-fixed">
               <p-dropdown id="float-input" [ngStyle]="{'padding': '0px'}" [(ngModel)]="novoUsuario.TIPO_USER" name="TIPO_USER" [options]="TIPO_USER" optionLabel="nome" optionValue="codigo"></p-dropdown>
               <label for="float-input">Tipo Usuário</label>
             </span>
@@ -35,7 +35,7 @@
           
 
           <div class="field col-12 md:col-2">
-            <span class="p-float-label">
+            <span class="p-float-label float-label-fixed">
               <input id="float-input" type="password" pinputtext="" class="p-inputtext p-component p-element p-filled"  [(ngModel)]="novoUsuario.SENHA" name="SENHA" >
               <label for="float-input">Senha</label>
             </span>

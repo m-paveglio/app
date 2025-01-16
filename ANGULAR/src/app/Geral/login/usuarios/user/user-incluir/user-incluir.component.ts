@@ -5,6 +5,7 @@ import { MessageService } from 'primeng/api';
 @Component({
   selector: 'app-user-incluir',
   templateUrl: './user-incluir.component.html',
+  styleUrls: ['./user-incluir.component.css'],
   providers: [MessageService]
 })
 export class UserIncluirComponent {

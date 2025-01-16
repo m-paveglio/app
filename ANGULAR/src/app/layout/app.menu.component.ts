@@ -21,7 +21,7 @@ export class AppMenuComponent implements OnInit {
                 ]
             },
             {
-                label: 'Menus',
+                label: 'Menus Admin',
                 items: [
                     { label: 'Usuários', icon: 'pi pi-fw pi-users', items: [
                         {
@@ -68,7 +68,7 @@ export class AppMenuComponent implements OnInit {
             },
 
             {
-                label: 'Relatórios',
+                label: 'Menus Contribuinte',
                 items: [
                     /*{ label: 'Usuários', icon: 'pi pi-fw pi-id-card', routerLink: ['user/userrelatorio']}*/
                 

@@ -1,0 +1,12 @@
+.float-label-fixed label {
+  top: -0.75rem !important;
+  font-size: 0.75rem !important;
+}
+
+.custom-tab-header {
+  background-color: var(--cyan-800);
+  color: var(--primary-color-text);
+  border-radius: var(--border-radius);
+  padding: 10px;
+  text-align: center;
+}

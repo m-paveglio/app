@@ -6,28 +6,28 @@
         <p-toast></p-toast>
        <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
           <div class="field col-12 md:col-2">
-            <span class="p-float-label">
+            <span class="p-float-label float-label-fixed">
               <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled" mask='00.000.000/0000-00'[(ngModel)]="novaEmpresa.CNPJ" name="CNPJ">
               <label for="float-input">CNPJ</label>
             </span>
           </div>
 
           <div class="field col-12 md:col-2">
-            <span class="p-float-label">
+            <span class="p-float-label float-label-fixed">
               <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled" [(ngModel)]="novaEmpresa.IM" name="IM">
               <label for="float-input">IM</label>
             </span>
           </div>
 
           <div class="field col-12 md:col-5">
-            <span class="p-float-label">
+            <span class="p-float-label float-label-fixed">
               <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled" [(ngModel)]="novaEmpresa.NOME" name="NOME">
               <label for="float-input">RAZÃO SOCIAL</label>
             </span>
           </div>
 
         <div class="field col-12 md:col-2">
-            <span class="p-float-label">
+            <span class="p-float-label float-label-fixed">
               <p-dropdown id="float-input" [ngStyle]="{'padding': '0px'}" [(ngModel)]="novaEmpresa.OPTANTE_SN" name="OPTANTE_SN" [options]="OPTANTE_SN" optionLabel="nome" optionValue="codigo"></p-dropdown>
               <label for="float-input">SIMPLES NACIONAL</label>
             </span>
