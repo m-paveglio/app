@@ -13,11 +13,13 @@ export class LoginService {
   private readonly tokenKey = 'authToken';
   private readonly userNameKey = 'userName'; // Novo item para armazenar o nome do usuário
   private isLoggedInSubject = new BehaviorSubject<boolean>(this.hasToken());
+  private empresaSelecionada = new BehaviorSubject<any>(null);
 
   constructor(
     private http: HttpClient,
     @Inject(PLATFORM_ID) private platformId: Object,
     private apiConfig: ApiConfigService // Injetar ApiConfigService
+
   ) {
     this.apiUrl = `${this.apiConfig.getBaseUrl()}/auth/login`; // Construir a URL usando o ApiConfigService
   }
@@ -67,5 +69,21 @@ export class LoginService {
     } else {
       return throwError('Erro ao tentar fazer login. Tente novamente mais tarde.');
     }
+  }
+
+  setEmpresaSelecionada(empresa: any) {
+    this.empresaSelecionada.next(empresa);
+  }
+
+  getEmpresaSelecionada() {
+    return this.empresaSelecionada.asObservable();
+  }
+
+  buscarPorCnpj(CNPJ: string): Observable<any> {
+    // Ajusta para usar apenas o endpoint /empresa
+    const url = `${this.apiConfig.getBaseUrl()}/empresa/${CNPJ}`;
+    return this.http.get(url).pipe(
+      catchError(this.handleError)
+    );
   }
 }

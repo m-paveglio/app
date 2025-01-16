@@ -1,29 +1,83 @@
 <p-toast></p-toast>
 <div class="mat-typography">
-    <div class="px-5 min-h-screen flex justify-content-center align-items-center">
-        <div class="border-1 surface-border surface-card border-round py-7 px-4 md:px-7 z-1">
-            <div class="mb-4">
-                <div class="text-900 text-xl font-bold mb-2 text-center">Log in</div>
-            </div>
-            <div class="flex flex-column">                
-                <span class="p-input-icon-left w-full mb-4">
-                    <i class="pi pi-pencil"></i>
-                    <input id="email" type="text" pinputtext="" placeholder="CPF" class="p-inputtext p-component p-element w-full md:w-25rem" mask="000.000.000-00" [(ngModel)]="credentials.CPF" (input)="onCPFInputChange($event)" (keydown.enter)="onLogin()" />
-                </span>
-                <span class="p-input-icon-left w-full mb-4">
-                    <i class="pi pi-lock"></i>
-                    <input id="password" type="password" pinputtext="" placeholder="SENHA" class="p-inputtext p-component p-element w-full md:w-25rem" [(ngModel)]="credentials.SENHA" (input)="onPasswordInputChange($event)" (keydown.enter)="onLogin()" />
-                </span>
-                <div class="mb-4 flex flex-wrap gap-3 text-center">
-                    <a class="text-600 cursor-pointer">Esqueceu sua Senha?</a>
-                </div>
-                <button pbutton="" pripple="" label="Log In" class="p-element w-full p-button p-component" tabindex="0" (click)="onLogin()">
-                    <span class="p-button-label">Log In</span>
+  <div class="px-5 min-h-screen flex justify-content-center align-items-center" *ngIf="selecionandoEmpresa">
+    <div class="border-1 surface-border surface-card border-round py-7 px-4 md:px-7 z-1">
+      <div class="mb-4">
+        <div class="text-900 text-xl font-bold mb-2 text-center">Selecione uma Empresa</div>
+      </div>
+      <div class="flex flex-column">
+        <p-table [value]="empresas" class="w-full">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>CNPJ</th>
+              <th>IM</th>
+              <th>Nome</th>
+              <th>Optante do SN</th>
+              <th>Selecionar</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-empresa>
+            <tr>
+              <td>{{ empresa.CNPJ | mask:'00.000.000/0000-00' }}</td>
+              <td>{{ empresa.IM }}</td>
+              <td>{{ empresa.NOME }}</td>
+              <td>{{ empresa.OPTANTE_SN }}</td>
+              <td>
+                <button 
+                  pButton 
+                  icon="pi pi-check"
+                  severity="success"
+                  class="p-button p-component" 
+                  (click)="selecionarEmpresa(empresa)">
                 </button>
-            </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!selecionandoEmpresa">
+    <div class="px-5 min-h-screen flex justify-content-center align-items-center">
+      <div class="border-1 surface-border surface-card border-round py-7 px-4 md:px-7 z-1">
+        <div class="mb-4">
+          <div class="text-900 text-xl font-bold mb-2 text-center">Log in</div>
         </div>
+        <div class="flex flex-column">
+          <span class="p-input-icon-left w-full mb-4">
+            <i class="pi pi-pencil"></i>
+            <input 
+              id="email" 
+              type="text" 
+              pInputText 
+              placeholder="CPF" 
+              class="p-inputtext p-component p-element w-full md:w-25rem" 
+              [(ngModel)]="credentials.CPF" 
+              mask="000.000.000-00" 
+              (input)="onCPFInputChange($event)" 
+              (keydown.enter)="onLogin()" />
+          </span>
+          <span class="p-input-icon-left w-full mb-4">
+            <i class="pi pi-lock"></i>
+            <input 
+              id="password" 
+              type="password" 
+              pInputText 
+              placeholder="SENHA" 
+              class="p-inputtext p-component p-element w-full md:w-25rem" 
+              [(ngModel)]="credentials.SENHA" 
+              (input)="onPasswordInputChange($event)" 
+              (keydown.enter)="onLogin()" />
+          </span>
+          <button 
+            pButton 
+            label="Log In" 
+            class="p-button p-component w-full" 
+            (click)="onLogin()">
+          </button>
+        </div>
+      </div>
     </div>
-    <div>
-        <div class="background-overlay"></div>
-    </div>
+  </div>
 </div>
