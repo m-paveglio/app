@@ -48,19 +48,23 @@ export class userService {
 
   //BUSCAR USUÁRIO PELO CPF
   async getUser(CPF: string) {
+    // Validação do CPF
     if (!cpfValidator.isValid(CPF)) {
       throw new HttpException('CPF inválido', HttpStatus.BAD_REQUEST);
     }
-
+  
+    // Busca o usuário no banco de dados
     const userFound = await this.userRepository.findOne({
       where: {
         CPF,
       },
     });
-
+  
+    // Lança exceção caso o usuário não seja encontrado
     if (!userFound) {
-      return new HttpException('Usuário não encontrado', HttpStatus.NOT_FOUND);
+      throw new HttpException('Usuário não encontrado', HttpStatus.NOT_FOUND);
     }
+  
     return userFound;
   }
 

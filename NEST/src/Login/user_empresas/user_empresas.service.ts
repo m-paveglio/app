@@ -63,21 +63,21 @@ export class UserEmpresasService {
 
   // Buscar usuário-empresa pelo CPF
   async getUserEmpresaCpf(CPF: string) {
+    // Validar CPF
     if (!cpf.isValid(CPF)) {
       throw new HttpException('CPF inválido', HttpStatus.BAD_REQUEST);
     }
   
-    // Buscar todos os registros associados ao CPF
+    // Buscar registros associados ao CPF
     const empresas = await this.userEmpresaRepository.find({
       where: { CPF },
     });
   
-    if (!empresas.length) {
-      throw new HttpException('Nenhum usuário-empresa encontrado para o CPF fornecido', HttpStatus.NOT_FOUND);
-    }
-  
-    return empresas; // Retorna uma lista de empresas
+    // Retornar array vazio caso não haja vínculos
+    return empresas; // Retorna [] se nenhuma empresa for encontrada
   }
+
+
   // Atualizar usuário-empresa
   async updateUserEmpresa(CNPJ: string, userEmpresaDto: UpdateUserEmpresaDto) {
     if (!cnpjValidator.isValid(CNPJ)) {
