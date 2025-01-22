@@ -14,6 +14,7 @@ import { EmpresasModule } from './Login/empresas/empresas.module';
 import { UserEmpresasModule } from './Login/user_empresas/user_empresas.module';
 import { WebserviceModule } from './Geral/Nfse/webservice/webservice.module';
 import { ServicosModule } from './Geral/Servicos/servicos.module';
+import { NfseModule } from './Geral/Nfse/nfse.module';
 
  
 
@@ -30,7 +31,8 @@ import { ServicosModule } from './Geral/Servicos/servicos.module';
     ProfissoesModule, 
     EmpresasModule,
     WebserviceModule,
-    ServicosModule
+    ServicosModule,
+    NfseModule
 
     ],
   controllers: [AppController],
