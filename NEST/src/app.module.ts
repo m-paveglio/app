@@ -11,11 +11,11 @@ import { LogradouroModule } from './Geral/Endereco/Logradouro/logradouro.module'
 import { ProfissoesModule } from './Geral/Profissoes/profissoes.module';
 import { pessoasModule } from './Geral/Pessoas/pessoas.module';
 import { EmpresasModule } from './Login/empresas/empresas.module';
-import { UserEmpresasProviders } from './Login/user_empresas/entities/user_empresa.providers';
 import { UserEmpresasModule } from './Login/user_empresas/user_empresas.module';
 import { WebserviceModule } from './Geral/Nfse/webservice/webservice.module';
+import { ServicosModule } from './Geral/Servicos/servicos.module';
 
-
+ 
 
 @Module({
   imports: [userModule, 
@@ -27,9 +27,11 @@ import { WebserviceModule } from './Geral/Nfse/webservice/webservice.module';
     PaisModule, 
     CidadesModule, 
     LogradouroModule,
-     ProfissoesModule, 
-     EmpresasModule,
-     WebserviceModule
+    ProfissoesModule, 
+    EmpresasModule,
+    WebserviceModule,
+    ServicosModule
+
     ],
   controllers: [AppController],
   providers: [AppService],
