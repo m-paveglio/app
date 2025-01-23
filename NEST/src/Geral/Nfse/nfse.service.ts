@@ -18,27 +18,35 @@ export class NfseService {
   async enviarLoteRps(dados: any): Promise<any> {
     // Gerar XML
     const xml = await this.xmlUtils.gerarXml('enviar-lote-rps', dados);
-
+  
+    console.log('XML Gerado:', xml);
+  
     // Configurar HTTPS com certificado
     const httpsAgent = new https.Agent({
       pfx: fs.readFileSync('certificado.pfx'),
-      passphrase: 'senha-certificado',
+      passphrase: 'minha_senha',
+      minVersion: 'TLSv1.2',
     });
-
-    // Enviar requisição SOAP
-    const response = await this.httpService
-      .post(this.nfseEndpoint, xml, {
-        headers: {
-          'Content-Type': 'text/xml;charset=utf-8',
-          'SOAPAction': 'http://nfse.abrasf.org.br/RecepcionarLoteRps',
-          'User-Agent': 'MeuSistema/1.0',
-        },
-        httpsAgent,
-      })
-      .toPromise();
-
-    // Retornar resposta do servidor
-    return response.data;
+  
+    try {
+      // Enviar requisição SOAP
+      const response = await this.httpService
+        .post(this.nfseEndpoint, xml, {
+          headers: {
+            'Content-Type': 'text/xml;charset=utf-8',
+            'SOAPAction': 'http://nfse.abrasf.org.br/RecepcionarLoteRps',
+          },
+          httpsAgent,
+        })
+        .toPromise();
+  
+      console.log('Resposta do Servidor:', response.data);
+      return response.data;
+  
+    } catch (error) {
+      console.error('Erro ao enviar a requisição:', error.response?.data || error.message);
+      throw error;
+    }
   }
 
   async consultarSituacao(dados: any): Promise<any> {
