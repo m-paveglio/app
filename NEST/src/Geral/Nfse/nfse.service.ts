@@ -19,11 +19,9 @@ export class NfseService {
   ) {}
 
   async enviarLoteRps(dados: any): Promise<any> {
-    // Gerar XML base
     const xml = await this.xmlUtils.gerarXml('enviar-lote-rps', dados);
     console.log('XML Gerado:', xml);
 
-    // Carregar certificado e chave privada do PFX
     const pfx = fs.readFileSync('certificado.pfx');
     const passphrase = 'minha_senha';
     const p12Asn1 = forge.asn1.fromDer(pfx.toString('binary'));
@@ -42,11 +40,9 @@ export class NfseService {
     const privateKey = forge.pki.privateKeyToPem(keyBag[Object.keys(keyBag)[0]][0].key);
     const publicCert = forge.pki.certificateToPem(certBag[Object.keys(certBag)[0]][0].cert);
 
-    // Assinar o XML
     const xmlAssinado = await this.assinarXml(xml, privateKey, publicCert);
     console.log('XML Assinado:', xmlAssinado);
 
-    // Configurar HTTPS com certificado
     const httpsAgent = new https.Agent({
       pfx,
       passphrase,
@@ -65,9 +61,78 @@ export class NfseService {
         .toPromise();
 
       console.log('Resposta do Servidor:', response.data);
+
+      // Extrair o número do protocolo
+      const protocolo = await this.extrairProtocolo(response.data);
+
+      // Realizar a consulta pelo protocolo
+      if (protocolo) {
+        const consultaResposta = await this.consultarProtocolo(dados.cnpj, dados.inscricaoMunicipal, protocolo);
+        console.log('Resposta da consulta pelo protocolo:', consultaResposta);
+      }
+
       return response.data;
     } catch (error) {
       console.error('Erro ao enviar a requisição:', error.response?.data || error.message);
+      throw error;
+    }
+  }
+
+  private async extrairProtocolo(xmlResposta: string): Promise<string | null> {
+    try {
+      const parsed = await parseStringPromise(xmlResposta, { explicitArray: false });
+      const protocolo = parsed['s:Envelope']['s:Body']['RecepcionarLoteRpsResponse']['EnviarLoteRpsResposta']['Protocolo'];
+      console.log('Protocolo extraído:', protocolo);
+      return protocolo || null;
+    } catch (error) {
+      console.error('Erro ao extrair o protocolo:', error.message);
+      return null;
+    }
+  }
+
+  async consultarProtocolo(cnpj: string, inscricaoMunicipal: string, protocolo: string): Promise<any> {
+    const xmlConsulta = `
+      <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:svc="http://nfse.abrasf.org.br">
+        <soap:Body>
+          <svc:ConsultarSituacaoLoteRps>
+            <Prestador>
+              <CpfCnpj>
+                <Cnpj>${cnpj}</Cnpj>
+              </CpfCnpj>
+              <InscricaoMunicipal>${inscricaoMunicipal}</InscricaoMunicipal>
+            </Prestador>
+            <Protocolo>${protocolo}</Protocolo>
+          </svc:ConsultarSituacaoLoteRps>
+        </soap:Body>
+      </soap:Envelope>
+    `.trim();
+
+    console.log('XML de Consulta de Protocolo:', xmlConsulta);
+
+    const pfx = fs.readFileSync('certificado.pfx');
+    const passphrase = 'minha_senha';
+
+    const httpsAgent = new https.Agent({
+      pfx,
+      passphrase,
+      minVersion: 'TLSv1.2',
+    });
+
+    try {
+      const response = await this.httpService
+        .post(this.nfseEndpoint, xmlConsulta, {
+          headers: {
+            'Content-Type': 'text/xml;charset=utf-8',
+            'SOAPAction': 'http://nfse.abrasf.org.br/ConsultarSituacaoLoteRps',
+          },
+          httpsAgent,
+        })
+        .toPromise();
+
+      console.log('Resposta da Consulta de Protocolo:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Erro na consulta pelo protocolo:', error.response?.data || error.message);
       throw error;
     }
   }
