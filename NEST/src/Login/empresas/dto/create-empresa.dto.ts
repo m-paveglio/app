@@ -16,4 +16,8 @@ export class CreateEmpresaDto {
   @IsString()
   @Length(2, 2)
   OPTANTE_SN: string;
+
+  @IsString()
+  @Length(1, 2)
+  AMBIENTE_INTEGRACAO: string;
 }

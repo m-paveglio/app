@@ -8,17 +8,25 @@ import { EmailService } from './common/email.service';
 import { parseStringPromise, Builder } from 'xml2js';
 import * as crypto from 'crypto';
 
+import { WebserviceService } from './webservice/webservice.service';
+
 @Injectable()
 export class NfseService {
   private readonly nfseEndpoint = 'https://www.issnetonline.com.br/homologaabrasf/webservicenfse204/nfse.asmx';
-
+  private cnpj: string | null = null;
+  private inscricaoMunicipal: string | null = null;
   constructor(
     private readonly httpService: HttpService,
     private readonly xmlUtils: XmlUtilsService,
     private readonly emailService: EmailService,
+    private readonly webserviceService: WebserviceService
   ) {}
 
   async enviarLoteRps(dados: any): Promise<any> {
+    // Guardar o CNPJ e Inscrição Municipal
+    this.cnpj = dados.cnpj;
+    this.inscricaoMunicipal = dados.inscricaoMunicipal;
+    
     const xml = await this.xmlUtils.gerarXml('enviar-lote-rps', dados);
     console.log('XML Gerado:', xml);
 
@@ -67,9 +75,9 @@ export class NfseService {
 
       // Realizar a consulta pelo protocolo
       if (protocolo) {
-        const consultaResposta = await this.consultarProtocolo(dados.cnpj, dados.inscricaoMunicipal, protocolo);
-        console.log('Resposta da consulta pelo protocolo:', consultaResposta);
-      }
+      const consultaResposta = await this.consultarProtocolo(protocolo);
+      console.log('Resposta da consulta pelo protocolo:', consultaResposta);
+    }
 
       return response.data;
     } catch (error) {
@@ -90,16 +98,21 @@ export class NfseService {
     }
   }
 
-  async consultarProtocolo(cnpj: string, inscricaoMunicipal: string, protocolo: string): Promise<any> {
+  async consultarProtocolo(protocolo: string): Promise<any> {
+    // Garantir que o CNPJ e Inscrição Municipal estejam definidos
+    if (!this.cnpj || !this.inscricaoMunicipal) {
+      throw new Error('CNPJ ou Inscrição Municipal não encontrados na memória.');
+    }
+
     const xmlConsulta = `
       <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:svc="http://nfse.abrasf.org.br">
         <soap:Body>
           <svc:ConsultarSituacaoLoteRps>
             <Prestador>
               <CpfCnpj>
-                <Cnpj>${cnpj}</Cnpj>
+                <Cnpj>${this.cnpj}</Cnpj>
               </CpfCnpj>
-              <InscricaoMunicipal>${inscricaoMunicipal}</InscricaoMunicipal>
+              <InscricaoMunicipal>${this.inscricaoMunicipal}</InscricaoMunicipal>
             </Prestador>
             <Protocolo>${protocolo}</Protocolo>
           </svc:ConsultarSituacaoLoteRps>
@@ -117,7 +130,7 @@ export class NfseService {
       passphrase,
       minVersion: 'TLSv1.2',
     });
-
+ 
     try {
       const response = await this.httpService
         .post(this.nfseEndpoint, xmlConsulta, {
@@ -283,14 +296,5 @@ private canonicalizeXml(xmlObject: any): string {
       .toPromise();
 
     return response.data;
-  }
-
-  async enviarEmailComNota(tomadorEmail: string, xmlNota: string): Promise<void> {
-    await this.emailService.enviarEmail({
-      to: tomadorEmail,
-      subject: 'Nota Fiscal Eletrônica - Autorizada',
-      body: 'Segue em anexo a nota fiscal autorizada.',
-      attachments: [{ filename: 'nota-fiscal.xml', content: xmlNota }],
-    });
   }
 }
