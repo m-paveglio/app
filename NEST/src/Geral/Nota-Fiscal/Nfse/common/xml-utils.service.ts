@@ -13,7 +13,7 @@ export class XmlUtilsService {
    */
   async gerarXml(templateName: string, dados: any): Promise<string> {
     // Caminho do template XML
-    const templatePath = path.join(process.cwd(), `src/Geral/Nfse/templates/${templateName}.xml`);
+    const templatePath = path.join(process.cwd(), `src/Geral/Nota-Fiscal/Nfse/templates/${templateName}.xml`);
 
     // Carregar o conteúdo do template
     const template = fs.readFileSync(templatePath, 'utf-8');

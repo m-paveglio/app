@@ -13,4 +13,8 @@ export class empresa {
   
   @Column({ type: 'text', length: 2 })
   OPTANTE_SN: string;
-}  
+
+  // Adicionando a coluna AMBIENTE_INTEGRACAO
+  @Column({ type: 'text', nullable: true })
+  AMBIENTE_INTEGRACAO: string; // Pode ser '1' ou '2', ou NULL
+}

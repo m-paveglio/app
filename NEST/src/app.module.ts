@@ -12,9 +12,9 @@ import { ProfissoesModule } from './Geral/Profissoes/profissoes.module';
 import { pessoasModule } from './Geral/Pessoas/pessoas.module';
 import { EmpresasModule } from './Login/empresas/empresas.module';
 import { UserEmpresasModule } from './Login/user_empresas/user_empresas.module';
-import { WebserviceModule } from './Geral/Nfse/webservice/webservice.module';
+import { WebserviceModule } from './Geral/Nota-Fiscal/Nfse/webservice/webservice.module';
 import { ServicosModule } from './Geral/Servicos/servicos.module';
-import { NfseModule } from './Geral/Nfse/nfse.module';
+import { NfseModule } from './Geral/Nota-Fiscal/Nfse/nfse.module';
 
  
 

@@ -11,5 +11,6 @@ import { DatabaseModule } from 'src/database/database.module';
     ...webserviceProviders,
     WebserviceService,
   ],
+  exports: [WebserviceService], // Exporta o serviço
 })
 export class WebserviceModule {}
