@@ -13,8 +13,6 @@ export class ServicosConsultarComponent implements OnInit {
   servicos: any[] = []; // Lista de serviços carregados
   cnpj: string | null = null; // CNPJ logado
   isLoading = false; // Flag para controlar o carregamento da lista de serviços
-  editMode = false; // Flag para verificar se o modo de edição está ativo
-  selectedServico: any | null = null; // Serviço selecionado para edição
 
   constructor(
     private servicosService: ServicosService,
@@ -32,16 +30,18 @@ export class ServicosConsultarComponent implements OnInit {
     }
   }
 
-
-  
-  // Carrega os serviços vinculados ao CNPJ logado
   async loadServicos(): Promise<void> {
     if (!this.cnpj) return;
-
+  
     this.isLoading = true;
     try {
       const resposta = await this.servicosService.getServicos(this.cnpj).toPromise();
-      this.servicos = Array.isArray(resposta) ? resposta : [resposta];
+      this.servicos = (Array.isArray(resposta) ? resposta : resposta?.data || []).map((servico) => ({
+        ...servico,
+        codServico: servico.COD_SERVICO, // Renomeia COD_SERVICO para codServico
+        isEditing: false, // Adiciona a flag isEditing
+      }));
+      console.log('Serviços carregados:', this.servicos);
     } catch (error) {
       this.showError('Erro ao carregar os serviços. Tente novamente.');
     } finally {
@@ -49,95 +49,127 @@ export class ServicosConsultarComponent implements OnInit {
     }
   }
 
-  abrirDialogoEdicao(servico: any): void {
-    this.editMode = true;
-    this.selectedServico = { ...servico }; // Clona o serviço para evitar alterações diretas
+  formatCurrency(value: number): string {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(value);
   }
 
-  async salvarServico(): Promise<void> {
-    if (!this.selectedServico) return;
+  formatCurrencyInput(event: any, servico: any): void {
+    const rawValue = event.target.value.replace(/\D/g, ''); // Remove tudo que não é número
+    const numericValue = parseFloat(rawValue) / 100; // Divide por 100 para ajustar ao formato monetário
+    servico.VALOR = numericValue; // Atualiza o valor bruto no modelo
+    event.target.value = this.formatCurrency(numericValue); // Atualiza o campo com o valor formatado
+  }
 
+  formatItemLC(servico: any): void {
+    const rawValue = String(servico.ITEM_LC).replace(/[^0-9.]/g, ''); // Remove caracteres inválidos
+    servico.ITEM_LC = rawValue.slice(0, 5); // Garante o limite de 5 caracteres
+  }
+
+  showError(message: string): void {
+    this.messageService.add({ severity: 'error', summary: 'Erro', detail: message });
+  }
+
+  startEditing(servico: any): void {
+    this.servicos.forEach((s) => (s.isEditing = false));
+    servico.isEditing = true;
+  
+    // Certifique-se de que o valor esteja numérico ao começar a editar
+    servico.VALOR = parseFloat(String(servico.VALOR).replace(/\D/g, '')) / 100;
+  }
+
+  async saveServico(servico: any): Promise<void> {
+    console.log('Tentando salvar o serviço:', servico);
+  
+    if (!servico || !servico.codServico) {
+      this.showError('Erro: Serviço inválido ou código do serviço não encontrado.');
+      console.error('Serviço inválido ou código do serviço não encontrado:', servico);
+      return;
+    }
+  
     try {
-      await this.servicosService
-        .updateServico(this.selectedServico.codServico, this.selectedServico)
-        .toPromise();
-
+      console.log('Chamando API para atualizar o serviço com código:', servico.codServico);
+      await this.servicosService.updateServico(servico.codServico, servico).toPromise();
+  
       this.messageService.add({
         severity: 'success',
         summary: 'Sucesso',
         detail: 'Serviço atualizado com sucesso!',
       });
-
-      this.loadServicos(); // Recarrega os serviços após salvar
-      this.cancelarEdicao(); // Fecha o modal
+  
+      console.log('Serviço salvo com sucesso:', servico);
+      servico.isEditing = false; // Sai do modo de edição
+      this.loadServicos(); // Atualiza a lista
     } catch (error) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Erro',
-        detail: 'Erro ao salvar o serviço. Tente novamente.',
-      });
+      console.error('Erro ao salvar o serviço:', error);
+      this.showError('Erro ao salvar o serviço. Tente novamente.');
     }
   }
 
-  // Cancela a edição e fecha o modal
-  cancelarEdicao(): void {
-    this.editMode = false;
-    this.selectedServico = null;
-  }
-
-  // Confirma a exclusão do serviço
-  confirmarExclusaoServico(servico: any): void {
+  confirmarExclusaoServico(servico: any) {
+    if (!servico || !servico.codServico) {
+      this.showError('Erro: Código do serviço não encontrado.');
+      return;
+    }
+  
     this.confirmationService.confirm({
       message: `Tem certeza que deseja excluir o serviço "${servico.DESC_SERVICO}"?`,
       header: 'Confirmação de Exclusão',
       icon: 'pi pi-exclamation-triangle',
+      acceptButtonStyleClass: 'p-button-danger p-button-text',  // Botão de aceitação customizado
+      rejectButtonStyleClass: 'p-button-text',  // Botão de rejeição customizado
+      acceptIcon: 'none',  // Remove o ícone do botão de aceitação
+      rejectIcon: 'none',  // Remove o ícone do botão de rejeição
+      acceptLabel: 'Sim',  // Texto do botão de aceitação
+      rejectLabel: 'Não',  // Texto do botão de rejeição
       accept: () => {
-        this.excluirServico(servico.codServico);
+        this.excluirServico(servico.codServico);  // Excluir o serviço
+      },
+      reject: () => {
+        this.messageService.add({
+          severity: 'info',
+          summary: 'Cancelado',
+          detail: 'A exclusão foi cancelada.',  // Mensagem ao cancelar a exclusão
+        });
       },
     });
   }
 
-  // Exclui o serviço
   async excluirServico(codServico: string): Promise<void> {
+    if (!codServico) {
+      this.showError('Erro: Código do serviço não encontrado.');
+      return;
+    }
+  
     try {
+      console.log('Excluindo serviço com código:', codServico);
       await this.servicosService.deleteServico(codServico).toPromise();
-
+  
       this.messageService.add({
         severity: 'success',
         summary: 'Sucesso',
         detail: 'Serviço excluído com sucesso!',
       });
-
-      this.loadServicos(); // Recarrega os serviços após excluir
+  
+      // Atualiza a lista de serviços
+      this.servicos = this.servicos.filter((servico) => servico.codServico !== codServico);
     } catch (error) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Erro',
-        detail: 'Erro ao excluir o serviço. Tente novamente.',
-      });
+      console.error('Erro ao excluir o serviço:', error);
+      this.showError('Erro ao excluir o serviço. Tente novamente.');
     }
   }
 
-
-  // Formata valores em BRL
-  formatCurrency(value: number): string {
-    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
-  }
-
-  // Ativa o modo de edição
-  editServico(servico: any): void {
-    this.editMode = true;
-    this.selectedServico = { ...servico }; // Clona o serviço para evitar alterações diretas
-  }
-
- 
-  // Exibe mensagens de sucesso
-  showSuccess(message: string): void {
-    this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: message });
-  }
-
-  // Exibe mensagens de erro
-  showError(message: string): void {
-    this.messageService.add({ severity: 'error', summary: 'Erro', detail: message });
+  cancelEditing(servico: any): void {
+    // Restaura os valores originais do serviço (recarrega da API)
+    const originalServico = this.servicos.find((s) => s.codServico === servico.codServico);
+    if (originalServico) {
+      Object.assign(servico, { ...originalServico });
+    }
+  
+    // Sai do modo de edição
+    servico.isEditing = false;
+    console.log('Edição cancelada para o serviço:', servico);
   }
 }

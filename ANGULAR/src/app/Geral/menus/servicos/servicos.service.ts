@@ -25,7 +25,7 @@ private apiUrl: string;
   }
 
   updateServico(codServico: string, servico: any): Observable<any> {
-    return this.http.put(`${this.apiUrl}/servicos/${codServico}`, servico);
+    return this.http.patch(`${this.apiUrl}/${codServico}`, servico);
   }
 
   deleteServico(codServico: string): Observable<any> {
