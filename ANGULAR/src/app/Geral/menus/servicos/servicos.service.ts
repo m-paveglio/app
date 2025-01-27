@@ -15,10 +15,10 @@ private apiUrl: string;
   {
     this.apiUrl = `${this.apiConfig.getBaseUrl()}/servicos`; // Construir a URL usando o ApiConfigService
   }
-
+ 
   getServicos(cnpj: string): Observable<any[]> {
     // A URL agora inclui o CNPJ na query string
-    return this.http.get<any[]>(`${this.apiUrl}?cnpj=${cnpj}`);
+    return this.http.get<any[]>(`${this.apiUrl}/CNPJ/${cnpj}`);
   }
 
   createServico(servico: any): Observable<any> {

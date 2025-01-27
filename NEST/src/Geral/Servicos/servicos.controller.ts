@@ -19,9 +19,9 @@ export class ServicosController {
     return this.ServicosService.getServico(COD_SERVICO);
   }
 
-  @Get(':CNPJ')
+  @Get('CNPJ/:CNPJ')
   getServicoCnpj(@Param('CNPJ') CNPJ: string) {
-    return this.ServicosService.getServico(CNPJ);
+    return this.ServicosService.getServicoCnpj(CNPJ);
   }
 
   @Get('desc/:DESC_SERVICO')

@@ -33,17 +33,20 @@ export class ServicosConsultarComponent implements OnInit {
   // Método para carregar os serviços do CNPJ logado
   async loadServicos(): Promise<void> {
     if (!this.cnpj) return;
-
+  
     this.isLoading = true; // Ativa o loading
     try {
-      // Passa o CNPJ para o método do serviço
-      this.servicos = (await this.servicosService.getServicos(this.cnpj).toPromise()) ?? [];
+      const resposta = await this.servicosService.getServicos(this.cnpj).toPromise();
+  
+      // Certifique-se de que `this.servicos` seja um array
+      this.servicos = Array.isArray(resposta) ? resposta : [resposta];
     } catch (error) {
       this.showError('Erro ao carregar os serviços. Tente novamente.');
     } finally {
       this.isLoading = false; // Desativa o loading
     }
   }
+  
 
   // Método para formatar o valor de exibição como R$ 10,00
   formatCurrency(value: number): string {
