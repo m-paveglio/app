@@ -1,18 +1,25 @@
-<div *ngIf="isLoading" class="p-d-flex p-ai-center p-jc-center">
-  <p-progressSpinner></p-progressSpinner>
-</div>
+<p-confirmDialog></p-confirmDialog>
+<p-toast></p-toast>
+<div class="grid" *ngIf="!editMode">
+    <div class="col-12">
+        <div *ngIf="!editMode" class="p-inputtext p-component p-element">
 
-<div *ngIf="!isLoading">
-  <h3>Serviços da Empresa (CNPJ: {{ cnpj }})</h3>
 
-  <p-table [value]="servicos">
+    <!-- Formulário de consulta CPF e nome -->
+    <h3 class="text-center" [ngStyle]="{backgroundColor:'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}">
+       SERVIÇOS
+    </h3>
+
+<div>
+  <p-table [value]="servicos" [paginator]="true" [rows]="5">
     <ng-template pTemplate="header">
       <tr>
         <th>Descrição</th>
         <th>Valor</th>
         <th>CNAE</th>
         <th>ITEM LC</th>
-        <th>Ação</th>
+        <th>ATIVIDADE DO MUNICÍPIO</th>
+        <th>Ações</th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-servico>
@@ -21,10 +28,87 @@
         <td>{{ formatCurrency(servico.VALOR) }}</td>
         <td>{{ servico.CNAE }}</td>
         <td>{{ servico.ITEM_LC }}</td>
+        <td>{{ servico.ATIVIDADE_MUNICIPIO }}</td>
         <td>
-          <button pButton icon="pi pi-pencil" label="Editar" (click)="editServico(servico)"></button>
+          <div class="flex gap-2">
+            <p-button
+              icon="pi pi-pencil"
+              severity="info"
+              (click)="editServico(servico)"
+            ></p-button>
+            <p-button
+              icon="pi pi-trash"
+              severity="danger"
+              (click)="confirmarExclusaoServico(servico)"
+            ></p-button>
+          </div>
         </td>
       </tr>
     </ng-template>
   </p-table>
+</div>
+
+<div *ngIf="editMode">
+  <h3>Editar Serviço</h3>
+  <div class="p-fluid p-formgrid grid">
+    <div class="field col-6">
+      <label for="descServico">Descrição</label>
+      <input
+        id="descServico"
+        type="text"
+        pInputText
+        [(ngModel)]="selectedServico.DESC_SERVICO"
+      />
+    </div>
+    <div class="field col-6">
+      <label for="valor">Valor</label>
+      <input
+        id="valor"
+        type="number"
+        pInputText
+        [(ngModel)]="selectedServico.VALOR"
+      />
+    </div>
+    <div class="field col-6">
+      <label for="cnae">CNAE</label>
+      <input
+        id="cnae"
+        type="text"
+        pInputText
+        [(ngModel)]="selectedServico.CNAE"
+      />
+    </div>
+    <div class="field col-6">
+      <label for="ITEM_LC">ITEM LC</label>
+      <input
+        id="ITEM_LC"
+        type="text"
+        pInputText
+        [(ngModel)]="selectedServico.ITEM_LC"
+      />
+    </div>
+    <div class="field col-6">
+      <label for="ATIVIDADE_MUNICIPIO">CNAE</label>
+      <input
+        id="ATIVIDADE_MUNICIPIO"
+        type="text"
+        pInputText
+        [(ngModel)]="selectedServico.ATIVIDADE_MUNICIPIO"
+      />
+    </div>
+    <div class="field col-12">
+      <p-button
+        label="Salvar"
+        icon="pi pi-save"
+        severity="success"
+        (click)="salvarServico()"
+      ></p-button>
+      <p-button
+        label="Cancelar"
+        icon="pi pi-times"
+        severity="danger"
+        (click)="cancelarEdicao()"
+      ></p-button>
+    </div>
+  </div>
 </div>

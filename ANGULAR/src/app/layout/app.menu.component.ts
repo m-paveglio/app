@@ -72,7 +72,7 @@ export class AppMenuComponent implements OnInit {
             {
                 label: 'Menus Contribuinte',
                 items: [
-                    { label: 'Serviços', icon: 'pi pi-fw pi-dollar', items: [
+                    { label: 'Serviços', icon: 'pi pi-fw pi-clipboard', items: [
                         {
                             label: 'Incluir',
                             icon: 'pi pi-fw pi-file-export',

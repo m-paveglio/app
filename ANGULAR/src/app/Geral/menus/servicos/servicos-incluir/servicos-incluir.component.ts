@@ -10,7 +10,7 @@ import { MessageService } from 'primeng/api';
   styleUrls: ['./servicos-incluir.component.css'],
   providers: [MessageService],
 })
-export class ServicosIncluirComponent implements OnInit {
+export class ServicosIncluirComponent {
   servicos: any[] = []; // Lista de serviços carregados
   novoServico: any = {}; // Objeto para criar/editar serviços
   selectedServico: any = null; // Serviço selecionado para edição
@@ -23,27 +23,6 @@ export class ServicosIncluirComponent implements OnInit {
     private messageService: MessageService
   ) {}
 
-  ngOnInit(): void {
-    this.cnpj = this.loginService.getEmpresaSelecionada()?.CNPJ;
-    if (this.cnpj) {
-      this.loadServicos();
-    } else {
-      this.showError('CNPJ não encontrado para a empresa logada.');
-    }
-  }
-
-  async loadServicos(): Promise<void> {
-    if (!this.cnpj) return;
-
-    this.isLoading = true;
-    try {
-      this.servicos = (await this.servicosService.getServicos(this.cnpj).toPromise()) ?? [];
-    } catch (error) {
-      this.showError('Erro ao carregar os serviços. Tente novamente.');
-    } finally {
-      this.isLoading = false;
-    }
-  }
 
   async adicionarServico(): Promise<void> {
     if (!this.cnpj) {
@@ -69,7 +48,6 @@ export class ServicosIncluirComponent implements OnInit {
         await this.servicosService.createServico(servico).toPromise();
         this.showSuccess('Serviço criado com sucesso!');
       }
-      this.loadServicos();
       this.resetForm();
     } catch (error) {
       this.showError('Erro ao salvar o serviço. Tente novamente.');

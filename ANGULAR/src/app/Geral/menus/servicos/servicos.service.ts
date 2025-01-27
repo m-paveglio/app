@@ -16,9 +16,8 @@ private apiUrl: string;
     this.apiUrl = `${this.apiConfig.getBaseUrl()}/servicos`; // Construir a URL usando o ApiConfigService
   }
  
-  getServicos(cnpj: string): Observable<any[]> {
-    // A URL agora inclui o CNPJ na query string
-    return this.http.get<any[]>(`${this.apiUrl}/CNPJ/${cnpj}`);
+  getServicos(cnpj: string): Observable<{ data: any[] }> {
+    return this.http.get<{ data: any[] }>(`${this.apiUrl}/CNPJ/${cnpj}`);
   }
 
   createServico(servico: any): Observable<any> {
@@ -26,7 +25,7 @@ private apiUrl: string;
   }
 
   updateServico(codServico: string, servico: any): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${codServico}`, servico);
+    return this.http.put(`${this.apiUrl}/servicos/${codServico}`, servico);
   }
 
   deleteServico(codServico: string): Observable<any> {

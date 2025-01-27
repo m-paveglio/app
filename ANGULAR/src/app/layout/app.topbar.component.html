@@ -1,3 +1,20 @@
+<style>
+    .layout-topbar-menu .user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Alinha à esquerda */
+    line-height: 1.2; /* Ajusta o espaçamento entre as linhas */
+}
+
+.layout-topbar-menu .user-name {
+    font-weight: bold; /* Destaca o nome do usuário */
+}
+
+.layout-topbar-menu .empresa-nome {
+    font-size: 0.9rem; /* Um pouco menor que o nome do usuário */
+    color: #888; /* Cor mais discreta */
+}
+</style>
 <div class="layout-topbar">
     <a class="layout-topbar-logo" routerLink="/dashboard">
         <img src="https://i.postimg.cc/MHd8QVrG/logo.png" alt="logo">
@@ -13,18 +30,16 @@
     </button>
 
     <div class="layout-topbar-menu">
-        <span>Bem-vindo, {{ userName }}!</span>
-        <span *ngIf="empresaNome"> | Empresa: {{ empresaNome }}</span>
+        <div class="user-info">
+            <span class="user-name">Bem-vindo, {{ userName }}!</span>
+            <span class="empresa-nome" *ngIf="empresaNome">Empresa: {{ empresaNome }}</span>
+        </div>
     </div>
 
     <div #topbarmenu class="layout-topbar-left" [ngClass]="{'layout-topbar-menu-mobile-active': layoutService.state.profileSidebarVisible}">
         <button class="p-link layout-topbar-button">
             <i class="pi pi-user"></i>
             <span>Profile</span>
-        </button>
-        <button class="p-link layout-topbar-button" [routerLink]="'/documentation'">
-            <i class="pi pi-cog"></i>
-            <span>Settings</span>
         </button>
         <button class="p-link layout-topbar-button" (click)="onLogout()">
             <i class="pi pi-sign-out"></i>

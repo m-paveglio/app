@@ -43,7 +43,7 @@ export class ServicosService {
     }
 
     async getServicoCnpj (CNPJ: string){
-      const ServicoFound = await this.ServicosRepository.findOne({
+      const ServicoFound = await this.ServicosRepository.find({
         where:{
           CNPJ,
         }
