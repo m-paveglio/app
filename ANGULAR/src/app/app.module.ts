@@ -26,6 +26,8 @@ import { EmpresasIncluirComponent } from './Geral/login/usuarios/empresas/empres
 import { EmpresasConsultarComponent } from './Geral/login/usuarios/empresas/empresas-consultar/empresas-consultar.component';
 import { TabViewModule } from 'primeng/tabview'
 import { DialogModule } from 'primeng/dialog';
+import { ServicosIncluirComponent } from './Geral/menus/servicos/servicos-incluir/servicos-incluir.component';
+import { ServicosConsultarComponent } from './Geral/menus/servicos/servicos-consultar/servicos-consultar.component';
 
 
 
@@ -42,7 +44,9 @@ import { DialogModule } from 'primeng/dialog';
     UserRelatorioComponent,
     GerarNfseComponent,
     EmpresasIncluirComponent,
-    EmpresasConsultarComponent
+    EmpresasConsultarComponent,
+    ServicosIncluirComponent,
+    ServicosConsultarComponent
         ],
   imports: [
     BrowserModule,

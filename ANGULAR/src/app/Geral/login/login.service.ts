@@ -14,6 +14,7 @@ export class LoginService {
   private readonly userNameKey = 'userName'; // Novo item para armazenar o nome do usuário
   private isLoggedInSubject = new BehaviorSubject<boolean>(this.hasToken());
   private empresaSelecionada = new BehaviorSubject<any>(null);
+  
 
   constructor(
     private http: HttpClient,
@@ -30,14 +31,25 @@ export class LoginService {
       catchError(this.handleError)
     );
   }
-
+  
   logout(): void {
     if (this.isBrowser()) {
-      localStorage.removeItem(this.tokenKey);
-      localStorage.removeItem(this.userNameKey); // Remover o nome do usuário
+      sessionStorage.removeItem(this.tokenKey); // Usando sessionStorage em vez de localStorage
+      sessionStorage.removeItem(this.userNameKey); // Remover o nome do usuário também
     }
     this.isLoggedInSubject.next(false);
-    sessionStorage.clear();
+  }
+  
+  private handleLoginSuccess(token: string, userName: string): void {
+    if (this.isBrowser()) {
+      sessionStorage.setItem(this.tokenKey, token); // Armazenar o token no sessionStorage
+      sessionStorage.setItem(this.userNameKey, userName); // Armazenar o nome do usuário no sessionStorage
+    }
+    this.isLoggedInSubject.next(true);
+  }
+  
+  private hasToken(): boolean {
+    return this.isBrowser() && !!sessionStorage.getItem(this.tokenKey); // Verificando no sessionStorage
   }
 
   isAuthenticated(): Observable<boolean> {
@@ -46,18 +58,6 @@ export class LoginService {
 
   getUserName(): string | null {
     return this.isBrowser() ? localStorage.getItem(this.userNameKey) : null;
-  }
-
-  private handleLoginSuccess(token: string, userName: string): void {
-    if (this.isBrowser()) {
-      localStorage.setItem(this.tokenKey, token);
-      localStorage.setItem(this.userNameKey, userName); // Armazenar o nome do usuário
-    }
-    this.isLoggedInSubject.next(true);
-  }
-
-  private hasToken(): boolean {
-    return this.isBrowser() && !!localStorage.getItem(this.tokenKey);
   }
 
   private isBrowser(): boolean {

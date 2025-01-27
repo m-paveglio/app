@@ -42,7 +42,7 @@ export class pessoas {
   COMPLEMENTO_LOGRADOURO: string;
 
   @Column({ length: 100 })
-  CIDADE: string;
+  COD_CIDADE: string;
 
   @Column({ length: 2 })
   UF: string;

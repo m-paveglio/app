@@ -13,8 +13,16 @@ export class GerarNfseComponent {
     dataEmissao: '',
     status: '',
     competencia: '',
-    valorServicos: ''
-    // Adicione os demais campos conforme necessário
+    valorServicos: '',
+    valorDeducoes: '',
+    valorPis: '',
+    valorCofins: '',
+    valorInss: '',
+    tomadorCpfCnpj: '',
+    tomadorRazaoSocial: '',
+    tomadorEndereco: '',
+    tomadorCep: '',
+    tomadorEmail: ''
   };
 
   isEnvioSucesso: boolean = false;
@@ -22,10 +30,19 @@ export class GerarNfseComponent {
   mensagem: string = '';
 
   onSubmit() {
-    console.log(this.nfseData);
-    // Lógica de envio do XML para o backend
-    this.isEnvioSucesso = true; // Atualize conforme a resposta do backend
+    console.log('Dados enviados:', this.nfseData);
+
+    // Simular envio ao backend
+    this.isEnvioSucesso = this.enviarDadosParaBackend(this.nfseData);
     this.exibirMensagem = true;
-    this.mensagem = this.isEnvioSucesso ? 'Nota fiscal enviada com sucesso!' : 'Erro ao enviar a nota fiscal.';
+    this.mensagem = this.isEnvioSucesso
+      ? 'Nota fiscal enviada com sucesso!'
+      : 'Erro ao enviar a nota fiscal.';
+  }
+
+  enviarDadosParaBackend(dados: any): boolean {
+    // TODO: Implementar envio ao backend
+    console.log('Enviando dados ao backend:', dados);
+    return true; // Simulação de sucesso
   }
 }

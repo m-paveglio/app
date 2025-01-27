@@ -11,6 +11,8 @@ import { GerarNfseComponent } from './Geral/menus/nfse/enviar/gerar-nfse.compone
 import { AuthGuardService } from './Geral/login/AuthGuardService';
 import { EmpresasIncluirComponent } from './Geral/login/usuarios/empresas/empresas-incluir/empresas-incluir.component';
 import { EmpresasConsultarComponent } from './Geral/login/usuarios/empresas/empresas-consultar/empresas-consultar.component';
+import { ServicosIncluirComponent } from './Geral/menus/servicos/servicos-incluir/servicos-incluir.component';
+import { ServicosConsultarComponent } from './Geral/menus/servicos/servicos-consultar/servicos-consultar.component';
 
 const routes: Routes = [
   { path: '', component: PagInicialComponent },
@@ -41,6 +43,13 @@ const routes: Routes = [
         children: [
           { path: 'gerar', component: GerarNfseComponent },
           { path: 'consultar', component: UserConsultarComponent },
+        ]
+      },
+      { 
+        path: 'servicos', 
+        children: [
+          { path: 'incluir', component: ServicosIncluirComponent },
+          { path: 'consultar', component: ServicosConsultarComponent },
         ]
       },
     ]

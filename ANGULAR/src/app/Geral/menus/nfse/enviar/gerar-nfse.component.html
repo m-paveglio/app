@@ -1,65 +1,253 @@
 <div class="grid" *ngIf="nfseData">
   <div class="col-12">
     <div class="p-inputtext p-component p-element">
-
-      <h5 class="text-center" [ngStyle]="{backgroundColor:'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}">EMISSÃO DE NOTA FISCAL</h5>
+      <h5
+        class="text-center"
+        [ngStyle]="{
+          backgroundColor: 'var(--cyan-800)',
+          color: 'var(--primary-color-text)',
+          borderRadius: 'var(--border-radius)'
+        }"
+      >
+        EMISSÃO DE NOTA FISCAL
+      </h5>
 
       <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
+        <!-- Número do RPS -->
         <div class="field col-12 md:col-1">
           <span class="p-float-label">
-            <input id="float-input" type="text" pinputtext class="p-inputtext p-component p-element p-filled" [(ngModel)]="nfseData.numero" name="numero">
-            <label for="float-input">Número</label>
+            <input
+              id="numero"
+              type="text"
+              pInputText
+              class="p-inputtext p-component p-element p-filled"
+              [(ngModel)]="nfseData.numero"
+              name="numero"
+            />
+            <label for="numero">Número</label>
           </span>
         </div>
 
+        <!-- Série do RPS -->
         <div class="field col-12 md:col-1">
           <span class="p-float-label">
-            <input id="float-input" type="text" pinputtext class="p-inputtext p-component p-element p-filled" [(ngModel)]="nfseData.serie" name="serie">
-            <label for="float-input">Série</label>
+            <input
+              id="serie"
+              type="text"
+              pInputText
+              class="p-inputtext p-component p-element p-filled"
+              [(ngModel)]="nfseData.serie"
+              name="serie"
+            />
+            <label for="serie">Série</label>
           </span>
         </div>
 
+        <!-- Tipo -->
         <div class="field col-12 md:col-1">
           <span class="p-float-label">
-            <input id="float-input" type="text" pinputtext class="p-inputtext p-component p-element p-filled" [(ngModel)]="nfseData.tipo" name="tipo">
-            <label for="float-input">Tipo</label>
+            <input
+              id="tipo"
+              type="text"
+              pInputText
+              class="p-inputtext p-component p-element p-filled"
+              [(ngModel)]="nfseData.tipo"
+              name="tipo"
+            />
+            <label for="tipo">Tipo</label>
           </span>
         </div>
 
+        <!-- Data de Emissão -->
         <div class="field col-12 md:col-2">
           <span class="p-float-label">
-            <input id="float-input" type="date" pinputtext class="p-inputtext p-component p-element p-filled" [(ngModel)]="nfseData.dataEmissao" name="dataEmissao">
-            <label for="float-input">Data de Emissão</label>
+            <input
+              id="dataEmissao"
+              type="date"
+              pInputText
+              class="p-inputtext p-component p-element p-filled"
+              [(ngModel)]="nfseData.dataEmissao"
+              name="dataEmissao"
+            />
+            <label for="dataEmissao">Data de Emissão</label>
           </span>
         </div>
 
-        <div class="field col-12 md:col-1">
-          <span class="p-float-label">
-            <input id="float-input" type="text" pinputtext class="p-inputtext p-component p-element p-filled" [(ngModel)]="nfseData.status" name="status">
-            <label for="float-input">Status</label>
-          </span>
-        </div>
-
+        <!-- Competência -->
         <div class="field col-12 md:col-2">
           <span class="p-float-label">
-            <input id="float-input" type="date" pinputtext class="p-inputtext p-component p-element p-filled" [(ngModel)]="nfseData.competencia" name="competencia">
-            <label for="float-input">Competência</label>
+            <input
+              id="competencia"
+              type="date"
+              pInputText
+              class="p-inputtext p-component p-element p-filled"
+              [(ngModel)]="nfseData.competencia"
+              name="competencia"
+            />
+            <label for="competencia">Competência</label>
           </span>
         </div>
 
-        <div class="field col-12 md:col-4">
+        <!-- Valor dos Serviços -->
+        <div class="field col-12 md:col-2">
           <span class="p-float-label">
-            <input id="float-input" type="text" pinputtext class="p-inputtext p-component p-element p-filled" [(ngModel)]="nfseData.valorServicos" name="valorServicos">
-            <label for="float-input">Valor dos Serviços</label>
+            <input
+              id="valorServicos"
+              type="text"
+              pInputText
+              class="p-inputtext p-component p-element p-filled"
+              [(ngModel)]="nfseData.valorServicos"
+              name="valorServicos"
+            />
+            <label for="valorServicos">Valor dos Serviços</label>
           </span>
         </div>
 
-        <!-- Adicione os demais campos conforme necessário -->
-
-        <div class="btn-group field col-12 md:col-1 flex flex-wrap gap-3 justify-content-center" role="group" aria-label="Third group">
-          <p-button icon="pi pi-check" severity="success" (click)="onSubmit()"/>
+        <!-- Campos de deduções -->
+        <h6 class="col-12 mt-4">Deduções</h6>
+        <div class="field col-12 md:col-2">
+          <span class="p-float-label">
+            <input
+              id="valorDeducoes"
+              type="text"
+              pInputText
+              class="p-inputtext p-component p-element p-filled"
+              [(ngModel)]="nfseData.valorDeducoes"
+              name="valorDeducoes"
+            />
+            <label for="valorDeducoes">Valor Deduções</label>
+          </span>
+        </div>
+        <div class="field col-12 md:col-2">
+          <span class="p-float-label">
+            <input
+              id="valorPis"
+              type="text"
+              pInputText
+              class="p-inputtext p-component p-element p-filled"
+              [(ngModel)]="nfseData.valorPis"
+              name="valorPis"
+            />
+            <label for="valorPis">Valor PIS</label>
+          </span>
+        </div>
+        <div class="field col-12 md:col-2">
+          <span class="p-float-label">
+            <input
+              id="valorCofins"
+              type="text"
+              pInputText
+              class="p-inputtext p-component p-element p-filled"
+              [(ngModel)]="nfseData.valorCofins"
+              name="valorCofins"
+            />
+            <label for="valorCofins">Valor COFINS</label>
+          </span>
+        </div>
+        <div class="field col-12 md:col-2">
+          <span class="p-float-label">
+            <input
+              id="valorInss"
+              type="text"
+              pInputText
+              class="p-inputtext p-component p-element p-filled"
+              [(ngModel)]="nfseData.valorInss"
+              name="valorInss"
+            />
+            <label for="valorInss">Valor INSS</label>
+          </span>
         </div>
 
+        <!-- Campos do tomador do serviço -->
+        <h6 class="col-12 mt-4">Tomador do Serviço</h6>
+        <div class="field col-12 md:col-2">
+          <span class="p-float-label">
+            <input
+              id="tomadorCpfCnpj"
+              type="text"
+              pInputText
+              class="p-inputtext p-component p-element p-filled"
+              [(ngModel)]="nfseData.tomadorCpfCnpj"
+              name="tomadorCpfCnpj"
+            />
+            <label for="tomadorCpfCnpj">CPF/CNPJ</label>
+          </span>
+        </div>
+        <div class="field col-12 md:col-3">
+          <span class="p-float-label">
+            <input
+              id="tomadorRazaoSocial"
+              type="text"
+              pInputText
+              class="p-inputtext p-component p-element p-filled"
+              [(ngModel)]="nfseData.tomadorRazaoSocial"
+              name="tomadorRazaoSocial"
+            />
+            <label for="tomadorRazaoSocial">Razão Social</label>
+          </span>
+        </div>
+        <div class="field col-12 md:col-2">
+          <span class="p-float-label">
+            <input
+              id="tomadorEndereco"
+              type="text"
+              pInputText
+              class="p-inputtext p-component p-element p-filled"
+              [(ngModel)]="nfseData.tomadorEndereco"
+              name="tomadorEndereco"
+            />
+            <label for="tomadorEndereco">Endereço</label>
+          </span>
+        </div>
+        <div class="field col-12 md:col-2">
+          <span class="p-float-label">
+            <input
+              id="tomadorCep"
+              type="text"
+              pInputText
+              class="p-inputtext p-component p-element p-filled"
+              [(ngModel)]="nfseData.tomadorCep"
+              name="tomadorCep"
+            />
+            <label for="tomadorCep">CEP</label>
+          </span>
+        </div>
+        <div class="field col-12 md:col-2">
+          <span class="p-float-label">
+            <input
+              id="tomadorEmail"
+              type="text"
+              pInputText
+              class="p-inputtext p-component p-element p-filled"
+              [(ngModel)]="nfseData.tomadorEmail"
+              name="tomadorEmail"
+            />
+            <label for="tomadorEmail">Email</label>
+          </span>
+        </div>
+
+        <!-- Botão Enviar -->
+        <div
+          class="btn-group field col-12 md:col-2 flex flex-wrap gap-3 justify-content-center"
+          role="group"
+          aria-label="Third group"
+        >
+          <p-button
+            icon="pi pi-check"
+            severity="success"
+            label="Emitir Nota Fiscal"
+            (click)="onSubmit()"
+          ></p-button>
+        </div>
+      </div>
+
+      <!-- Mensagem de Retorno -->
+      <div
+        *ngIf="exibirMensagem"
+        class="mt-4"
+        [ngClass]="{ 'text-success': isEnvioSucesso, 'text-danger': !isEnvioSucesso }"
+      >
+        {{ mensagem }}
       </div>
     </div>
   </div>

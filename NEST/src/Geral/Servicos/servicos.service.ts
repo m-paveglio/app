@@ -42,6 +42,20 @@ export class ServicosService {
       return ServicoFound
     }
 
+    async getServicoCnpj (CNPJ: string){
+      const ServicoFound = await this.ServicosRepository.findOne({
+        where:{
+          CNPJ,
+        }
+      })
+
+      if (!ServicoFound){
+      return new HttpException('Serviço não encontrado', HttpStatus.NOT_FOUND)
+      }
+      return ServicoFound
+    }
+
+
     async deleteServico (COD_SERVICO: string){
       const ServicoFound = await this.ServicosRepository.findOne({
         where: {

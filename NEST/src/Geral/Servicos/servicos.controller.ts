@@ -13,10 +13,15 @@ export class ServicosController {
     return this.ServicosService.getServicos();
   }
 
-  
+   
   @Get(':COD_SERVICO')
   getServico(@Param('COD_SERVICO') COD_SERVICO: string) {
     return this.ServicosService.getServico(COD_SERVICO);
+  }
+
+  @Get(':CNPJ')
+  getServicoCnpj(@Param('CNPJ') CNPJ: string) {
+    return this.ServicosService.getServico(CNPJ);
   }
 
   @Get('desc/:DESC_SERVICO')

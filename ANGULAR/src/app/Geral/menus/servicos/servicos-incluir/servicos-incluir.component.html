@@ -1,0 +1,94 @@
+<div class="grid" *ngIf="servicos">
+    <div class="col-12">
+      <div class="p-inputtext p-component p-element">
+        <h3
+          class="text-center"
+          [ngStyle]="{ backgroundColor: 'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)' }"
+        >
+          INCLUIR SERVIÇO
+        </h3>
+        <p-toast></p-toast>
+        <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
+          <div class="field col-12 md:col-8">
+            <span class="p-float-label float-label-fixed">
+              <input
+                id="desc-servico"
+                type="text"
+                pinputtext
+                class="p-inputtext p-component p-element p-filled"
+                [(ngModel)]="novoServico.DESC_SERVICO"
+                name="DESC_SERVICO"
+              />
+              <label for="desc-servico">DESCRIÇÃO DO SERVIÇO</label>
+            </span>
+          </div>
+  
+          <div class="field col-12 md:col-2">
+            <span class="p-float-label float-label-fixed">
+              <input
+                id="valor-servico"
+                type="text"
+                pinputtext
+                class="p-inputtext p-component p-element p-filled"
+                [(ngModel)]="novoServico.VALOR"
+                name="VALOR"
+                (input)="formatCurrency($event)"
+              />
+              <label for="valor-servico">VALOR (R$)</label>
+            </span>
+          </div>
+  
+          <div class="field col-12 md:col-2">
+            <span class="p-float-label float-label-fixed">
+              <input
+                id="cnae-servico"
+                type="text"
+                pinputtext
+                mask="0000-0/00"
+                class="p-inputtext p-component p-element p-filled"
+                [(ngModel)]="novoServico.CNAE"
+                name="CNAE"
+              />
+              <label for="cnae-servico">CNAE</label>
+            </span>
+          </div>
+  
+          <div class="field col-12 md:col-3">
+            <span class="p-float-label float-label-fixed">
+              <input
+                id="item-lc"
+                type="text"
+                pinputtext
+                mask="00.00"
+                class="p-inputtext p-component p-element p-filled"
+                [(ngModel)]="novoServico.ITEM_LC"
+                name="ITEM_LC"
+                maxlength="5"
+                (input)="formatItemLC()"
+              />
+              <label for="item-lc">ITEM LC</label>
+            </span>
+          </div>
+          
+          <div class="field col-12 md:col-4">
+            <span class="p-float-label float-label-fixed">
+              <input
+                id="atividade-municipio"
+                type="text"
+                pinputtext
+                class="p-inputtext p-component p-element p-filled"
+                [(ngModel)]="novoServico.ATIVIDADE_MUNICIPIO"
+                name="ATIVIDADE_MUNICIPIO"
+              />
+              <label for="atividade-municipio">ATIVIDADE NO MUNICÍPIO</label>
+            </span>
+          </div>
+  
+          <div class="btn-group field col-12 md:col-1 flex flex-wrap gap-3" role="group" aria-label="Salvar serviço">
+            <p-button icon="pi pi-save" severity="success" (click)="adicionarServico()"></p-button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
