@@ -1,39 +1,52 @@
 import { Component } from '@angular/core';
 import { PessoasService } from '../pessoas.service';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-pessoas-incluir',
   templateUrl: './pessoas-incluir.component.html',
   styleUrls: ['./pessoas-incluir.component.css'],
+  providers: [MessageService],
 })
 export class PessoasIncluirComponent {
   mask: String = '';
   resultado: any;
   novaPessoa: any = {};
-  mensagem: any;
-  exibirMensagem: boolean = false;
 
-  constructor(private PessoasService: PessoasService) {}
+  constructor(
+    private PessoasService: PessoasService,
+    private messageService: MessageService
+  ) {}
+
+  // Exibe mensagem de sucesso
+  showSuccess(message: string): void {
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Sucesso',
+      detail: message,
+    });
+  }
+
+  // Exibe mensagem de erro
+  showError(message: string): void {
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Erro',
+      detail: message,
+    });
+  }
 
   // Método para criar uma pessoa
   createPessoa() {
     this.PessoasService.createPessoa(this.novaPessoa).subscribe(
       (data) => {
         this.resultado = data;
-        this.novaPessoa = {};
-        this.mensagem = 'Usuário cadastrado com sucesso';
-        this.exibirMensagem = true;
-        setTimeout(() => {
-          this.exibirMensagem = false;
-        }, 3000);
+        this.novaPessoa = {}; // Limpa o formulário
+        this.showSuccess('Usuário cadastrado com sucesso');
       },
       (error) => {
         console.error('Erro ao adicionar usuário:', error);
-        this.mensagem = 'Erro ao cadastrar usuário';
-        this.exibirMensagem = true;
-        setTimeout(() => {
-          this.exibirMensagem = false;
-        }, 3000);
+        this.showError('Erro ao cadastrar usuário. Verifique os dados e tente novamente.');
       }
     );
   }
@@ -48,19 +61,16 @@ export class PessoasIncluirComponent {
         this.novaPessoa.BAIRRO_LOGRADOURO = endereco.bairro;
         this.novaPessoa.CIDADE = endereco.cidade;
         this.novaPessoa.UF = endereco.uf;
+        this.showSuccess('Endereço preenchido automaticamente');
       },
       (error) => {
         console.error('Erro ao buscar endereço:', error);
-        // Limpa os campos de endereço se ocorrer erro
+        // Limpa os campos de endereço
         this.novaPessoa.RUA_LOGRADOURO = '';
         this.novaPessoa.BAIRRO_LOGRADOURO = '';
         this.novaPessoa.CIDADE = '';
         this.novaPessoa.UF = '';
-        this.mensagem = 'Erro ao buscar endereço. Verifique o CEP informado.';
-        this.exibirMensagem = true;
-        setTimeout(() => {
-          this.exibirMensagem = false;
-        }, 3000);
+        this.showError('Erro ao buscar endereço. Verifique o CEP informado.');
       }
     );
   }
