@@ -14,7 +14,7 @@ export class pessoasService {
   async createPessoa(pessoasDto: createPessoasDto) {
     const pessoaFound = await this.pessoasRepository.findOne({
       where: {
-        CPF: pessoasDto.CPF,
+        CPF_CNPJ: pessoasDto.CPF,
       },
     });
 
@@ -29,10 +29,10 @@ export class pessoasService {
     return this.pessoasRepository.save(newPessoa);
   }
 
-    async getPessoa (CPF: string){
+    async getPessoa (CPF_CNPJ: string){
       const pessoaFound = await this.pessoasRepository.findOne({
         where:{
-          CPF,
+          CPF_CNPJ,
         }
       })
 
@@ -42,10 +42,10 @@ export class pessoasService {
       return pessoaFound
     }
 
-    async updatePessoa(CPF: string, userDto: updatePessoasDto) {
+    async updatePessoa(CPF_CNPJ: string, userDto: updatePessoasDto) {
       const pessoaFound = await this.pessoasRepository.findOne({
         where: {
-          CPF,
+          CPF_CNPJ,
         },
       });
   

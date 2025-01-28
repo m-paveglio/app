@@ -64,8 +64,26 @@ export class ServicosConsultarComponent implements OnInit {
   }
 
   formatItemLC(servico: any): void {
-    const rawValue = String(servico.ITEM_LC).replace(/[^0-9.]/g, ''); // Remove caracteres inválidos
-    servico.ITEM_LC = rawValue.slice(0, 5); // Garante o limite de 5 caracteres
+    if (!servico.ITEM_LC) return;
+  
+    let rawValue = String(servico.ITEM_LC).replace(/[^0-9.]/g, '');
+  
+    if (rawValue.includes('.')) {
+      const parts = rawValue.split('.');
+      rawValue = `${parts[0].slice(0, 2)}.${parts[1].slice(0, 2)}`;
+    } else {
+
+      rawValue = `${rawValue.slice(0, 2)}.${rawValue.slice(2, 4)}`;
+    }
+  
+
+    servico.ITEM_LC = rawValue.padEnd(5, '');
+  }
+
+  formatCNAE(cnae: string): string {
+    if (!cnae) return '';
+    // Aplica a máscara "0000-0/00" manualmente
+    return cnae.replace(/(\d{4})(\d{1})(\d{2})/, '$1-$2/$3');
   }
 
   showError(message: string): void {

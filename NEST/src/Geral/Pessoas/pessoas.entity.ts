@@ -1,12 +1,9 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, PrimaryColumn } from 'typeorm';
 
 @Entity('PESSOAS')
 export class pessoas {
-  @PrimaryGeneratedColumn()
-  ID: number;
-
-  @Column({ length: 14, unique: true })
-  CPF: string;
+  @PrimaryColumn({ length: 14, unique: true })
+  CPF_CNPJ: string;
 
   @Column({ type: 'varchar', length: 100 })
   NOME: string;
@@ -19,12 +16,6 @@ export class pessoas {
 
   @Column({ length: 15 })
   TELEFONE_CELULAR: string;
-  
-  @Column({ length: 2 })
-  COD_PROFISSAO: string;
-
-  @Column({ length: 15 })
-  DT_NASCIMENTO: string;
 
   @Column({ length: 10 })
   CEP: string;

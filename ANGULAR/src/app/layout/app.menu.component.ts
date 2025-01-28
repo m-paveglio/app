@@ -85,6 +85,20 @@ export class AppMenuComponent implements OnInit {
                         },
                         ],
                      },  
+
+                     { label: 'Pessoas', icon: 'pi pi-fw pi-users', items: [
+                        {
+                            label: 'Incluir',
+                            icon: 'pi pi-fw pi-user-plus',
+                            routerLink: ['pessoas/incluir']
+                        },
+                        {
+                            label: 'Consultar',
+                            icon: 'pi pi-fw pi-search',
+                            routerLink: ['pessoas/consultar']
+                        },
+                        ],
+                     },  
                 
                 ]},
 

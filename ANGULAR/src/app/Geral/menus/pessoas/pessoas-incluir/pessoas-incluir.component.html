@@ -1,14 +1,5 @@
-<style>.mensagem {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: red;
-  z-index: 999;
-}
 
-</style>
-<div class="grid" *ngIf="novoUsuario">
+<div class="grid" *ngIf="novaPessoa">
     <div class="col-12">
       <div class="p-inputtext p-component p-element" >
 
@@ -17,65 +8,36 @@
     <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
           <div class="field col-12 md:col-4">
             <span class="p-float-label">
-              <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled" mask='000.000.000-00'[(ngModel)]="novoUsuario.CPF" name="CPF">
-              <label for="float-input">CPF</label>
+              <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled" mask='000.000.000-00 || 00.000.000/0000-00'[(ngModel)]="novaPessoa.CPF_CNPJ" name="CPF_CNPJ">
+              <label for="float-input">CPF / CNPJ</label>
             </span>
           </div>
 
           <div class="field col-12 md:col-4">
             <span class="p-float-label">
-              <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled" [(ngModel)]="novoUsuario.NOME" name="NOME">
+              <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled" [(ngModel)]="novaPessoa.NOME" name="NOME">
               <label for="float-input">Nome</label>
             </span>
           </div>
 
           <div class="field col-12 md:col-4">
             <span class="p-float-label">
-              <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled" [(ngModel)]="novoUsuario.EMAIL" name="email">
+              <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled" [(ngModel)]="novaPessoa.EMAIL" name="email">
               <label for="float-input">E-mail</label>
             </span>
           </div>
 
           <div class="field col-12 md:col-1">
             <span class="p-float-label">
-              <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled" [(ngModel)]="novoUsuario.DDD" name="ddd">
+              <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled" [(ngModel)]="novaPessoa.DDD" name="ddd">
               <label for="float-input">DDD</label>
             </span>
           </div>
          
           <div class="field col-12 md:col-3">
             <span class="p-float-label">
-              <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled"  mask='0 0000-0000'[(ngModel)]="novoUsuario.TELEFONE_CELULAR" name="celular">
+              <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled"  mask='0 0000-0000'[(ngModel)]="novaPessoa.TELEFONE_CELULAR" name="celular">
               <label for="float-input">Celular</label>
-            </span>
-          </div>
-
-          <div class="field col-12 md:col-2">
-            <span class="p-float-label">
-              <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled"  mask='00/00/0000'[(ngModel)]="novoUsuario.DT_NASCIMENTO" name="dt_nascimento" >
-              <label for="float-input">Data de Nascimento</label>
-            </span>
-          </div>
-
-
-          <div class="field col-12 md:col-2">
-            <span class="p-float-label">
-              <p-dropdown id="float-input" [(ngModel)]="novoUsuario.COD_PERMISSAO" name="permissao" [options]="permissoes" optionLabel="nome" optionValue="codigo"></p-dropdown>
-              <label for="float-input">Permissão</label>
-            </span>
-          </div>
-
-          <div class="field col-12 md:col-2">
-            <span class="p-float-label">
-              <p-dropdown id="float-input" [(ngModel)]="novoUsuario.COD_CARGO" name="profissao" [options]="profissoes" optionLabel="nome" optionValue="codigo"></p-dropdown>
-              <label for="float-input">Profissão</label>
-            </span>
-          </div>
-
-          <div class="field col-12 md:col-2">
-            <span class="p-float-label">
-              <input id="float-input" type="password" pinputtext="" class="p-inputtext p-component p-element p-filled"  [(ngModel)]="novoUsuario.SENHA" name="SENHA" >
-              <label for="float-input">Senha</label>
             </span>
           </div>
     </div>
@@ -85,64 +47,66 @@
           <h5 class="text-center" [ngStyle]="{backgroundColor:'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}">ENDEREÇO</h5>
       <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
           
-          <div class="field col-12 md:col-2">
-            <span class="p-float-label">
-              <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled"  mask='00000-000'[(ngModel)]="novoUsuario.CEP" name="cep">
-              <label for="float-input">CEP</label>
-            </span>
-          </div>
-
+        <div class="field col-12 md:col-2">
+          <span class="p-float-label">
+            <input 
+              id="float-input" 
+              type="text" 
+              pinputtext 
+              class="p-inputtext p-component p-element p-filled" 
+              mask="00000-000" 
+              [(ngModel)]="novaPessoa.CEP" 
+              name="cep" 
+              (blur)="buscarEnderecoPorCEP(novaPessoa.CEP)" 
+            />
+            <label for="float-input">CEP</label>
+          </span>
+        </div>
+        
           <div class="field col-12 md:col-6">
             <span class="p-float-label">
-              <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled"  [(ngModel)]="novoUsuario.RUA_LOGRADOURO" name="logradouro">
+              <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled"  [(ngModel)]="novaPessoa.RUA_LOGRADOURO" name="logradouro">
               <label for="float-input">Logradouro</label>
             </span>
           </div>
 
           <div class="field col-12 md:col-1">
             <span class="p-float-label">
-              <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled"  [(ngModel)]="novoUsuario.NUMERO_LOGRADOURO" name="numero_logradouro">
+              <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled"  [(ngModel)]="novaPessoa.NUMERO_LOGRADOURO" name="numero_logradouro">
               <label for="float-input">Número</label>
             </span>
           </div>
 
           <div class="field col-12 md:col-3">
             <span class="p-float-label">
-              <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled"  [(ngModel)]="novoUsuario.BAIRRO_LOGRADOURO" name="bairro_logradouro">
+              <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled"  [(ngModel)]="novaPessoa.BAIRRO_LOGRADOURO" name="bairro_logradouro">
               <label for="float-input">Bairro</label>
             </span>
           </div>
 
           <div class="field col-12 md:col-4">
             <span class="p-float-label">
-              <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled"  [(ngModel)]="novoUsuario.COMPLEMENTO_LOGRADOURO" name="complemento_logradouro">
+              <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled"  [(ngModel)]="novaPessoa.COMPLEMENTO_LOGRADOURO" name="complemento_logradouro">
               <label for="float-input">Complemento</label>
             </span>
           </div>
 
           <div class="field col-12 md:col-4">
             <span class="p-float-label">
-              <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled"  [(ngModel)]="novoUsuario.CIDADE" name="cidade">
+              <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled"  [(ngModel)]="novaPessoa.CIDADE" name="cidade">
               <label for="float-input">Cidade</label>
             </span>
           </div>
           
           <div class="field col-12 md:col-1">
             <span class="p-float-label">
-              <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled"  [(ngModel)]="novoUsuario.UF" name="uf">
+              <input id="float-input" type="text" pinputtext="" class="p-inputtext p-component p-element p-filled"  [(ngModel)]="novaPessoa.UF" name="uf">
               <label for="float-input">UF</label>
             </span>
           </div>
 
-          <div class="field col-12 md:col-2">
-            <span class="p-float-label">
-              <p-dropdown id="float-input" [ngStyle]="{'padding': '0px'}" [(ngModel)]="novoUsuario.USER_SIS" name="USER_SIS" [options]="USER_SIS" optionLabel="nome" optionValue="codigo"></p-dropdown>
-              <label for="float-input">USUÁRIO</label>
-            </span>
-          </div>
-
           <div class="btn-group field col-12 md:col-1 flex flex-wrap gap-3 justify-content-center" role="group" aria-label="Third group">
-            <button type="button" class="btn btn-success" (click)="adicionarUsuario()">
+            <button type="button" class="btn btn-success" (click)="createPessoa()">
                 <i class="pi pi-check"></i> 
             </button>
           </div>

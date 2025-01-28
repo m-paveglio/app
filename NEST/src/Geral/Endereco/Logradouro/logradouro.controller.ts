@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Param, Delete, Patch, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Param, Delete, Patch, BadRequestException } from '@nestjs/common';
 import { LogradouroService } from './logradouro.service';
 import { Logradouro } from './entities/logradouro.entity';
 import { CreateLogradouroDto } from './dto/create-logradouro.dto';
@@ -15,7 +15,14 @@ export class LogradouroController {
 
   @Get(':CEP')
   getLogradouro(@Param('CEP') CEP: string) {
-    return this.LogradouroService.getLogradouro(CEP);
+    // Validação simples do formato do CEP
+      return this.LogradouroService.getLogradouro(CEP);
+  }
+
+  @Get('cep/:CEP')
+  getLogradouroCep(@Param('CEP') CEP: string) {
+    // Faz a chamada ao método que inclui os dados relacionados (cidade e UF)
+    return this.LogradouroService.getLogradouroCep(CEP);
   }
 
   @Get('desc/:NOME_DO_LOGRADOURO')
@@ -29,12 +36,16 @@ export class LogradouroController {
   }
 
   @Delete(':COD_LOGRADOURO')
-  deleteLogradouro(@Param('cpf') cpf: string) {
-    return this.LogradouroService.deleteLogradouro(cpf);
+  deleteLogradouro(@Param('COD_LOGRADOURO') COD_LOGRADOURO: string) {
+    return this.LogradouroService.deleteLogradouro(COD_LOGRADOURO);
   }
 
   @Patch(':COD_LOGRADOURO')
-  updateLogradouro(@Param('COD_LOGRADOURO') COD_LOGRADOURO: string, @Body() Logradouro: UpdateLogradouroDto) {
+  updateLogradouro(
+    @Param('COD_LOGRADOURO') COD_LOGRADOURO: string,
+    @Body() Logradouro: UpdateLogradouroDto,
+  ) {
     return this.LogradouroService.updateLogradouro(COD_LOGRADOURO, Logradouro);
   }
+
 }

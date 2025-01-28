@@ -81,4 +81,26 @@ export class LogradouroService {
       });
     }
 
+    async getLogradouroCep(CEP: string) {
+      // Fazendo a busca do logradouro e unindo os dados de cidade e UF
+      const logradouroFound = await this.logradouroRepository
+        .createQueryBuilder('logradouro')
+        .leftJoinAndSelect('logradouro.cidade', 'cidade') // Relaciona com a tabela de cidades
+        .leftJoinAndSelect('cidade.uf', 'uf') // Relaciona com a tabela de UF
+        .where('logradouro.CEP = :CEP', { CEP })
+        .getOne();
+    
+      if (!logradouroFound) {
+        throw new HttpException('CEP não encontrado', HttpStatus.NOT_FOUND);
+      }
+    
+      return {
+        logradouro: logradouroFound.NOME_DO_LOGRADOURO,
+        bairro: logradouroFound.BAIRRO,
+        cidade: logradouroFound.cidade.NOME_CIDADE,
+        uf: logradouroFound.cidade.uf.COD_UF,
+      };
+    }
+    
+
   }

@@ -28,6 +28,8 @@ import { TabViewModule } from 'primeng/tabview'
 import { DialogModule } from 'primeng/dialog';
 import { ServicosIncluirComponent } from './Geral/menus/servicos/servicos-incluir/servicos-incluir.component';
 import { ServicosConsultarComponent } from './Geral/menus/servicos/servicos-consultar/servicos-consultar.component';
+import { PessoasIncluirComponent } from './Geral/menus/pessoas/pessoas-incluir/pessoas-incluir.component';
+
 
 
 
@@ -46,7 +48,8 @@ import { ServicosConsultarComponent } from './Geral/menus/servicos/servicos-cons
     EmpresasIncluirComponent,
     EmpresasConsultarComponent,
     ServicosIncluirComponent,
-    ServicosConsultarComponent
+    ServicosConsultarComponent,
+    PessoasIncluirComponent
         ],
   imports: [
     BrowserModule,

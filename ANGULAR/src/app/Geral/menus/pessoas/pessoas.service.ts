@@ -1,69 +1,47 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { ApiConfigService } from '../../../api-config.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class UserService {
-  private apiUrl = 'http://localhost:3000'; // Substitua pela URL real da sua API
+export class PessoasService {
+  private apiUrl: string;
+  private apiUrl1: string;
 
-  constructor(private http: HttpClient) {}
-
-  buscarPorCpf(cpf: string): Observable<any> {
-    const url = `${this.apiUrl}/pessoas/${cpf}`;
-    return this.http.get(url).pipe(
-      catchError(this.handleError)
-    );
+  constructor(private http: HttpClient, private apiConfig: ApiConfigService) {
+    this.apiUrl = `${this.apiConfig.getBaseUrl()}/pessoas`; // Construir a URL usando ApiConfigService
+    this.apiUrl1 = `${this.apiConfig.getBaseUrl()}/logradouro`; // Construir a URL usando ApiConfigService
   }
 
-  buscarPorNome(nome: string): Observable<any> {
-    const url = `${this.apiUrl}/pessoas/${nome}`;
-    return this.http.get(url).pipe(
-      catchError(this.handleError)
-    );
+  // POST: Criar uma nova pessoa
+  createPessoa(pessoa: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}`, pessoa);
   }
 
-  adicionarPessoa(usuario: any): Observable<any> {
-    const url = `${this.apiUrl}/pessoas`;
-    return this.http.post(url, usuario).pipe(
-      map(response => {
-        this.handleSuccess('Adicionado com sucesso!');
-        return response;
-      }),
-      catchError(this.handleError)
-    );
+  // PATCH: Atualizar uma pessoa
+  updatePessoa(CPF_CNPJ: string, pessoa: any): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/${CPF_CNPJ}`, pessoa);
   }
 
-  editarPessoa(cpf: string, usuario: any): Observable<any> {
-    const url = `${this.apiUrl}/pessoas/${cpf}`;
-    return this.http.patch(url, usuario).pipe(
-      map(response => {
-        this.handleSuccess('Editado com sucesso!');
-        return response;
-      }),
-      catchError(this.handleError)
-    );
+  // DELETE: Deletar uma pessoa
+  deletePessoa(CPF_CNPJ: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${CPF_CNPJ}`);
   }
 
-   private handleError(error: any): Observable<never> {
-    let errorMessage = 'Erro desconhecido';
-    if (error.error instanceof ErrorEvent) {
-      // Erro do cliente
-      errorMessage = `Erro: ${error.error.message}`;
-    } else if (error.status) {
-      // Erro do servidor
-      errorMessage = `Erro ${error.status}: ${error.error.message || error.statusText}`;
-    }
-    console.error(errorMessage);
-    return throwError(errorMessage);
+  // GET: Pesquisar pessoa pelo CPF ou Nome
+  getPessoa(CPF_CNPJ: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/${CPF_CNPJ}`);
   }
 
-  private handleSuccess(message: string): void {
-    console.log(message); // ou você pode exibir a mensagem de sucesso de outra forma
- 
+  GetPessoaNome(nome: string): Observable<any[]> {
+    const params = new HttpParams()
+      .set('nome', nome);
+    return this.http.get<any[]>(`${this.apiUrl}/nome/`, { params });
   }
 
-
+  getEnderecoPorCEP(cep: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl1}/cep/${cep}`);
+  }
 }

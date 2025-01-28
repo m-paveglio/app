@@ -13,6 +13,7 @@ import { EmpresasIncluirComponent } from './Geral/login/usuarios/empresas/empres
 import { EmpresasConsultarComponent } from './Geral/login/usuarios/empresas/empresas-consultar/empresas-consultar.component';
 import { ServicosIncluirComponent } from './Geral/menus/servicos/servicos-incluir/servicos-incluir.component';
 import { ServicosConsultarComponent } from './Geral/menus/servicos/servicos-consultar/servicos-consultar.component';
+import { PessoasIncluirComponent } from './Geral/menus/pessoas/pessoas-incluir/pessoas-incluir.component';
 
 const routes: Routes = [
   { path: '', component: PagInicialComponent },
@@ -50,6 +51,13 @@ const routes: Routes = [
         children: [
           { path: 'incluir', component: ServicosIncluirComponent },
           { path: 'consultar', component: ServicosConsultarComponent },
+        ]
+      },
+
+      { 
+        path: 'pessoas', 
+        children: [
+          { path: 'incluir', component: PessoasIncluirComponent },
         ]
       },
     ]

@@ -1,5 +1,5 @@
 import { DataSource } from 'typeorm';
-import { PaisEntity } from './entities/pai.entity';
+import { PaisEntity } from './entities/pais.entity';
 
 
 export const paisProviders = [

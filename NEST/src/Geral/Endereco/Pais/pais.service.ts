@@ -1,5 +1,5 @@
 import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
-import { PaisEntity } from './entities/pai.entity';
+import { PaisEntity } from './entities/pais.entity';
 import { Repository, Like } from 'typeorm';
 
 @Injectable()
