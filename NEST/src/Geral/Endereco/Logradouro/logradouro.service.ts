@@ -99,6 +99,7 @@ export class LogradouroService {
         bairro: logradouroFound.BAIRRO,
         cidade: logradouroFound.cidade.NOME_CIDADE,
         uf: logradouroFound.cidade.uf.COD_UF,
+        cod_ibge: logradouroFound.cidade.COD_IBGE
       };
     }
     

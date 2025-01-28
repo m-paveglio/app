@@ -61,7 +61,7 @@ export class PessoasIncluirComponent {
         this.novaPessoa.BAIRRO_LOGRADOURO = endereco.bairro;
         this.novaPessoa.CIDADE = endereco.cidade;
         this.novaPessoa.UF = endereco.uf;
-        this.showSuccess('Endereço preenchido automaticamente');
+        this.novaPessoa.COD_IBGE = endereco.cod_ibge;
       },
       (error) => {
         console.error('Erro ao buscar endereço:', error);
@@ -70,6 +70,7 @@ export class PessoasIncluirComponent {
         this.novaPessoa.BAIRRO_LOGRADOURO = '';
         this.novaPessoa.CIDADE = '';
         this.novaPessoa.UF = '';
+        this.novaPessoa.COD_IBGE = '';
         this.showError('Erro ao buscar endereço. Verifique o CEP informado.');
       }
     );

@@ -34,22 +34,22 @@ export class LoginService {
   
   logout(): void {
     if (this.isBrowser()) {
-      sessionStorage.removeItem(this.tokenKey); // Usando sessionStorage em vez de localStorage
-      sessionStorage.removeItem(this.userNameKey); // Remover o nome do usuário também
+      localStorage.removeItem(this.tokenKey); // Usando localStorage em vez de localStorage
+      localStorage.removeItem(this.userNameKey); // Remover o nome do usuário também
     }
     this.isLoggedInSubject.next(false);
   }
   
   private handleLoginSuccess(token: string, userName: string): void {
     if (this.isBrowser()) {
-      sessionStorage.setItem(this.tokenKey, token); // Armazenar o token no sessionStorage
-      sessionStorage.setItem(this.userNameKey, userName); // Armazenar o nome do usuário no sessionStorage
+      localStorage.setItem(this.tokenKey, token); // Armazenar o token no localStorage
+      localStorage.setItem(this.userNameKey, userName); // Armazenar o nome do usuário no localStorage
     }
     this.isLoggedInSubject.next(true);
   }
   
   private hasToken(): boolean {
-    return this.isBrowser() && !!sessionStorage.getItem(this.tokenKey); // Verificando no sessionStorage
+    return this.isBrowser() && !!localStorage.getItem(this.tokenKey); // Verificando no localStorage
   }
 
   isAuthenticated(): Observable<boolean> {
@@ -74,12 +74,12 @@ export class LoginService {
 
   setEmpresaSelecionada(empresa: any): void {
     this.empresaSelecionada = empresa;
-    sessionStorage.setItem('empresaSelecionada', JSON.stringify(empresa));
+    localStorage.setItem('empresaSelecionada', JSON.stringify(empresa));
   }
 
   getEmpresaSelecionada(): any {
     if (!this.empresaSelecionada) {
-      const storedEmpresa = sessionStorage.getItem('empresaSelecionada');
+      const storedEmpresa = localStorage.getItem('empresaSelecionada');
       if (storedEmpresa) {
         this.empresaSelecionada = JSON.parse(storedEmpresa);
       }

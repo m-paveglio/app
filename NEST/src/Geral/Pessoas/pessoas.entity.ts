@@ -23,18 +23,22 @@ export class pessoas {
   @Column({ length: 100 })
   RUA_LOGRADOURO: string;
   
-  @Column({ length: 10 })
+  @Column({ length: 10, nullable: true})
   NUMERO_LOGRADOURO: string;
 
-  @Column({ length: 100 })
+  @Column({ length: 200, nullable: true})
   BAIRRO_LOGRADOURO: string;
 
-  @Column({ length: 100 })
+  @Column({ length: 200, nullable: true })
   COMPLEMENTO_LOGRADOURO: string;
 
-  @Column({ length: 100 })
-  COD_CIDADE: string;
+  @Column({ length: 200 })
+  CIDADE: string;
 
   @Column({ length: 2 })
   UF: string;
+
+  @Column({ length: 15 })
+  COD_IBGE: string;
+
 }

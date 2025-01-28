@@ -9,10 +9,12 @@ import { ApiConfigService } from '../../../api-config.service';
 export class PessoasService {
   private apiUrl: string;
   private apiUrl1: string;
+  private apiUrl2: string;
 
   constructor(private http: HttpClient, private apiConfig: ApiConfigService) {
     this.apiUrl = `${this.apiConfig.getBaseUrl()}/pessoas`; // Construir a URL usando ApiConfigService
     this.apiUrl1 = `${this.apiConfig.getBaseUrl()}/logradouro`; // Construir a URL usando ApiConfigService
+    this.apiUrl2 = `${this.apiConfig.getBaseUrl()}/cidades`; // Construir a URL usando ApiConfigService
   }
 
   // POST: Criar uma nova pessoa
@@ -43,5 +45,9 @@ export class PessoasService {
 
   getEnderecoPorCEP(cep: string): Observable<any> {
     return this.http.get<any>(`${this.apiUrl1}/cep/${cep}`);
+  }
+
+  getCidadePorCodCidade(COD_CIDADE: string): Observable<any> {
+    return this.http.get(`${this.apiUrl2}/${COD_CIDADE}`);
   }
 }

@@ -15,7 +15,7 @@
       </h5>
 
       <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
-        <div class="field col-12 md:col-4">
+        <div class="field col-12 md:col-3">
           <span class="p-float-label">
             <input
               id="float-input"
@@ -30,7 +30,7 @@
           </span>
         </div>
 
-        <div class="field col-12 md:col-4">
+        <div class="field col-12 md:col-5">
           <span class="p-float-label">
             <input
               id="float-input"
@@ -63,6 +63,7 @@
             <input
               id="float-input"
               type="text"
+              mask="00"
               pinputtext
               class="p-inputtext p-component p-element p-filled"
               [(ngModel)]="novaPessoa.DDD"
@@ -184,6 +185,21 @@
             <label for="float-input">Cidade</label>
           </span>
         </div>
+
+        <div class="field col-12 md:col-2">
+            <span class="p-float-label">
+              <input
+                id="float-input"
+                type="text"
+                pinputtext
+                class="p-inputtext p-component p-element p-filled"
+                [(ngModel)]="novaPessoa.COD_IBGE"
+                name="COD_IBGE"
+                disabled
+              />
+              <label for="float-input">Código IBGE</label>
+            </span>
+          </div>
 
         <div class="field col-12 md:col-1">
           <span class="p-float-label">
