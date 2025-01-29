@@ -14,16 +14,16 @@
           <div class="field col-12 md:col-4">
             <span class="p-float-label">
               <input
-                id="cpf-input"
+                id="CPF_CNPJ-input"
                 type="text"
                 pinputtext=""
                 class="p-inputtext p-component p-element p-filled"
                 mask="000.000.000-00"
-                [(ngModel)]="CPF"
-                name="CPF"
+                [(ngModel)]="CPF_CNPJ"
+                name="CPF_CNPJ"
                 (keydown.enter)="buscarpessoas()"
               />
-              <label for="cpf-input">CPF</label>
+              <label for="CPF_CNPJ-input">CPF</label>
             </span>
           </div>
 
@@ -83,42 +83,164 @@
     <!-- Exibe os detalhes da pessoa selecionada -->
     <div *ngIf="resultado" class="p-inputtext p-component p-element">
       <h3 class="text-center" [ngStyle]="{backgroundColor:'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}">
-        DADOS PRELIMINARES
+          DADOS PRELIMINARES
       </h3>
-      <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
-        <div class="field col-12 md:col-3">
-          <span class="p-float-label">
-            <input
-              id="cpf-cnpj-detalhes"
-              type="text"
-              pinputtext
-              [(ngModel)]="resultado.CPF"
-              name="CPF"
-              [readonly]="!editMode"
-            />
-            <label for="cpf-cnpj-detalhes">CPF / CNPJ</label>
-          </span>
-        </div>
+  
+       
+              <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
+                  <!-- CPF -->
+                  <div class="field col-12 md:col-2">
+                      <span class="p-float-label float-label-fixed">
+                          <input id="resultado-CPF_CNPJ" type="text" pinputtext class="p-inputtext p-component p-element"
+                              [ngClass]="{ 'p-filled': !editMode }"
+                              [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
+                              mask='000.000.000-00 || 00.000.000/0000-00' [(ngModel)]="resultado.CPF_CNPJ" name="CPF_CNPJ" [readonly]="!editMode">
+                          <label for="resultado-CPF_CNPJ">CPF / CNPJ</label>
+                      </span>
+                  </div>
+  
+                  <!-- Nome -->
+                  <div class="field col-12 md:col-4">
+                      <span class="p-float-label float-label-fixed">
+                          <input id="resultado-nome" type="text" pinputtext class="p-inputtext p-component p-element"
+                              [ngClass]="{ 'p-filled': !editMode }"
+                              [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
+                              [(ngModel)]="resultado.NOME" name="Nome" [readonly]="!editMode">
+                          <label for="resultado-nome">Nome</label>
+                      </span>
+                  </div>
+  
+                  <!-- Email -->
+                  <div class="field col-12 md:col-4">
+                      <span class="p-float-label float-label-fixed">
+                          <input id="resultado-email" type="text" pinputtext class="p-inputtext p-component p-element"
+                              [ngClass]="{ 'p-filled': !editMode }"
+                              [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
+                              [(ngModel)]="resultado.EMAIL" name="E-mail" [readonly]="!editMode">
+                          <label for="resultado-email">E-mail</label>
+                      </span>
+                  </div>
+  
+                  <!-- DDD -->
+                  <div class="field col-12 md:col-1">
+                      <span class="p-float-label float-label-fixed">
+                          <input id="resultado-ddd" type="text" mask="00" pinputtext class="p-inputtext p-component p-element"
+                              [ngClass]="{ 'p-filled': !editMode }"
+                              [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
+                              [(ngModel)]="resultado.DDD" name="DDD" [readonly]="!editMode">
+                          <label for="resultado-ddd">DDD</label>
+                      </span>
+                  </div>
+  
+                  <!-- Celular -->
+                  <div class="field col-12 md:col-3">
+                      <span class="p-float-label float-label-fixed">
+                          <input id="resultado-celular" type="text" mask="0 0000-0000" pinputtext class="p-inputtext p-component p-element"
+                              [ngClass]="{ 'p-filled': !editMode }"
+                              [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
+                              [(ngModel)]="resultado.TELEFONE_CELULAR" name="Celular" [readonly]="!editMode">
+                          <label for="resultado-celular">Celular</label>
+                      </span>
+                  </div>
+              </div>
+          <h3
+          class="text-center"
+          [ngStyle]="{
+            backgroundColor: 'var(--cyan-800)',
+            color: 'var(--primary-color-text)',
+            borderRadius: 'var(--border-radius)'
+          }"
+        >
+          ENDEREÇO
+        </h3>
+  
+              <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
+                  <!-- CEP -->
+                  <div class="field col-12 md:col-2">
+                      <span class="p-float-label">
+                          <input id="resultado-CEP" type="text" mask="00000-000" pinputtext class="p-inputtext p-component p-element"
+                              [ngClass]="{ 'p-filled': !editMode }"
+                              [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
+                              [(ngModel)]="resultado.CEP" name="CEP" (blur)="buscarEnderecoPorCEP(resultado.CEP ?? '')" [readonly]="!editMode">
+                          <label for="resultado-CEP">CEP</label>
+                      </span>
+                  </div>
+  
+                  <!-- Logradouro -->
+                  <div class="field col-12 md:col-6">
+                      <span class="p-float-label">
+                          <input id="resultado-logradouro" type="text" pinputtext class="p-inputtext p-component p-element"
+                              [ngClass]="{ 'p-filled': !editMode }"
+                              [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
+                              [(ngModel)]="resultado.RUA_LOGRADOURO" name="Logradouro" [readonly]="!editMode">
+                          <label for="resultado-logradouro">Logradouro</label>
+                      </span>
+                  </div>
+  
+                  <!-- Número -->
+                  <div class="field col-12 md:col-1">
+                      <span class="p-float-label">
+                          <input id="resultado-numero" type="text" pinputtext class="p-inputtext p-component p-element"
+                              [ngClass]="{ 'p-filled': !editMode }"
+                              [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
+                              [(ngModel)]="resultado.NUMERO_LOGRADOURO" name="Numero" [readonly]="!editMode">
+                          <label for="resultado-numero">Número</label>
+                      </span>
+                  </div>
+  
+                  <!-- Bairro -->
+                  <div class="field col-12 md:col-3">
+                      <span class="p-float-label">
+                          <input id="resultado-bairro" type="text" pinputtext class="p-inputtext p-component p-element"
+                              [ngClass]="{ 'p-filled': !editMode }"
+                              [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
+                              [(ngModel)]="resultado.BAIRRO_LOGRADOURO" name="Bairro" [readonly]="!editMode">
+                          <label for="resultado-bairro">Bairro</label>
+                      </span>
+                  </div>
 
-        <div class="field col-12 md:col-5">
-          <span class="p-float-label">
-            <input
-              id="nome-detalhes"
-              type="text"
-              pinputtext
-              [(ngModel)]="resultado.NOME"
-              name="NOME"
-              [readonly]="!editMode"
-            />
-            <label for="nome-detalhes">Nome</label>
-          </span>
-        </div>
+                  <div class="field col-12 md:col-3">
+                    <span class="p-float-label">
+                        <input id="resultado-COMPLEMENTO" type="text" pinputtext class="p-inputtext p-component p-element"
+                            [ngClass]="{ 'p-filled': !editMode }"
+                            [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
+                            [(ngModel)]="resultado.COMPLEMENTO_LOGRADOURO" name="COMPLEMENTO" [readonly]="!editMode">
+                        <label for="resultado-COMPLEMENTO">Complemento</label>
+                    </span>
+                </div>
 
-        <div class="btn-group field col-12 md:col-2 flex flex-wrap gap-3" role="group">
-          <p-button *ngIf="editMode" icon="pi pi-save" severity="success" (click)="salvarpessoas()"></p-button>
-          <p-button icon="pi pi-trash" severity="danger" (click)="confirmarExclusao()"></p-button>
-        </div>
-      </div>
-    </div>
+                <div class="field col-12 md:col-3">
+                  <span class="p-float-label">
+                      <input id="resultado-CIDADE" type="text" pinputtext class="p-inputtext p-component p-element"
+                          [ngClass]="{ 'p-filled': !editMode }"
+                          [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
+                          [(ngModel)]="resultado.CIDADE" name="CIDADE" [readonly]="!editMode">
+                      <label for="resultado-CIDADE">Cidade</label>
+                  </span>
+              </div>
+
+              <div class="field col-12 md:col-3">
+                <span class="p-float-label">
+                    <input id="resultado-COD_IBGE" type="text" pinputtext class="p-inputtext p-component p-element"
+                        [ngClass]="{ 'p-filled': !editMode }"
+                        [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
+                        [(ngModel)]="resultado.COD_IBGE" name="COD_IBGE" [readonly]="!editMode">
+                    <label for="resultado-COD_IBGE">Código IBGE</label>
+                </span>
+            </div>
+
+            <div class="field col-12 md:col-3">
+              <span class="p-float-label">
+                  <input id="resultado-UF" type="text" pinputtext class="p-inputtext p-component p-element"
+                      [ngClass]="{ 'p-filled': !editMode }"
+                      [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
+                      [(ngModel)]="resultado.UF" name="UF" [readonly]="!editMode">
+                  <label for="resultado-UF">UF</label>
+              </span>
+          </div>
+              </div>
   </div>
+  
+  
+</div>
 </div>
