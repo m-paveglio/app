@@ -162,7 +162,8 @@
                                     <label for=""></label>
                                     <p-button *ngIf="!editMode" icon="pi pi-pencil" severity="info" (click)="editarUsuario(resultado.CPF)"></p-button>
                                     <p-button *ngIf="editMode" icon="pi pi-save" severity="success" (click)="salvarUsuario()"></p-button>
-                                    <p-button icon="pi pi-trash" severity="danger" (click)="confirmarExclusao()"></p-button>
+                                    <p-button *ngIf="editMode" icon="pi pi-times" severity="warning" (click)="cancelarEdicao()"></p-button>
+                                    <p-button *ngIf="!editMode" icon="pi pi-trash" severity="danger" (click)="confirmarExclusao()"></p-button>
                                 </div>
                             </div>
                         </p-tabPanel>

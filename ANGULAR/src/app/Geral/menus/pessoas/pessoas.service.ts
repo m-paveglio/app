@@ -36,11 +36,10 @@ export class PessoasService {
   buscarPorCpf(CPF_CNPJ: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/${CPF_CNPJ}`);
   }
-
-  buscarPorNome(nome: string): Observable<any[]> {
-    const params = new HttpParams()
-      .set('nome', nome);
-    return this.http.get<any[]>(`${this.apiUrl}/nome/`, { params });
+  buscarPorNome(nome: string): Observable<any> {
+    const url = `${this.apiUrl}/nome/${nome}`;
+    return this.http.get(url).pipe(
+    );
   }
 
   getEnderecoPorCEP(cep: string): Observable<any> {

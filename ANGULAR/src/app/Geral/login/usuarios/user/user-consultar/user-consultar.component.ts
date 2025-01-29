@@ -580,4 +580,9 @@ limparFormulario() {
   this.USER_STATUS = '';
 }
 
+cancelarEdicao() {
+  this.editMode = false;
+  // Adicione qualquer lógica necessária para restaurar os dados originais
+}
+
 }

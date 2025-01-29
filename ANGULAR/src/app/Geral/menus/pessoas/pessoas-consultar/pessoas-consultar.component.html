@@ -7,7 +7,7 @@
     <!-- Exibe o formulário de busca se não houver resultados -->
     <div *ngIf="!resultado && pessoasEncontrados.length === 0" class="p-inputtext p-component p-element">
       <h3 class="text-center" [ngStyle]="{backgroundColor:'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}">
-        CONSULTAR PESSOA
+        CONSULTAR CLIENTE
       </h3>
       <form (ngSubmit)="buscarpessoas()">
         <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
@@ -18,12 +18,12 @@
                 type="text"
                 pinputtext=""
                 class="p-inputtext p-component p-element p-filled"
-                mask="000.000.000-00"
+                mask='000.000.000-00 || 00.000.000/0000-00'
                 [(ngModel)]="CPF_CNPJ"
                 name="CPF_CNPJ"
                 (keydown.enter)="buscarpessoas()"
               />
-              <label for="CPF_CNPJ-input">CPF</label>
+              <label for="CPF_CNPJ-input">CPF / CNPJ</label>
             </span>
           </div>
 
@@ -52,7 +52,7 @@
     <!-- Exibe a tabela de resultados se houver registros encontrados -->
     <div *ngIf="pessoasEncontrados.length > 0" class="p-inputtext p-component p-element" style="margin-top: 20px;">
       <h3 class="text-center" [ngStyle]="{backgroundColor:'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}">
-        SELECIONAR PESSOA
+        SELECIONAR CLIENTE
       </h3>
       <p-table
         [value]="pessoasEncontrados"
@@ -63,14 +63,14 @@
       >
         <ng-template pTemplate="header">
           <tr>
-            <th>CPF</th>
+            <th>CPF / CNPJ</th>
             <th>Nome</th>
-            <th>Ação</th>
+            <th>Selecionar</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-pessoa>
           <tr>
-            <td>{{ pessoa.CPF }}</td>
+            <td>{{ pessoa.CPF_CNPJ | mask: pessoa.CPF_CNPJ.length <= 11 ? '000.000.000-00' : '00.000.000/0000-00' }}</td>
             <td>{{ pessoa.NOME }}</td>
             <td>
               <p-button icon="pi pi-check" severity="success" (click)="selecionarpessoas(pessoa)"></p-button>
@@ -89,7 +89,7 @@
        
               <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
                   <!-- CPF -->
-                  <div class="field col-12 md:col-2">
+                  <div class="field col-12 md:col-4">
                       <span class="p-float-label float-label-fixed">
                           <input id="resultado-CPF_CNPJ" type="text" pinputtext class="p-inputtext p-component p-element"
                               [ngClass]="{ 'p-filled': !editMode }"
@@ -100,7 +100,7 @@
                   </div>
   
                   <!-- Nome -->
-                  <div class="field col-12 md:col-4">
+                  <div class="field col-12 md:col-8">
                       <span class="p-float-label float-label-fixed">
                           <input id="resultado-nome" type="text" pinputtext class="p-inputtext p-component p-element"
                               [ngClass]="{ 'p-filled': !editMode }"
@@ -219,7 +219,7 @@
                   </span>
               </div>
 
-              <div class="field col-12 md:col-3">
+              <div class="field col-12 md:col-2">
                 <span class="p-float-label float-label-fixed">
                     <input id="resultado-COD_IBGE" type="text" pinputtext class="p-inputtext p-component p-element"
                         [ngClass]="{ 'p-filled': !editMode }"
@@ -229,7 +229,7 @@
                 </span>
             </div>
 
-            <div class="field col-12 md:col-3">
+            <div class="field col-12 md:col-1">
               <span class="p-float-label float-label-fixed">
                   <input id="resultado-UF" type="text" pinputtext class="p-inputtext p-component p-element"
                       [ngClass]="{ 'p-filled': !editMode }"

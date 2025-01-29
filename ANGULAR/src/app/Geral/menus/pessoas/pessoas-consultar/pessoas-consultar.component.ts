@@ -21,6 +21,8 @@ interface Pessoa {
   UF?: string;
 }
 
+
+
 @Component({
   selector: 'app-pessoas-consultar',
   templateUrl: './pessoas-consultar.component.html',
@@ -35,63 +37,123 @@ export class PessoasConsultarComponent {
   editMode = false;
   novaPessoa: any = {};
 
+  resultados: Pessoa = {
+    CPF: '',
+    CPF_CNPJ: '',
+    NOME: '',
+    EMAIL: '',
+    TIPO_USER: '',
+    DDD: '',
+    TELEFONE_CELULAR: '',
+    CEP: '',
+    RUA_LOGRADOURO: '',
+    NUMERO_LOGRADOURO: '',
+    BAIRRO_LOGRADOURO: '',
+    COMPLEMENTO_LOGRADOURO: '',
+    CIDADE: '',
+    COD_IBGE: '',
+    UF: ''
+  };
+
   constructor(
     private pessoasService: PessoasService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService
   ) {}
 
-  // Validação de CPF
   isCpfValido(CPF_CNPJ: string): boolean {
     if (!CPF_CNPJ || CPF_CNPJ.length !== 11) return false;
-    let soma = 0,
-      resto;
-    if (CPF_CNPJ === '00000000000') return false;
-    for (let i = 1; i <= 9; i++) soma += parseInt(CPF_CNPJ.substring(i - 1, i)) * (11 - i);
+    let soma = 0, resto;
+    if (/^(\d)\1+$/.test(CPF_CNPJ)) return false; // Evita CPFs com números repetidos (ex: 00000000000)
+    for (let i = 1; i <= 9; i++) soma += parseInt(CPF_CNPJ[i - 1]) * (11 - i);
     resto = (soma * 10) % 11;
     if (resto === 10 || resto === 11) resto = 0;
-    if (resto !== parseInt(CPF_CNPJ.substring(9, 10))) return false;
+    if (resto !== parseInt(CPF_CNPJ[9])) return false;
     soma = 0;
-    for (let i = 1; i <= 10; i++) soma += parseInt(CPF_CNPJ.substring(i - 1, i)) * (12 - i);
+    for (let i = 1; i <= 10; i++) soma += parseInt(CPF_CNPJ[i - 1]) * (12 - i);
     resto = (soma * 10) % 11;
-    return resto === parseInt(CPF_CNPJ.substring(10, 11));
+    return resto === parseInt(CPF_CNPJ[10]);
+  }
+
+  /** Valida se um CNPJ é válido */
+  isCnpjValido(CNPJ: string): boolean {
+    if (!CNPJ || CNPJ.length !== 14) return false;
+    if (/^(\d)\1+$/.test(CNPJ)) return false; // Evita CNPJs com números repetidos
+
+    let tamanho = CNPJ.length - 2;
+    let numeros = CNPJ.substring(0, tamanho);
+    let digitos = CNPJ.substring(tamanho);
+    let soma = 0, pos = tamanho - 7;
+    
+    for (let i = tamanho; i >= 1; i--) {
+      soma += parseInt(numeros[tamanho - i]) * pos--;
+      if (pos < 2) pos = 9;
+    }
+    
+    let resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);
+    if (resultado !== parseInt(digitos[0])) return false;
+    
+    tamanho++;
+    numeros = CNPJ.substring(0, tamanho);
+    soma = 0;
+    pos = tamanho - 7;
+    
+    for (let i = tamanho; i >= 1; i--) {
+      soma += parseInt(numeros[tamanho - i]) * pos--;
+      if (pos < 2) pos = 9;
+    }
+    
+    resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);
+    return resultado === parseInt(digitos[1]);
+  }
+
+  /** Determina se um CPF ou CNPJ é válido */
+  isCpfCnpjValido(CPF_CNPJ: string): boolean {
+    if (CPF_CNPJ.length === 11) return this.isCpfValido(CPF_CNPJ);
+    if (CPF_CNPJ.length === 14) return this.isCnpjValido(CPF_CNPJ);
+    return false;
   }
 
   buscarpessoas() {
+    if (!this.CPF_CNPJ && !this.nome) {
+      this.showError('Informe um CPF, CNPJ ou Nome para realizar a busca.');
+      return;
+    }
+
     if (this.CPF_CNPJ) {
-      // Busca por CPF
+      if (!this.isCpfCnpjValido(this.CPF_CNPJ)) {
+        this.showError('CPF ou CNPJ inválido.');
+        return;
+      }
       this.buscarPorCpf();
-    } else if (this.nome) {
-      // Busca por Nome
-      this.buscarPorNome();
     } else {
-      this.showError('Informe um CPF ou Nome para realizar a busca.');
+      this.buscarPorNome();
     }
   }
-  
+
   buscarPorCpf() {
     this.pessoasService.buscarPorCpf(this.CPF_CNPJ).subscribe(
       (data) => {
         if (data) {
-          this.resultado = data; // Exibe os detalhes da pessoa
-          this.pessoasEncontrados = []; // Limpa a tabela
+          this.resultado = data;
+          this.pessoasEncontrados = [];
         } else {
-          this.showError('Nenhuma pessoa encontrada com este CPF.');
+          this.showError('Nenhuma pessoa encontrada com este CPF/CNPJ.');
         }
       },
       (error) => {
-        console.error('Erro ao buscar por CPF:', error);
+        console.error('Erro ao buscar por CPF/CNPJ:', error);
         this.showError('Erro ao buscar pessoa. Tente novamente.');
       }
     );
   }
-  
+
   buscarPorNome() {
     this.pessoasService.buscarPorNome(this.nome).subscribe(
       (data) => {
         if (data && data.length > 0) {
-          this.pessoasEncontrados = data; // Exibe a tabela com resultados
-          this.resultado = null; // Limpa os detalhes
+          this.pessoasEncontrados = data;
+          this.resultado = null;
         } else {
           this.showError('Nenhuma pessoa encontrada com este nome.');
         }
@@ -102,6 +164,14 @@ export class PessoasConsultarComponent {
       }
     );
   }
+
+  showSuccess(message: string) {
+    this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: message });
+  }
+
+  showError(message: string) {
+    this.messageService.add({ severity: 'error', summary: 'Erro', detail: message });
+  }
   
   selecionarpessoas(pessoa: Pessoa) {
     this.resultado = pessoa; // Define a pessoa selecionada como resultado
@@ -110,7 +180,7 @@ export class PessoasConsultarComponent {
 
   salvarpessoas() {
     if (this.resultado) {
-      this.pessoasService.atualizarpessoas(this.resultado.CPF, this.resultado).subscribe(
+      this.pessoasService.atualizarpessoas(this.resultado.CPF_CNPJ, this.resultado).subscribe(
         () => {
           this.editMode = false;
           this.showSuccess('Dados atualizados com sucesso!');
@@ -150,28 +220,43 @@ export class PessoasConsultarComponent {
   }
 
   buscarEnderecoPorCEP(cep: string) {
+    if (!cep) return;
+
+    // Garante que resultado não seja null
+    if (!this.resultado) {
+        this.resultado = {} as Pessoa;
+    }
+
+    // Limpa todos os campos antes da busca
+    Object.assign(this.resultado, {
+        RUA_LOGRADOURO: '',
+        BAIRRO_LOGRADOURO: '',
+        CIDADE: '',
+        UF: '',
+        COD_IBGE: '',
+        COMPLEMENTO_LOGRADOURO: '',
+        NUMERO_LOGRADOURO: ''
+    });
 
     this.pessoasService.getEnderecoPorCEP(cep).subscribe(
       (endereco) => {
-        // Preenche os campos do formulário com os dados do endereço
-        this.novaPessoa.RUA_LOGRADOURO = endereco.logradouro;
-        this.novaPessoa.BAIRRO_LOGRADOURO = endereco.bairro;
-        this.novaPessoa.CIDADE = endereco.cidade;
-        this.novaPessoa.UF = endereco.uf;
-        this.novaPessoa.COD_IBGE = endereco.cod_ibge;
+        if (this.resultado) {
+          // Preenche apenas os campos retornados pela API, os outros permanecem vazios
+          this.resultado.RUA_LOGRADOURO = endereco.logradouro || '';
+          this.resultado.BAIRRO_LOGRADOURO = endereco.bairro || '';
+          this.resultado.CIDADE = endereco.cidade || '';
+          this.resultado.UF = endereco.uf || '';
+          this.resultado.COD_IBGE = endereco.cod_ibge || '';
+          this.resultado.COMPLEMENTO_LOGRADOURO = endereco.complemento || '';
+          this.resultado.NUMERO_LOGRADOURO = endereco.numero || '';
+        }
       },
       (error) => {
         console.error('Erro ao buscar endereço:', error);
-        // Limpa os campos de endereço
-        this.novaPessoa.RUA_LOGRADOURO = '';
-        this.novaPessoa.BAIRRO_LOGRADOURO = '';
-        this.novaPessoa.CIDADE = '';
-        this.novaPessoa.UF = '';
-        this.novaPessoa.COD_IBGE = '';
         this.showError('Erro ao buscar endereço. Verifique o CEP informado.');
       }
     );
-  }
+}
 
   editarPessoas(CPF_CNPJ: string) {
     this.pessoasService.buscarPorCpf(CPF_CNPJ).subscribe(
@@ -191,11 +276,4 @@ export class PessoasConsultarComponent {
     // Adicione qualquer lógica necessária para restaurar os dados originais
 }
 
-  showSuccess(message: string) {
-    this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: message });
-  }
-
-  showError(message: string) {
-    this.messageService.add({ severity: 'error', summary: 'Erro', detail: message });
-  }
 }
