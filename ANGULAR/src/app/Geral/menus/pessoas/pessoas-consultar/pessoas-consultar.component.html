@@ -157,7 +157,7 @@
               <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
                   <!-- CEP -->
                   <div class="field col-12 md:col-2">
-                      <span class="p-float-label">
+                      <span class="p-float-label float-label-fixed">
                           <input id="resultado-CEP" type="text" mask="00000-000" pinputtext class="p-inputtext p-component p-element"
                               [ngClass]="{ 'p-filled': !editMode }"
                               [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
@@ -168,7 +168,7 @@
   
                   <!-- Logradouro -->
                   <div class="field col-12 md:col-6">
-                      <span class="p-float-label">
+                      <span class="p-float-label float-label-fixed">
                           <input id="resultado-logradouro" type="text" pinputtext class="p-inputtext p-component p-element"
                               [ngClass]="{ 'p-filled': !editMode }"
                               [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
@@ -179,7 +179,7 @@
   
                   <!-- Número -->
                   <div class="field col-12 md:col-1">
-                      <span class="p-float-label">
+                      <span class="p-float-label float-label-fixed">
                           <input id="resultado-numero" type="text" pinputtext class="p-inputtext p-component p-element"
                               [ngClass]="{ 'p-filled': !editMode }"
                               [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
@@ -190,7 +190,7 @@
   
                   <!-- Bairro -->
                   <div class="field col-12 md:col-3">
-                      <span class="p-float-label">
+                      <span class="p-float-label float-label-fixed">
                           <input id="resultado-bairro" type="text" pinputtext class="p-inputtext p-component p-element"
                               [ngClass]="{ 'p-filled': !editMode }"
                               [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
@@ -200,7 +200,7 @@
                   </div>
 
                   <div class="field col-12 md:col-3">
-                    <span class="p-float-label">
+                    <span class="p-float-label float-label-fixed">
                         <input id="resultado-COMPLEMENTO" type="text" pinputtext class="p-inputtext p-component p-element"
                             [ngClass]="{ 'p-filled': !editMode }"
                             [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
@@ -210,7 +210,7 @@
                 </div>
 
                 <div class="field col-12 md:col-3">
-                  <span class="p-float-label">
+                  <span class="p-float-label float-label-fixed">
                       <input id="resultado-CIDADE" type="text" pinputtext class="p-inputtext p-component p-element"
                           [ngClass]="{ 'p-filled': !editMode }"
                           [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
@@ -220,7 +220,7 @@
               </div>
 
               <div class="field col-12 md:col-3">
-                <span class="p-float-label">
+                <span class="p-float-label float-label-fixed">
                     <input id="resultado-COD_IBGE" type="text" pinputtext class="p-inputtext p-component p-element"
                         [ngClass]="{ 'p-filled': !editMode }"
                         [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
@@ -230,7 +230,7 @@
             </div>
 
             <div class="field col-12 md:col-3">
-              <span class="p-float-label">
+              <span class="p-float-label float-label-fixed">
                   <input id="resultado-UF" type="text" pinputtext class="p-inputtext p-component p-element"
                       [ngClass]="{ 'p-filled': !editMode }"
                       [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
@@ -238,8 +238,15 @@
                   <label for="resultado-UF">UF</label>
               </span>
           </div>
-              </div>
-  </div>
+          <div class="btn-group field col-12 md:col-2 flex flex-wrap gap-3" role="group" aria-label="Edit group">
+            <label for=""></label>
+            <p-button *ngIf="!editMode" icon="pi pi-pencil" severity="info" (click)="editarPessoas(resultado.CPF_CNPJ)"></p-button>
+            <p-button *ngIf="editMode" icon="pi pi-save" severity="success" (click)="salvarpessoas()"></p-button>
+            <p-button *ngIf="editMode" icon="pi pi-times" severity="warning" (click)="cancelarEdicao()"></p-button>
+            <p-button *ngIf="!editMode" icon="pi pi-trash" severity="danger" (click)="confirmarExclusao()"></p-button>
+        </div>
+       </div>
+   </div>
   
   
 </div>

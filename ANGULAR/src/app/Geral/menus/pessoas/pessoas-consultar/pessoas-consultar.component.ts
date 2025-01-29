@@ -5,7 +5,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 // Interface para tipar os dados da pessoa
 interface Pessoa {
   CPF: string;
-  CPF_CNPJ?: string; // Adicionado
+  CPF_CNPJ: string; // Adicionado
   NOME: string;
   EMAIL?: string;
   TIPO_USER?: string;
@@ -172,6 +172,24 @@ export class PessoasConsultarComponent {
       }
     );
   }
+
+  editarPessoas(CPF_CNPJ: string) {
+    this.pessoasService.buscarPorCpf(CPF_CNPJ).subscribe(
+      (data) => {
+        this.resultado = data;
+        this.editMode = true;
+      },
+      (error) => {
+        console.error('Erro ao excluir pessoa:', error);
+        this.showError('Erro ao excluir a pessoa.');
+      }
+    );
+  }
+
+  cancelarEdicao() {
+    this.editMode = false;
+    // Adicione qualquer lógica necessária para restaurar os dados originais
+}
 
   showSuccess(message: string) {
     this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: message });
