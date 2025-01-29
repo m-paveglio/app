@@ -220,7 +220,7 @@ export class PessoasConsultarComponent {
   }
 
   buscarEnderecoPorCEP(cep: string) {
-    if (!cep) return;
+    if (!cep || !this.editMode) return; // 🔹 Bloqueia a busca se não estiver no modo edição
 
     // Garante que resultado não seja null
     if (!this.resultado) {
