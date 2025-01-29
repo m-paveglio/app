@@ -29,6 +29,7 @@ import { DialogModule } from 'primeng/dialog';
 import { ServicosIncluirComponent } from './Geral/menus/servicos/servicos-incluir/servicos-incluir.component';
 import { ServicosConsultarComponent } from './Geral/menus/servicos/servicos-consultar/servicos-consultar.component';
 import { PessoasIncluirComponent } from './Geral/menus/pessoas/pessoas-incluir/pessoas-incluir.component';
+import { PessoasConsultarComponent } from './Geral/menus/pessoas/pessoas-consultar/pessoas-consultar.component';
 
 
 
@@ -49,7 +50,9 @@ import { PessoasIncluirComponent } from './Geral/menus/pessoas/pessoas-incluir/p
     EmpresasConsultarComponent,
     ServicosIncluirComponent,
     ServicosConsultarComponent,
-    PessoasIncluirComponent
+    PessoasIncluirComponent,
+    PessoasConsultarComponent
+    
         ],
   imports: [
     BrowserModule,

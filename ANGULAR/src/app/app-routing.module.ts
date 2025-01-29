@@ -14,6 +14,7 @@ import { EmpresasConsultarComponent } from './Geral/login/usuarios/empresas/empr
 import { ServicosIncluirComponent } from './Geral/menus/servicos/servicos-incluir/servicos-incluir.component';
 import { ServicosConsultarComponent } from './Geral/menus/servicos/servicos-consultar/servicos-consultar.component';
 import { PessoasIncluirComponent } from './Geral/menus/pessoas/pessoas-incluir/pessoas-incluir.component';
+import { PessoasConsultarComponent } from './Geral/menus/pessoas/pessoas-consultar/pessoas-consultar.component';
 
 const routes: Routes = [
   { path: '', component: PagInicialComponent },
@@ -53,11 +54,11 @@ const routes: Routes = [
           { path: 'consultar', component: ServicosConsultarComponent },
         ]
       },
-
       { 
         path: 'pessoas', 
         children: [
           { path: 'incluir', component: PessoasIncluirComponent },
+          { path: 'consultar', component: PessoasConsultarComponent },
         ]
       },
     ]

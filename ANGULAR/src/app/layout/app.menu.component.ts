@@ -97,8 +97,7 @@ export class AppMenuComponent implements OnInit {
                             icon: 'pi pi-fw pi-search',
                             routerLink: ['pessoas/consultar']
                         },
-                        ],
-                     },  
+                    ]},
                 
                 ]},
 

@@ -23,7 +23,7 @@ export class PessoasService {
   }
 
   // PATCH: Atualizar uma pessoa
-  updatePessoa(CPF_CNPJ: string, pessoa: any): Observable<any> {
+  atualizarpessoas(CPF_CNPJ: string, pessoa: any): Observable<any> {
     return this.http.patch(`${this.apiUrl}/${CPF_CNPJ}`, pessoa);
   }
 
@@ -33,11 +33,11 @@ export class PessoasService {
   }
 
   // GET: Pesquisar pessoa pelo CPF ou Nome
-  getPessoa(CPF_CNPJ: string): Observable<any> {
+  buscarPorCpf(CPF_CNPJ: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/${CPF_CNPJ}`);
   }
 
-  GetPessoaNome(nome: string): Observable<any[]> {
+  buscarPorNome(nome: string): Observable<any[]> {
     const params = new HttpParams()
       .set('nome', nome);
     return this.http.get<any[]>(`${this.apiUrl}/nome/`, { params });
