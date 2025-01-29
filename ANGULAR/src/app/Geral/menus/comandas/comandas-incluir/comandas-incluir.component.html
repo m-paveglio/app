@@ -1,0 +1,92 @@
+<div class="p-m-4">
+    <h2>Gerenciar Comandas</h2>
+    
+    <p-button label="Adicionar Comanda" icon="pi pi-plus" (click)="openDialog()"></p-button>
+    
+    <p-carousel *ngIf="comandas.length > 0" [value]="comandas" [numVisible]="3" [numScroll]="1">
+        <ng-template let-comanda pTemplate="item">
+            <div class="p-card p-m-2">
+                <div class="p-card-header">
+                    <h3>{{ comanda.nome }}</h3>
+                </div>
+                <div class="p-card-body">
+                    <p-table [value]="comanda.servicos">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th>Serviço</th>
+                                <th>Valor</th>
+                                <th>Qtd</th>
+                                <th>Total</th>
+                                <th>Ação</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template let-servico pTemplate="body">
+                            <tr>
+                                <td>{{ servico.nome }}</td>
+                                <td>{{ servico.valor | currency }}</td>
+                                <td>
+                                    <p-inputNumber [(ngModel)]="servico.qtd" [min]="1" (onInput)="calcularTotal(comanda)"></p-inputNumber>
+                                </td>
+                                <td>{{ servico.total | currency }}</td>
+                                <td>
+                                    <p-button icon="pi pi-trash" class="p-button-danger" (click)="removerServico(comanda, servico)"></p-button>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                    <h4>Total: {{ comanda.total | currency }}</h4>
+                </div>
+                <div class="p-card-footer">
+                    <p-button label="Adicionar Serviço" icon="pi pi-plus" (click)="openServicoDialog(comanda)"></p-button>
+                </div>
+            </div>
+        </ng-template>
+    </p-carousel>
+
+    <!-- Dialog para Adicionar Comanda -->
+    <p-dialog header="Nova Comanda" [(visible)]="dialogComanda">
+        <div class="p-fluid">
+            <p-inputText placeholder="Buscar usuário por nome ou CPF" [(ngModel)]="filtroUsuario" (input)="filtrarUsuarios()"></p-inputText>
+
+            <p-table [value]="usuariosFiltrados" selectionMode="single" [(selection)]="usuarioSelecionado">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Nome</th>
+                        <th>CPF</th>
+                        <th>Ação</th>
+                    </tr>
+                </ng-template>
+                <ng-template let-usuario pTemplate="body">
+                    <tr>
+                        <td>{{ usuario.nome }}</td>
+                        <td>{{ usuario.cpf }}</td>
+                        <td>
+                            <p-button label="Selecionar" (click)="selecionarUsuario(usuario)"></p-button>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+
+            <p-divider></p-divider>
+
+            <p-inputText placeholder="Ou insira um nome manualmente" [(ngModel)]="novoContribuinte"></p-inputText>
+        </div>
+
+        <p-footer>
+            <p-button label="Cancelar" (click)="dialogComanda = false"></p-button>
+            <p-button label="Criar comanda" (click)="adicionarComanda()"></p-button>
+        </p-footer>
+    </p-dialog>
+
+    <!-- Dialog para Adicionar Serviço -->
+    <p-dialog header="Adicionar Serviço" [(visible)]="dialogServico">
+        <div class="p-fluid">
+            <p-dropdown [options]="servicosDisponiveis" [(ngModel)]="servicoSelecionado" optionLabel="nome"></p-dropdown>
+            <p-inputNumber placeholder="Quantidade" [(ngModel)]="quantidadeServico" [min]="1"></p-inputNumber>
+        </div>
+        <p-footer>
+            <p-button label="Cancelar" (click)="dialogServico = false"></p-button>
+            <p-button label="Adicionar" (click)="adicionarServico()"></p-button>
+        </p-footer>
+    </p-dialog>
+</div>

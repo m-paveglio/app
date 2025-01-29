@@ -8,13 +8,13 @@ import { UfModule } from './Geral/Endereco/UF/uf.module';
 import { PaisModule } from './Geral/Endereco/Pais/pais.module';
 import { CidadesModule } from './Geral/Endereco/Cidades/cidades.module';
 import { LogradouroModule } from './Geral/Endereco/Logradouro/logradouro.module';
-import { ProfissoesModule } from './Geral/Profissoes/profissoes.module';
 import { pessoasModule } from './Geral/Pessoas/pessoas.module';
 import { EmpresasModule } from './Login/empresas/empresas.module';
 import { UserEmpresasModule } from './Login/user_empresas/user_empresas.module';
 import { WebserviceModule } from './Geral/Nota-Fiscal/Nfse/webservice/webservice.module';
 import { ServicosModule } from './Geral/Servicos/servicos.module';
 import { NfseModule } from './Geral/Nota-Fiscal/Nfse/nfse.module';
+import { ComandasModule } from './Geral/Comanda/comanda.module';
 
  
 
@@ -28,11 +28,11 @@ import { NfseModule } from './Geral/Nota-Fiscal/Nfse/nfse.module';
     PaisModule, 
     CidadesModule, 
     LogradouroModule,
-    ProfissoesModule, 
     EmpresasModule,
     WebserviceModule,
     ServicosModule,
-    NfseModule
+    NfseModule,
+    ComandasModule
 
     ],
   controllers: [AppController],

@@ -222,6 +222,11 @@ export class PessoasConsultarComponent {
   buscarEnderecoPorCEP(cep: string) {
     if (!cep || !this.editMode) return; // 🔹 Bloqueia a busca se não estiver no modo edição
 
+    if (!this.isCepValido(cep)) {
+        this.showError('CEP inválido! O CEP deve ter 8 dígitos numéricos.');
+        return;
+    }
+
     // Garante que resultado não seja null
     if (!this.resultado) {
         this.resultado = {} as Pessoa;
@@ -241,7 +246,6 @@ export class PessoasConsultarComponent {
     this.pessoasService.getEnderecoPorCEP(cep).subscribe(
       (endereco) => {
         if (this.resultado) {
-          // Preenche apenas os campos retornados pela API, os outros permanecem vazios
           this.resultado.RUA_LOGRADOURO = endereco.logradouro || '';
           this.resultado.BAIRRO_LOGRADOURO = endereco.bairro || '';
           this.resultado.CIDADE = endereco.cidade || '';
@@ -257,6 +261,12 @@ export class PessoasConsultarComponent {
       }
     );
 }
+
+/** Valida se o CEP é válido */
+isCepValido(cep: string): boolean {
+    return /^\d{8}$/.test(cep.replace(/\D/g, '')); // Permite apenas números e exige 8 dígitos
+}
+
 
   editarPessoas(CPF_CNPJ: string) {
     this.pessoasService.buscarPorCpf(CPF_CNPJ).subscribe(

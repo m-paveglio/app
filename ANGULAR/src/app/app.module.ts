@@ -30,6 +30,7 @@ import { ServicosIncluirComponent } from './Geral/menus/servicos/servicos-inclui
 import { ServicosConsultarComponent } from './Geral/menus/servicos/servicos-consultar/servicos-consultar.component';
 import { PessoasIncluirComponent } from './Geral/menus/pessoas/pessoas-incluir/pessoas-incluir.component';
 import { PessoasConsultarComponent } from './Geral/menus/pessoas/pessoas-consultar/pessoas-consultar.component';
+import { ComandasIncluirComponent } from './Geral/menus/comandas/comandas-incluir/comandas-incluir.component';
 
 
 
@@ -51,7 +52,8 @@ import { PessoasConsultarComponent } from './Geral/menus/pessoas/pessoas-consult
     ServicosIncluirComponent,
     ServicosConsultarComponent,
     PessoasIncluirComponent,
-    PessoasConsultarComponent
+    PessoasConsultarComponent,
+    ComandasIncluirComponent
     
         ],
   imports: [

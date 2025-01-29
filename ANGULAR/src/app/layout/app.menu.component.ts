@@ -98,6 +98,8 @@ export class AppMenuComponent implements OnInit {
                             routerLink: ['pessoas/consultar']
                         },
                     ]},
+
+                    { label: 'Comandas', icon: 'pi pi-fw pi-users', routerLink: 'comandas' }
                 
                 ]},
 
