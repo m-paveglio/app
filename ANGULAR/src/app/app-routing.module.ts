@@ -16,6 +16,7 @@ import { ServicosConsultarComponent } from './Geral/menus/servicos/servicos-cons
 import { PessoasIncluirComponent } from './Geral/menus/pessoas/pessoas-incluir/pessoas-incluir.component';
 import { PessoasConsultarComponent } from './Geral/menus/pessoas/pessoas-consultar/pessoas-consultar.component';
 import { ComandasIncluirComponent } from './Geral/menus/comandas/comandas-incluir/comandas-incluir.component';
+import { ComandasConsultarComponent } from './Geral/menus/comandas/comandas-consultar/comandas-consultar.component';
 
 const routes: Routes = [
   { path: '', component: PagInicialComponent },
@@ -65,7 +66,8 @@ const routes: Routes = [
       { 
         path: 'comandas', 
         children: [
-          { path: 'incluir/consultar', component: ComandasIncluirComponent },
+          { path: 'incluir', component: ComandasIncluirComponent },
+          { path: 'consultar', component: ComandasConsultarComponent },
         ]
       },
     ]

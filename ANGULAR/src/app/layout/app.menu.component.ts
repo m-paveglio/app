@@ -72,7 +72,7 @@ export class AppMenuComponent implements OnInit {
             {
                 label: 'Menus Contribuinte',
                 items: [
-                    { label: 'Serviços', icon: 'pi pi-fw pi-clipboard', items: [
+                    { label: 'Serviços', icon: 'pi pi-fw pi-briefcase', items: [
                         {
                             label: 'Incluir',
                             icon: 'pi pi-fw pi-file-export',
@@ -101,12 +101,17 @@ export class AppMenuComponent implements OnInit {
 
                     { 
                         label: 'Comandas', 
-                        icon: 'pi pi-fw pi-users', 
+                        icon: 'pi pi-fw pi-clipboard', 
                         items: [
                           {
-                            label: 'Incluir/Consultar',
-                            icon: 'pi pi-fw pi-user-plus',
-                            routerLink: ['comandas/incluir/consultar']
+                            label: 'Incluir',
+                            icon: 'pi pi-fw pi-file-plus',
+                            routerLink: ['comandas/incluir']
+                          },
+                          {
+                            label: 'Consultar',
+                            icon: 'pi pi-fw pi-file-plus',
+                            routerLink: ['comandas/consultar']
                           },
                         ]
                       }
