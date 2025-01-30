@@ -2,16 +2,3 @@
     top: -0.75rem !important;
     font-size: 0.75rem !important;
   }
-
-.p-card {
-    border-radius: 10px;
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.p-card-header {
-    text-align: center;
-}
-
-.p-card-body {
-    padding: 10px;
-}

@@ -63,7 +63,10 @@ const routes: Routes = [
         ]
       },
       { 
-        path: 'comandas', component: ComandasIncluirComponent
+        path: 'comandas', 
+        children: [
+          { path: 'incluir/consultar', component: ComandasIncluirComponent },
+        ]
       },
     ]
   }

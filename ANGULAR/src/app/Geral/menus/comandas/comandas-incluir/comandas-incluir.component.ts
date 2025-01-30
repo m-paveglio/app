@@ -1,174 +1,119 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { ComandasService } from '../comandas.service';
 import { LoginService } from '../../../login/login.service';
-import { MessageService } from 'primeng/api';
-import { FormBuilder } from '@angular/forms';
-
-interface Comanda {
-  id: number;
-  nome: string;
-  data_fim?: string;
-  servicos: Servico[];
-  total: number;
-}
-
-interface Servico {
-  id: number;
-  nome: string;
-  valor: number;
-  qtd: number;
-  total: number;
-}
-
-interface Usuario {
-  id: number;
-  nome: string;
-  cpf: string;
-}
 
 @Component({
-  selector: 'app-comandas-incluir',
+  selector: 'app-comandas',
   templateUrl: './comandas-incluir.component.html',
-  styleUrls: ['./comandas-incluir.component.css'],
-  providers: [MessageService],
+  styleUrls: ['./comandas-incluir.component.css']
 })
-export class ComandasIncluirComponent implements OnInit {
-  comandas: Comanda[] = [];
-  servicosDisponiveis: Servico[] = [];
-  usuarios: Usuario[] = [];
-  usuariosFiltrados: Usuario[] = [];
+export class ComandasIncluirComponent {
+  novoCliente: string = ''; // Para criação de uma nova comanda
+  cnpj: string | null = null; // CNPJ do prestador logado
+  cpfCnpjInput: string = ''; // Para entrada de CPF/CNPJ
+  nomeCliente: string = ''; // Para entrada do nome do cliente
+  enderecoCliente: string = ''; // Para entrada do endereço
+  displayDialogCPF: boolean = false; // Controle do diálogo para CPF/CNPJ
+  displayDialogEndereco: boolean = false; // Controle do diálogo para nome e endereço
 
-  dialogComanda = false;
-  dialogServico = false;
-  
-  filtroUsuario = '';
-  usuarioSelecionado: Usuario | null = null;
-  novoContribuinte = '';
-
-  comandaSelecionada!: Comanda;
-  servicoSelecionado!: Servico;
-  quantidadeServico = 1;
+  // Propriedades faltantes
+  CPF_CNPJ: string = ''; // Adicionada a propriedade CPF_CNPJ
+  nome: string = ''; // Adicionada a propriedade nome
 
   constructor(
-    private comandasService: ComandasService, // Nome corrigido
-    private loginService: LoginService,
-    private messageService: MessageService
+    private comandasService: ComandasService,
+    private loginService: LoginService
   ) {}
 
-  ngOnInit() {
-    this.carregarComandas();
-    this.carregarServicos();
-    this.carregarUsuarios();
+  // Abre o diálogo para CPF/CNPJ
+  openDialogCPF(isCpf: boolean) {
+    if (isCpf) {
+      this.displayDialogCPF = true; // Exibe o diálogo de CPF/CNPJ
+    } else {
+      this.displayDialogEndereco = true; // Exibe o diálogo de nome e endereço
+    }
   }
 
-  carregarComandas() {
-    this.comandasService.getComandasAbertas().subscribe(
-      (comandas: Comanda[]) => (this.comandas = comandas),
-      (error: any) => console.error('Erro ao carregar comandas:', error)
-    );
-  }
-
-  carregarServicos() {
-    this.comandasService.getServicos().subscribe(
-      (servicos: Servico[]) => (this.servicosDisponiveis = servicos),
-      (error: any) => console.error('Erro ao carregar serviços:', error)
-    );
-  }
-
-  carregarUsuarios() {
-    this.comandasService.getUsuarios().subscribe(
-      (usuarios: Usuario[]) => {
-        this.usuarios = usuarios;
-        this.usuariosFiltrados = usuarios;
-      },
-      (error: any) => console.error('Erro ao carregar usuários:', error)
-    );
-  }
-
-  filtrarUsuarios() {
-    this.usuariosFiltrados = this.usuarios.filter(u =>
-      u.nome.toLowerCase().includes(this.filtroUsuario.toLowerCase()) ||
-      u.cpf.includes(this.filtroUsuario)
-    );
-  }
-
-  openDialog() {
-    this.dialogComanda = true;
-    this.filtroUsuario = '';
-    this.usuariosFiltrados = this.usuarios;
-  }
-
-  selecionarUsuario(usuario: Usuario) {
-    this.usuarioSelecionado = usuario;
-    this.novoContribuinte = usuario.nome;
-  }
-
-  adicionarComanda() {
-    if (!this.novoContribuinte.trim()) {
-      this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: 'Insira um nome ou selecione um usuário!' });
+  // Buscar cliente pelo CPF ou CNPJ
+  buscarClientePorCPF() {
+    if (!this.cpfCnpjInput.trim()) {
+      console.warn('Informe o CPF ou CNPJ.');
       return;
     }
 
-    const novaComanda: Comanda = {
-      id: new Date().getTime(),
-      nome: this.novoContribuinte,
-      servicos: [],
-      total: 0
-    };
+    // Aqui você pode implementar a lógica de buscar cliente no backend
+    console.log('Buscando cliente com CPF/CNPJ:', this.cpfCnpjInput);
+    // Após buscar, podemos preencher o nomeCliente com os dados do cliente
+    // Exemplo: this.nomeCliente = dadosDoCliente.nome;
 
-    this.comandasService.adicionarComanda(novaComanda).subscribe(
-      (comandaCriada: Comanda) => {
-        this.comandas.push(comandaCriada);
-        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Comanda criada com sucesso!' });
-
-        this.dialogComanda = false;
-        this.novoContribuinte = '';
-        this.usuarioSelecionado = null;
-
-        this.openServicoDialog(comandaCriada);
-      },
-      (error: any) => console.error('Erro ao criar comanda:', error)
-    );
+    this.displayDialogCPF = false; // Fecha o diálogo após buscar o cliente
   }
 
-  openServicoDialog(comanda: Comanda) {
-    this.comandaSelecionada = comanda;
-    this.dialogServico = true;
+  // Método para cancelar a busca
+  cancelarBusca() {
+    this.cpfCnpjInput = ''; // Limpa o campo de CPF/CNPJ
+    this.displayDialogCPF = false; // Fecha o diálogo
+    console.log('Busca cancelada.');
   }
 
-  adicionarServico() {
-    if (!this.servicoSelecionado) {
-      this.messageService.add({ severity: 'warn', summary: 'Atenção', detail: 'Selecione um serviço!' });
+  // Método para selecionar o cliente
+  selecionarCliente() {
+    if (!this.cpfCnpjInput.trim()) {
+      console.warn('Por favor, informe o CPF/CNPJ antes de selecionar um cliente.');
       return;
     }
 
-    const servico = { 
-      ...this.servicoSelecionado, 
-      qtd: this.quantidadeServico, 
-      total: this.servicoSelecionado.valor * this.quantidadeServico 
+    // Aqui você pode adicionar a lógica para preencher os dados do cliente após seleção
+    console.log('Cliente selecionado:', this.cpfCnpjInput);
+    this.displayDialogCPF = false; // Fecha o diálogo após selecionar o cliente
+    this.nomeCliente = 'Nome do Cliente'; // Exemplo de preenchimento após selecionar
+  }
+
+  // Salvar nome e endereço do cliente
+  salvarEndereco() {
+    if (!this.nomeCliente.trim() || !this.enderecoCliente.trim()) {
+      console.warn('Informe o nome e o endereço do cliente.');
+      return;
+    }
+
+    console.log('Nome e endereço do cliente:', this.nomeCliente, this.enderecoCliente);
+    this.displayDialogEndereco = false; // Fecha o diálogo
+  }
+
+  // ✅ Criar uma nova comanda
+  criarComanda() {
+    if (!this.nomeCliente.trim()) {
+      console.warn('Informe o nome do cliente antes de criar a comanda.');
+      return;
+    }
+
+    if (!this.cnpj) {
+      console.warn('CNPJ não encontrado.');
+      return;
+    }
+
+    const novaComanda = {
+      CNPJ_PRESTADOR: this.cnpj,
+      NOME_CLIENTE: this.nomeCliente,
+      DATA_INICIAL: new Date(),
+      DATA_FINAL: null,
+      ITENS: []
     };
 
-    this.comandaSelecionada.servicos.push(servico);
-    this.calcularTotal(this.comandaSelecionada);
-
-    this.dialogServico = false;
-    this.salvarComandas();
+    this.comandasService.createComanda(novaComanda).subscribe({
+      next: () => {
+        console.log('Comanda criada com sucesso!');
+        this.nomeCliente = ''; // Limpa o campo de entrada
+      },
+      error: (error) => {
+        console.error('Erro ao criar comanda:', error);
+      }
+    });
   }
 
-  calcularTotal(comanda: Comanda) {
-    comanda.total = comanda.servicos.reduce((sum, s) => sum + s.total, 0);
-    this.salvarComandas();
-  }
-
-  removerServico(comanda: Comanda, servico: Servico) {
-    comanda.servicos = comanda.servicos.filter(s => s !== servico);
-    this.calcularTotal(comanda);
-  }
-
-  salvarComandas() {
-    this.comandasService.atualizarComandas(this.comandas).subscribe(
-      () => this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Comanda atualizada!' }),
-      (error: any) => console.error('Erro ao atualizar comandas:', error)
-    );
+  // Método de busca de pessoas (substituir pelo método adequado)
+  buscarpessoas() {
+    console.log('Buscando pessoas...');
+    // Aqui você pode implementar a lógica para realizar a busca
   }
 }

@@ -42,20 +42,6 @@ export class ComandasService {
       return ComandaFound
     }
 
-    async getComandaCnpj (CPF_CNPJ: string){
-      const ComandaFound = await this.ComandasRepository.find({
-        where:{
-          CPF_CNPJ,
-        }
-      })
-
-      if (!ComandaFound){
-      return new HttpException('Comanda não encontrada', HttpStatus.NOT_FOUND)
-      }
-      return ComandaFound
-    }
-
-
     async deleteComanda (COD_COMANDA: string){
       const ComandaFound = await this.ComandasRepository.findOne({
         where: {
@@ -95,4 +81,25 @@ export class ComandasService {
       });
     }
 
+    async getComandaCnpj (CNPJ_PRESTADOR: string){
+      const ComandaFound = await this.ComandasRepository.find({
+        where:{
+          CNPJ_PRESTADOR,
+        }
+      })
+
+      if (!ComandaFound){
+      return new HttpException('Comanda não encontrada', HttpStatus.NOT_FOUND)
+      }
+      return ComandaFound
+    }
+
+    async getComandaCnpjEmAberto(CNPJ_PRESTADOR: string) {
+      return await this.ComandasRepository.find({
+        where: {
+          CNPJ_PRESTADOR,
+          DATA_FINAL: null,
+        },
+      });
+    }
   }

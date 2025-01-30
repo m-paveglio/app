@@ -99,7 +99,17 @@ export class AppMenuComponent implements OnInit {
                         },
                     ]},
 
-                    { label: 'Comandas', icon: 'pi pi-fw pi-users', routerLink: 'comandas' }
+                    { 
+                        label: 'Comandas', 
+                        icon: 'pi pi-fw pi-users', 
+                        items: [
+                          {
+                            label: 'Incluir/Consultar',
+                            icon: 'pi pi-fw pi-user-plus',
+                            routerLink: ['comandas/incluir/consultar']
+                          },
+                        ]
+                      }
                 
                 ]},
 

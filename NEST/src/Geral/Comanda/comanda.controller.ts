@@ -19,9 +19,9 @@ export class ComandasController {
     return this.ComandasService.getComanda(COD_COMANDA);
   }
 
-  @Get('CPF_CNPJ/:CPF_CNPJ')
-  getcomandaCnpj(@Param('CPF_CNPJ') CPF_CNPJ: string) {
-    return this.ComandasService.getComandaCnpj(CPF_CNPJ);
+  @Get('CNPJ_PRESTADOR/:CNPJ_PRESTADOR')
+  getcomandaCnpj(@Param('CNPJ_PRESTADOR') CNPJ_PRESTADOR: string) {
+    return this.ComandasService.getComandaCnpj(CNPJ_PRESTADOR);
   }
 
   @Get('NOME/:NOME')
@@ -42,5 +42,10 @@ export class ComandasController {
   @Patch(':COD_COMANDA')
   updatecomanda(@Param('COD_COMANDA') COD_COMANDA: string, @Body() comandas: UpdateComandaDto) {
     return this.ComandasService.updateComanda(COD_COMANDA, comandas);
+  }
+
+  @Get('EmAberto/:CNPJ_PRESTADOR')
+  getComandaCnpjEmAberto(@Param('CNPJ_PRESTADOR') CNPJ_PRESTADOR: string): Promise<Comandas[]> {
+  return this.ComandasService.getComandaCnpjEmAberto(CNPJ_PRESTADOR);
   }
 }

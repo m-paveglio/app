@@ -15,8 +15,8 @@ export class ComandasService { // Nome da classe corrigido (Padrão PascalCase)
   }
 
   // ✅ Buscar comandas por CPF/CNPJ
-  getComandas(cpfCnpj: string): Observable<{ data: any[] }> {
-    return this.http.get<{ data: any[] }>(`${this.apiUrl}/CPF_CNPJ/${cpfCnpj}`)
+  getComandas(CPF_CNPJ: string): Observable<{ data: any[] }> {
+    return this.http.get<{ data: any[] }>(`${this.apiUrl}/CPF_CNPJ/${CPF_CNPJ}`)
       .pipe(catchError(this.handleError));
   }
 
@@ -27,20 +27,20 @@ export class ComandasService { // Nome da classe corrigido (Padrão PascalCase)
   }
 
   // ✅ Atualizar comanda existente
-  updateComanda(codComanda: string, comanda: any): Observable<any> {
-    return this.http.patch(`${this.apiUrl}/${codComanda}`, comanda)
+  updateComanda(COD_COMANDA: string, comanda: any): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/${COD_COMANDA}`, comanda)
       .pipe(catchError(this.handleError));
   }
 
   // ✅ Excluir comanda pelo código
-  deleteComanda(codComanda: string): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${codComanda}`)
+  deleteComanda(COD_COMANDA: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${COD_COMANDA}`)
       .pipe(catchError(this.handleError));
   }
 
   // ✅ Buscar comandas pelo nome do usuário
-  searchComanda(nome: string): Observable<any[]> {
-    const params = new HttpParams().set('NOME', nome);
+  searchComanda(NOME: string): Observable<any[]> {
+    const params = new HttpParams().set('NOME', NOME);
     return this.http.get<any[]>(`${this.apiUrl}/NOME`, { params })
       .pipe(catchError(this.handleError));
   }
@@ -50,4 +50,10 @@ export class ComandasService { // Nome da classe corrigido (Padrão PascalCase)
     console.error('Erro na requisição:', error);
     return throwError(() => new Error('Erro ao processar a solicitação, tente novamente mais tarde.'));
   }
+
+  getComandasAbertas(cnpj: string): Observable<{ data: any[] }> {
+    return this.http.get<{ data: any[] }>(`${this.apiUrl}/EmAberto/${cnpj}`)
+      .pipe(catchError(this.handleError));
+  }
+
 }

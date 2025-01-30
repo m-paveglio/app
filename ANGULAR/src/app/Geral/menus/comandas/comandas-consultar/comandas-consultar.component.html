@@ -1,0 +1,47 @@
+<div class="grid" *ngIf="!cnpj">
+  <div class="col-12">
+    <div class="p-inputtext p-component p-element">
+      <h3
+        class="text-center"
+        [ngStyle]="{ backgroundColor: 'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)' }"
+      >
+        COMANDAS
+      </h3>
+      <p-toast></p-toast>
+        <div class="comandas-container">
+          <!-- Título -->
+
+          <!-- Listagem das comandas em aberto -->
+          <div *ngIf="comandasEmAberto.length > 0">
+            <h3>Comandas em Aberto</h3>
+            <ul>
+              <li *ngFor="let comanda of comandasEmAberto">
+                <p><strong>Cliente:</strong> {{ comanda.NOME_CLIENTE }}</p>
+                <p><strong>Data de Abertura:</strong> {{ comanda.DATA_INICIAL | date }}</p>
+                <p><strong>Status:</strong> Aberta</p>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Caso não haja comandas em aberto -->
+          <div *ngIf="comandasEmAberto.length === 0">
+            <p>Não há comandas em aberto.</p>
+          </div>
+
+          <!-- Criar nova comanda -->
+          <div class="nova-comanda">
+            <h3>Criar Nova Comanda</h3>
+            <label for="nomeCliente">Nome do Cliente:</label>
+            <input
+              id="nomeCliente"
+              [(ngModel)]="novoCliente"
+              type="text"
+              placeholder="Digite o nome do cliente"
+              class="input-field"
+            />
+            <button (click)="criarComanda()" [disabled]="!novoCliente.trim()">Criar Comanda</button>
+          </div>
+        </div>
+    </div>
+  </div>
+</div>
