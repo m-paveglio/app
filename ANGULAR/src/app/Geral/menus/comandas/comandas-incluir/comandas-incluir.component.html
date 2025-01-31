@@ -18,11 +18,13 @@
         <!-- Botões para a escolha -->
         <div style="display: flex; justify-content: center;">
           <p-button label="SIM" [raised]="true" severity="success" (click)="openDialogCPF(true)" [ngStyle]="{'margin': '0 10px'}"></p-button>
-          <p-button label="NÃO" [raised]="true" severity="warning" (click)="openDialogCPF(false)" [ngStyle]="{'margin': '0 10px'}"></p-button>
+          <p-button label="NÃO" [raised]="true" severity="warning" (click)="openDialogNovaPessoa()" [ngStyle]="{'margin': '0 10px'}"></p-button>
         </div>
 
         <!-- Exibir os diálogos conforme a escolha -->
-        <p-dialog header="Informar CPF/CNPJ" [(visible)]="displayDialogCPF" [modal]="true" [closable]="false">
+        <p-dialog header="BUSCAR CLIENTE" [(visible)]="displayDialogCPF" [modal]="true" [closable]="true" [style]="{width: '40vw'}"
+          class="text-center" [ngStyle]="{ backgroundColor: 'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}"
+          [headerStyle]="{ backgroundColor: 'var(--cyan-800)', color: 'var(--primary-color-text)', borderTopLeftRadius: 'var(--border-radius)', borderTopRightRadius: 'var(--border-radius)' }">
           <form (ngSubmit)="buscarpessoas()">
             <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
               <div class="field col-12 md:col-4">
@@ -35,13 +37,13 @@
                     mask='000.000.000-00 || 00.000.000/0000-00'
                     [(ngModel)]="CPF_CNPJ"
                     name="CPF_CNPJ"
-                    (keydown.enter)="buscarClientePorCPF()"
+                    (keydown.enter)="buscarPorCpf()" 
                   />
                   <label for="CPF_CNPJ-input">CPF / CNPJ</label>
                 </span>
               </div>
         
-              <div class="field col-12 md:col-7">
+              <div class="field col-12 md:col-4">
                 <span class="p-float-label">
                   <input
                     id="nome-input"
@@ -50,27 +52,176 @@
                     class="p-inputtext p-component p-element p-filled"
                     [(ngModel)]="nome"
                     name="NOME"
-                    (keydown.enter)="buscarClientePorCPF()"
+                    (keydown.enter)="buscarpessoas()"
                   />
                   <label for="nome-input">Nome</label>
                 </span>
               </div>
         
-              <div class="btn-group field col-12 md:col-1 flex flex-wrap gap-3" role="group" aria-label="Third group">
-                <p-button icon="pi pi-search" severity="success" (click)="buscarClientePorCPF()"></p-button>
-                <p-button icon="pi pi-times" severity="danger" (click)="cancelarBusca()" label="Cancelar" class="p-button-outlined"></p-button>
-                <p-button icon="pi pi-check" severity="primary" (click)="selecionarCliente()" label="Selecionar Cliente"></p-button>
+              <div class="btn-group field col-12 md:col-4 flex flex-wrap gap-3" role="group" aria-label="Third group">
+                <p-button icon="pi pi-search" severity="success" (click)="buscarpessoas()"></p-button>
+                <p-button icon="pi pi-times" severity="danger" (click)="cancelarBusca()" label="" class="p-button-outlined"></p-button>
               </div>
             </div>
           </form>
         </p-dialog>
 
+        <p-dialog header="Usuários Encontrados" [(visible)]="displayDialogUsuarios" [modal]="true" [closable]="true" [style]="{width: '50vw'}">
+          <p-table
+            [value]="pessoasEncontrados"
+            [paginator]="true"
+            [rows]="5"
+            [tableStyle]="{ 'min-width': '50rem' }"
+            [rowsPerPageOptions]="[5, 10, 20]"
+          >
+            <ng-template pTemplate="header">
+              <tr>
+                <th>CPF / CNPJ</th>
+                <th>Nome</th>
+                <th>Selecionar</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-pessoa>
+              <tr>
+                <td>{{ pessoa.CPF_CNPJ | mask: pessoa.CPF_CNPJ.length <= 11 ? '000.000.000-00' : '00.000.000/0000-00' }}</td>
+                <td>{{ pessoa.NOME }}</td>
+                <td>
+                  <p-button icon="pi pi-check" severity="primary" (click)="selecionarCliente()" label=""></p-button>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </p-dialog>
+        
+
         <div></div>
 
-        <p-dialog header="Informar Nome e Endereço" [(visible)]="displayDialogEndereco" [modal]="true" [closable]="false">
-          <input pInputText [(ngModel)]="nomeCliente" placeholder="Nome do Cliente" />
-          <input pInputText [(ngModel)]="enderecoCliente" placeholder="Endereço do Cliente" />
-          <button pButton label="Salvar" (click)="salvarEndereco()" class="p-mr-2"></button>
+        <p-dialog [(visible)]="displayDialogNovaPessoa" [modal]="true" [closable]="true" [style]="{width: '60vw'}">
+          <h3 class="text-center" [ngStyle]="{ backgroundColor: 'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}">
+            DADOS PRELIMINARES
+          </h3>
+        
+          <div class="p-fluid p-formgrid grid" style="margin-top: 20px">        
+            <div class="field col-12 md:col-6">
+              <span class="p-float-label">
+                <input id="nome-input" type="text" pinputtext class="p-inputtext p-component p-element p-filled"
+                       [(ngModel)]="novaPessoa.NOME" name="NOME" />
+                <label for="nome-input">Nome</label>
+              </span>
+            </div>
+        
+            <div class="field col-12 md:col-3">
+              <span class="p-float-label">
+                <input id="email-input" type="text" pinputtext class="p-inputtext p-component p-element p-filled"
+                       [(ngModel)]="novaPessoa.EMAIL" name="email" />
+                <label for="email-input">E-mail</label>
+              </span>
+            </div>
+        
+            <div class="field col-12 md:col-1">
+              <span class="p-float-label">
+                <input id="ddd-input" type="text" mask="00" pinputtext class="p-inputtext p-component p-element p-filled"
+                       [(ngModel)]="novaPessoa.DDD" name="ddd" />
+                <label for="ddd-input">DDD</label>
+              </span>
+            </div>
+        
+            <div class="field col-12 md:col-2">
+              <span class="p-float-label">
+                <input id="telefone-input" type="text" pinputtext class="p-inputtext p-component p-element p-filled"
+                       mask="0 0000-0000" [(ngModel)]="novaPessoa.TELEFONE_CELULAR" name="celular" />
+                <label for="telefone-input">Celular</label>
+              </span>
+            </div>
+          </div>
+        
+          <h3 class="text-center" [ngStyle]="{ backgroundColor: 'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}">
+            ENDEREÇO
+          </h3>
+        
+          <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
+            <div class="field col-12 md:col-2">
+              <span class="p-float-label">
+                <input id="cep-input" type="text" pinputtext class="p-inputtext p-component p-element p-filled"
+                       mask="00000-000" [(ngModel)]="novaPessoa.CEP" name="cep" (blur)="buscarEnderecoPorCEP(novaPessoa.CEP)" />
+                <label for="cep-input">CEP</label>
+              </span>
+            </div>
+        
+            <div class="field col-12 md:col-6">
+              <span class="p-float-label">
+                <input id="logradouro-input" type="text" pinputtext class="p-inputtext p-component p-element p-filled"
+                       [(ngModel)]="novaPessoa.RUA_LOGRADOURO" name="logradouro" />
+                <label for="logradouro-input">Logradouro</label>
+              </span>
+            </div>
+        
+            <div class="field col-12 md:col-1">
+              <span class="p-float-label">
+                <input id="numero-input" type="text" pinputtext class="p-inputtext p-component p-element p-filled"
+                       [(ngModel)]="novaPessoa.NUMERO_LOGRADOURO" name="numero_logradouro" />
+                <label for="numero-input">Número</label>
+              </span>
+            </div>
+        
+            <div class="field col-12 md:col-3">
+              <span class="p-float-label">
+                <input id="bairro-input" type="text" pinputtext class="p-inputtext p-component p-element p-filled"
+                       [(ngModel)]="novaPessoa.BAIRRO_LOGRADOURO" name="bairro_logradouro" />
+                <label for="bairro-input">Bairro</label>
+              </span>
+            </div>
+        
+            <div class="field col-12 md:col-3">
+              <span class="p-float-label">
+                <input id="cidade-input" type="text" pinputtext class="p-inputtext p-component p-element p-filled"
+                       [(ngModel)]="novaPessoa.CIDADE" name="cidade" />
+                <label for="cidade-input">Cidade</label>
+              </span>
+            </div>
+
+            <div class="field col-12 md:col-3">
+              <span class="p-float-label">
+                <input
+                  id="float-input"
+                  type="text"
+                  pinputtext
+                  class="p-inputtext p-component p-element p-filled"
+                  [(ngModel)]="novaPessoa.COMPLEMENTO_LOGRADOURO"
+                  name="complemento_logradouro"
+                />
+                <label for="float-input">Complemento</label>
+              </span>
+            </div>
+        
+            <div class="field col-12 md:col-2">
+                <span class="p-float-label">
+                  <input
+                    id="float-input"
+                    type="text"
+                    pinputtext
+                    class="p-inputtext p-component p-element p-filled"
+                    [(ngModel)]="novaPessoa.COD_IBGE"
+                    name="COD_IBGE"
+                    disabled
+                  />
+                  <label for="float-input">Código IBGE</label>
+                </span>
+              </div>
+        
+            <div class="field col-12 md:col-1">
+              <span class="p-float-label">
+                <input id="uf-input" type="text" pinputtext class="p-inputtext p-component p-element p-filled"
+                       [(ngModel)]="novaPessoa.UF" name="uf" />
+                <label for="uf-input">UF</label>
+              </span>
+            </div>
+        
+            <!-- Botão para salvar -->
+            <div class="btn-group field col-12 md:col-1 flex flex-wrap gap-3" role="group" aria-label="Salvar pessoa">
+              <p-button icon="pi pi-save" severity="success" (click)="createPessoa()"></p-button>
+            </div>
+          </div>
         </p-dialog>
       </div>
     </div>

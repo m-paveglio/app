@@ -1,11 +1,32 @@
 import { Component } from '@angular/core';
 import { ComandasService } from '../comandas.service';
 import { LoginService } from '../../../login/login.service';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { PessoasService } from '../../pessoas/pessoas.service';
+
+interface Pessoa {
+  CPF: string;
+  CPF_CNPJ: string; // Adicionado
+  NOME: string;
+  EMAIL?: string;
+  TIPO_USER?: string;
+  DDD?: string; // Adicionado
+  TELEFONE_CELULAR?: string; // Adicionado
+  CEP?: string;
+  RUA_LOGRADOURO?: string;
+  NUMERO_LOGRADOURO?: string;
+  BAIRRO_LOGRADOURO?: string;
+  COMPLEMENTO_LOGRADOURO?: string;
+  CIDADE?: string;
+  COD_IBGE?: string;
+  UF?: string;
+}
 
 @Component({
   selector: 'app-comandas',
   templateUrl: './comandas-incluir.component.html',
-  styleUrls: ['./comandas-incluir.component.css']
+  styleUrls: ['./comandas-incluir.component.css'],
+  providers: [MessageService, ConfirmationService],
 })
 export class ComandasIncluirComponent {
   novoCliente: string = ''; // Para criação de uma nova comanda
@@ -15,6 +36,11 @@ export class ComandasIncluirComponent {
   enderecoCliente: string = ''; // Para entrada do endereço
   displayDialogCPF: boolean = false; // Controle do diálogo para CPF/CNPJ
   displayDialogEndereco: boolean = false; // Controle do diálogo para nome e endereço
+  resultado: Pessoa | null = null; // Tipado como Pessoa
+  pessoasEncontrados: Pessoa[] = []; // Lista de pessoas encontradas
+  displayDialogUsuarios: boolean = false;
+  displayDialogNovaPessoa: boolean = false; // Controla o diálogo de nova pessoa
+  novaPessoa: any = {}; // Objeto para armazenar os dados da nova pessoa
 
   // Propriedades faltantes
   CPF_CNPJ: string = ''; // Adicionada a propriedade CPF_CNPJ
@@ -22,7 +48,10 @@ export class ComandasIncluirComponent {
 
   constructor(
     private comandasService: ComandasService,
-    private loginService: LoginService
+    private loginService: LoginService,
+    private messageService: MessageService,
+    private confirmationService: ConfirmationService,
+    private pessoasService: PessoasService
   ) {}
 
   // Abre o diálogo para CPF/CNPJ
@@ -34,19 +63,109 @@ export class ComandasIncluirComponent {
     }
   }
 
-  // Buscar cliente pelo CPF ou CNPJ
-  buscarClientePorCPF() {
-    if (!this.cpfCnpjInput.trim()) {
-      console.warn('Informe o CPF ou CNPJ.');
+  isCpfValido(CPF_CNPJ: string): boolean {
+    if (!CPF_CNPJ || CPF_CNPJ.length !== 11) return false;
+    let soma = 0, resto;
+    if (/^(\d)\1+$/.test(CPF_CNPJ)) return false; // Evita CPFs com números repetidos (ex: 00000000000)
+    for (let i = 1; i <= 9; i++) soma += parseInt(CPF_CNPJ[i - 1]) * (11 - i);
+    resto = (soma * 10) % 11;
+    if (resto === 10 || resto === 11) resto = 0;
+    if (resto !== parseInt(CPF_CNPJ[9])) return false;
+    soma = 0;
+    for (let i = 1; i <= 10; i++) soma += parseInt(CPF_CNPJ[i - 1]) * (12 - i);
+    resto = (soma * 10) % 11;
+    return resto === parseInt(CPF_CNPJ[10]);
+  }
+
+  /** Valida se um CNPJ é válido */
+  isCnpjValido(CNPJ: string): boolean {
+    if (!CNPJ || CNPJ.length !== 14) return false;
+    if (/^(\d)\1+$/.test(CNPJ)) return false; // Evita CNPJs com números repetidos
+
+    let tamanho = CNPJ.length - 2;
+    let numeros = CNPJ.substring(0, tamanho);
+    let digitos = CNPJ.substring(tamanho);
+    let soma = 0, pos = tamanho - 7;
+    
+    for (let i = tamanho; i >= 1; i--) {
+      soma += parseInt(numeros[tamanho - i]) * pos--;
+      if (pos < 2) pos = 9;
+    }
+    
+    let resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);
+    if (resultado !== parseInt(digitos[0])) return false;
+    
+    tamanho++;
+    numeros = CNPJ.substring(0, tamanho);
+    soma = 0;
+    pos = tamanho - 7;
+    
+    for (let i = tamanho; i >= 1; i--) {
+      soma += parseInt(numeros[tamanho - i]) * pos--;
+      if (pos < 2) pos = 9;
+    }
+    
+    resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);
+    return resultado === parseInt(digitos[1]);
+  }
+
+  /** Determina se um CPF ou CNPJ é válido */
+  isCpfCnpjValido(CPF_CNPJ: string): boolean {
+    if (CPF_CNPJ.length === 11) return this.isCpfValido(CPF_CNPJ);
+    if (CPF_CNPJ.length === 14) return this.isCnpjValido(CPF_CNPJ);
+    return false;
+  }
+
+  buscarpessoas() {
+    if (!this.CPF_CNPJ && !this.nome) {
+      this.showError('Informe um CPF, CNPJ ou Nome para realizar a busca.');
       return;
     }
 
-    // Aqui você pode implementar a lógica de buscar cliente no backend
-    console.log('Buscando cliente com CPF/CNPJ:', this.cpfCnpjInput);
-    // Após buscar, podemos preencher o nomeCliente com os dados do cliente
-    // Exemplo: this.nomeCliente = dadosDoCliente.nome;
+    if (this.CPF_CNPJ) {
+      if (!this.isCpfCnpjValido(this.CPF_CNPJ)) {
+        this.showError('CPF ou CNPJ inválido.');
+        return;
+      }
+      this.buscarPorCpf();
+    } else {
+      this.buscarPorNome();
+    }
+  }
 
-    this.displayDialogCPF = false; // Fecha o diálogo após buscar o cliente
+  buscarPorCpf() {
+    this.pessoasService.buscarPorCpf(this.CPF_CNPJ).subscribe(
+      (data) => {
+        if (data) {
+          // Se a resposta for um objeto único, transforma em um array
+          this.pessoasEncontrados = Array.isArray(data) ? data : [data];
+          this.displayDialogUsuarios = true; // Abre o diálogo corretamente
+        } else {
+          this.showError('Nenhuma pessoa encontrada com este CPF/CNPJ.');
+        }
+      },
+      (error) => {
+        console.error('Erro ao buscar por CPF/CNPJ:', error);
+        this.showError('Erro ao buscar pessoa. Tente novamente.');
+      }
+    );
+  }
+
+  buscarPorNome() {
+    this.pessoasService.buscarPorNome(this.nome).subscribe(
+      (data) => {
+        if (data && data.length > 0) {
+          this.pessoasEncontrados = data;
+          this.displayDialogUsuarios = true; // Agora o diálogo será aberto corretamente
+        } else {
+          this.showError('Nenhuma pessoa encontrada com este nome.');
+        }
+      },
+      (error) => {
+        console.error('Erro ao buscar por Nome:', error);
+        this.showError('Erro ao buscar pessoa. Tente novamente.');
+      }
+    );
   }
 
   // Método para cancelar a busca
@@ -111,9 +230,53 @@ export class ComandasIncluirComponent {
     });
   }
 
-  // Método de busca de pessoas (substituir pelo método adequado)
-  buscarpessoas() {
-    console.log('Buscando pessoas...');
-    // Aqui você pode implementar a lógica para realizar a busca
+  showSuccess(message: string) {
+    this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: message });
   }
+
+  showError(message: string) {
+    this.messageService.add({ severity: 'error', summary: 'Erro', detail: message });
+  }
+
+  selecionarpessoas(pessoa: Pessoa) {
+    this.resultado = pessoa; // Define a pessoa selecionada como resultado
+    this.pessoasEncontrados = []; // Limpa a lista de pessoas
+  }
+
+  openDialogNovaPessoa() {
+    this.novaPessoa = {}; // Reseta os dados sempre que abrir o diálogo
+    this.displayDialogNovaPessoa = true; // Abre o diálogo
+  }
+  
+  createPessoa() {
+    console.log("Criando nova pessoa:", this.novaPessoa);
+    // Aqui você pode chamar um serviço para salvar os dados no backend
+    this.displayDialogNovaPessoa = false; // Fecha o diálogo após salvar
+  }
+
+
+  buscarEnderecoPorCEP(cep: string) {
+
+    this.pessoasService.getEnderecoPorCEP(cep).subscribe(
+      (endereco) => {
+        // Preenche os campos do formulário com os dados do endereço
+        this.novaPessoa.RUA_LOGRADOURO = endereco.logradouro;
+        this.novaPessoa.BAIRRO_LOGRADOURO = endereco.bairro;
+        this.novaPessoa.CIDADE = endereco.cidade;
+        this.novaPessoa.UF = endereco.uf;
+        this.novaPessoa.COD_IBGE = endereco.cod_ibge;
+      },
+      (error) => {
+        console.error('Erro ao buscar endereço:', error);
+        // Limpa os campos de endereço
+        this.novaPessoa.RUA_LOGRADOURO = '';
+        this.novaPessoa.BAIRRO_LOGRADOURO = '';
+        this.novaPessoa.CIDADE = '';
+        this.novaPessoa.UF = '';
+        this.novaPessoa.COD_IBGE = '';
+        this.showError('Erro ao buscar endereço. Verifique o CEP informado.');
+      }
+    );
+  }
+
 }
