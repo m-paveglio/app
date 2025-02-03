@@ -18,16 +18,16 @@ export class Comandas {
   NOME: string;
 
   @ManyToOne(() => Servicos, (servico) => servico.COD_SERVICO, { eager: true })
-  @Column({ length: 20, nullable: false })
+  @Column({ length: 20, nullable: true })
   COD_SERVICO: string;
 
-  @Column('decimal', { precision: 10, scale: 2 })
+  @Column('decimal', { precision: 10, scale: 2, nullable: true })
   VALOR: number;
 
-  @Column('decimal', { precision: 10, scale: 2 })
+  @Column('decimal', { precision: 10, scale: 2, nullable: true  })
   QUANTIDADE: number;
 
-  @Column('decimal', { precision: 10, scale: 2 })
+  @Column('decimal', { precision: 10, scale: 2, nullable: true  })
   VALOR_FINAL: number;
 
   @Column({ type: 'datetime', nullable: false })

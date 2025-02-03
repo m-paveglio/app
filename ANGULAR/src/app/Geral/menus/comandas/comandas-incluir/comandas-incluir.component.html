@@ -1,4 +1,4 @@
-<div class="grid" *ngIf="!cnpj">
+<div class="grid" *ngIf="cnpj !== undefined">
   <div class="col-12">
     <div class="p-inputtext p-component p-element">
       <h3
@@ -86,7 +86,7 @@
                 <td>{{ pessoa.CPF_CNPJ | mask: pessoa.CPF_CNPJ.length <= 11 ? '000.000.000-00' : '00.000.000/0000-00' }}</td>
                 <td>{{ pessoa.NOME }}</td>
                 <td>
-                  <p-button icon="pi pi-check" severity="primary" (click)="selecionarCliente()" label=""></p-button>
+                  <p-button icon="pi pi-check" severity="primary" (click)="criarComanda()" label=""></p-button>
                 </td>
               </tr>
             </ng-template>

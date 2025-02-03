@@ -48,11 +48,22 @@ export class ComandasIncluirComponent {
 
   constructor(
     private comandasService: ComandasService,
-    private loginService: LoginService,
+    private loginService: LoginService, // Responsável pelo usuário logado
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private pessoasService: PessoasService
   ) {}
+
+
+  ngOnInit() {
+    this.cnpj = this.loginService.getEmpresaSelecionada() || null;
+    console.log("CNPJ do prestador logado:", this.cnpj);
+  
+    // Se o CNPJ for indefinido, exiba um erro no console
+    if (!this.cnpj) {
+      console.warn("CNPJ não encontrado. O HTML pode estar oculto.");
+    }
+  }
 
   // Abre o diálogo para CPF/CNPJ
   openDialogCPF(isCpf: boolean) {
@@ -136,10 +147,11 @@ export class ComandasIncluirComponent {
   buscarPorCpf() {
     this.pessoasService.buscarPorCpf(this.CPF_CNPJ).subscribe(
       (data) => {
+        console.log("Dados retornados pela API:", data); // Depuração
+  
         if (data) {
-          // Se a resposta for um objeto único, transforma em um array
           this.pessoasEncontrados = Array.isArray(data) ? data : [data];
-          this.displayDialogUsuarios = true; // Abre o diálogo corretamente
+          this.displayDialogUsuarios = true;
         } else {
           this.showError('Nenhuma pessoa encontrada com este CPF/CNPJ.');
         }
@@ -201,31 +213,40 @@ export class ComandasIncluirComponent {
 
   // ✅ Criar uma nova comanda
   criarComanda() {
-    if (!this.nomeCliente.trim()) {
-      console.warn('Informe o nome do cliente antes de criar a comanda.');
+    console.log("Nome do cliente antes de criar comanda:", this.nomeCliente); // ✅ Debug
+  
+    if ((!this.nomeCliente || !this.nomeCliente.trim()) && (!this.CPF_CNPJ || !this.CPF_CNPJ.trim())) {
+      this.showError('Informe um CPF/CNPJ ou o nome do cliente antes de criar a comanda.');
       return;
     }
-
+    
+  
     if (!this.cnpj) {
-      console.warn('CNPJ não encontrado.');
+      this.showError('CNPJ do prestador não encontrado. Verifique se está logado corretamente.');
+      console.error('Erro: this.cnpj está indefinido.');
       return;
     }
-
+  
     const novaComanda = {
-      CNPJ_PRESTADOR: this.cnpj,
-      NOME_CLIENTE: this.nomeCliente,
-      DATA_INICIAL: new Date(),
+      CNPJ_PRESTADOR: this.cnpj || "CNPJ NÃO DEFINIDO", // Define um valor padrão
+      NOME: this.nomeCliente || "Cliente Desconhecido",
+      CPF_CNPJ_CLIENTE: this.CPF_CNPJ,
+      DATA_INICIO: new Date(),
       DATA_FINAL: null,
       ITENS: []
     };
-
+  
+    console.log("Criando comanda com:", novaComanda); // ✅ Verifique os dados antes da API
+  
     this.comandasService.createComanda(novaComanda).subscribe({
-      next: () => {
-        console.log('Comanda criada com sucesso!');
+      next: (response) => {
+        console.log('Comanda criada com sucesso!', response);
+        this.showSuccess('Comanda criada com sucesso!');
         this.nomeCliente = ''; // Limpa o campo de entrada
       },
       error: (error) => {
         console.error('Erro ao criar comanda:', error);
+        this.showError('Erro ao criar comanda. Verifique os dados e tente novamente.');
       }
     });
   }
@@ -239,9 +260,12 @@ export class ComandasIncluirComponent {
   }
 
   selecionarpessoas(pessoa: Pessoa) {
-    this.resultado = pessoa; // Define a pessoa selecionada como resultado
-    this.pessoasEncontrados = []; // Limpa a lista de pessoas
+    this.resultado = pessoa; 
+    this.nomeCliente = pessoa.NOME; // ✅ Agora armazena o nome do cliente
+    this.displayDialogUsuarios = false; // ✅ Fecha o diálogo após seleção
+    console.log("Cliente selecionado:", this.nomeCliente); // ✅ Debug para verificar
   }
+  
 
   openDialogNovaPessoa() {
     this.novaPessoa = {}; // Reseta os dados sempre que abrir o diálogo

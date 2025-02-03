@@ -105,12 +105,12 @@ export class AppMenuComponent implements OnInit {
                         items: [
                           {
                             label: 'Incluir',
-                            icon: 'pi pi-fw pi-file-plus',
+                            icon: 'pi pi-fw pi-plus',
                             routerLink: ['comandas/incluir']
                           },
                           {
                             label: 'Consultar',
-                            icon: 'pi pi-fw pi-file-plus',
+                            icon: 'pi pi-fw pi-search',
                             routerLink: ['comandas/consultar']
                           },
                         ]
