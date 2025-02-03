@@ -3,6 +3,7 @@ import { ComandasService } from '../comandas.service';
 import { LoginService } from '../../../login/login.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { PessoasService } from '../../pessoas/pessoas.service';
+import { Router } from '@angular/router';
 
 interface Pessoa {
   CPF: string;
@@ -47,6 +48,7 @@ export class ComandasIncluirComponent {
   nome: string = ''; // Adicionada a propriedade nome
 
   constructor(
+    private router: Router,
     private comandasService: ComandasService,
     private loginService: LoginService, // Responsável pelo usuário logado
     private messageService: MessageService,
@@ -213,43 +215,64 @@ export class ComandasIncluirComponent {
 
   // ✅ Criar uma nova comanda
   criarComanda() {
-    console.log("Nome do cliente antes de criar comanda:", this.nomeCliente); // ✅ Debug
-  
-    if ((!this.nomeCliente || !this.nomeCliente.trim()) && (!this.CPF_CNPJ || !this.CPF_CNPJ.trim())) {
-      this.showError('Informe um CPF/CNPJ ou o nome do cliente antes de criar a comanda.');
+    // Certifique-se de que this.nomeCliente sempre tem um valor tratado corretamente
+    this.nomeCliente = this.nomeCliente?.trim() || '';
+
+    console.log("Nome do cliente antes de criar comanda:", this.nomeCliente);
+
+    // ✅ Permite criar comanda apenas com o nome do cliente
+    if (!this.nomeCliente && !this.CPF_CNPJ?.trim()) {
+      this.showError('Informe pelo menos o nome do cliente ou um CPF/CNPJ antes de criar a comanda.');
       return;
     }
-    
-  
+
     if (!this.cnpj) {
       this.showError('CNPJ do prestador não encontrado. Verifique se está logado corretamente.');
       console.error('Erro: this.cnpj está indefinido.');
       return;
     }
-  
+
     const novaComanda = {
-      CNPJ_PRESTADOR: this.cnpj || "CNPJ NÃO DEFINIDO", // Define um valor padrão
+      CNPJ_PRESTADOR: this.cnpj || "CNPJ NÃO DEFINIDO",
       NOME: this.nomeCliente || "Cliente Desconhecido",
-      CPF_CNPJ_CLIENTE: this.CPF_CNPJ,
+      CPF_CNPJ_CLIENTE: this.CPF_CNPJ?.trim() || null, 
+      EMAIL: this.novaPessoa?.EMAIL || null,
+      DDD: this.novaPessoa?.DDD || null,
+      TELEFONE_CELULAR: this.novaPessoa?.TELEFONE_CELULAR || null,
+      ENDERECO: {
+        CEP: this.novaPessoa?.CEP || null,
+        RUA_LOGRADOURO: this.novaPessoa?.RUA_LOGRADOURO || null,
+        NUMERO_LOGRADOURO: this.novaPessoa?.NUMERO_LOGRADOURO || null,
+        BAIRRO_LOGRADOURO: this.novaPessoa?.BAIRRO_LOGRADOURO || null,
+        COMPLEMENTO_LOGRADOURO: this.novaPessoa?.COMPLEMENTO_LOGRADOURO || null,
+        CIDADE: this.novaPessoa?.CIDADE || null,
+        UF: this.novaPessoa?.UF || null,
+        COD_IBGE: this.novaPessoa?.COD_IBGE || null
+      },
       DATA_INICIO: new Date(),
       DATA_FINAL: null,
       ITENS: []
     };
-  
-    console.log("Criando comanda com:", novaComanda); // ✅ Verifique os dados antes da API
-  
+
+    console.log("Criando comanda com:", novaComanda);
+
     this.comandasService.createComanda(novaComanda).subscribe({
       next: (response) => {
         console.log('Comanda criada com sucesso!', response);
         this.showSuccess('Comanda criada com sucesso!');
         this.nomeCliente = ''; // Limpa o campo de entrada
+        this.novaPessoa = {}; // Limpa os dados temporários
+
+        setTimeout(() => {
+          this.router.navigate(['dashboard/comandas/consultar']);
+        }, 2000);
       },
       error: (error) => {
         console.error('Erro ao criar comanda:', error);
         this.showError('Erro ao criar comanda. Verifique os dados e tente novamente.');
       }
     });
-  }
+}
 
   showSuccess(message: string) {
     this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: message });

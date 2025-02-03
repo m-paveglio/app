@@ -73,18 +73,18 @@ export class LoginService {
   }
 
   setEmpresaSelecionada(empresa: any): void {
-    this.empresaSelecionada = empresa;
+    this.empresaSelecionada.next(empresa); // Atualiza o BehaviorSubject corretamente
     localStorage.setItem('empresaSelecionada', JSON.stringify(empresa));
   }
-
+  
   getEmpresaSelecionada(): any {
-    if (!this.empresaSelecionada) {
+    if (!this.empresaSelecionada.value) { // Se ainda não foi inicializado, busca do localStorage
       const storedEmpresa = localStorage.getItem('empresaSelecionada');
       if (storedEmpresa) {
-        this.empresaSelecionada = JSON.parse(storedEmpresa);
+        this.empresaSelecionada.next(JSON.parse(storedEmpresa));
       }
     }
-    return this.empresaSelecionada;
+    return this.empresaSelecionada.value; // Retorna o valor atualizado corretamente
   }
 
 

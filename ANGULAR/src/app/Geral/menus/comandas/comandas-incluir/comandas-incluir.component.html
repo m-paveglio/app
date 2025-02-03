@@ -104,9 +104,13 @@
           <div class="p-fluid p-formgrid grid" style="margin-top: 20px">        
             <div class="field col-12 md:col-6">
               <span class="p-float-label">
-                <input id="nome-input" type="text" pinputtext class="p-inputtext p-component p-element p-filled"
-                       [(ngModel)]="novaPessoa.NOME" name="NOME" />
-                <label for="nome-input">Nome</label>
+                <input id="nome-input" 
+                    type="text" 
+                    pinputtext 
+                    class="p-inputtext p-component p-element p-filled"
+                    [(ngModel)]="nomeCliente" 
+                    name="NOME" />
+              <label for="nome-input">Nome</label>
               </span>
             </div>
         
@@ -219,7 +223,7 @@
         
             <!-- Botão para salvar -->
             <div class="btn-group field col-12 md:col-1 flex flex-wrap gap-3" role="group" aria-label="Salvar pessoa">
-              <p-button icon="pi pi-save" severity="success" (click)="createPessoa()"></p-button>
+              <p-button icon="pi pi-save" severity="success" (click)="criarComanda()"></p-button>
             </div>
           </div>
         </p-dialog>
