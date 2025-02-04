@@ -8,8 +8,9 @@ import { LoginService } from '../../../login/login.service';
   styleUrls: ['./comandas-consultar.component.css']
 })
 export class ComandasConsultarComponent implements OnInit {
-  comandasEmAberto: any[] = []; // Lista de comandas em aberto
-  cnpj: string | null = null; // CNPJ do prestador logado
+  comandasEmAberto: any[] = [];
+  responsiveOptions: any[] = [];
+  cnpj: string | null = null;
 
   constructor(
     private comandasService: ComandasService,
@@ -19,20 +20,48 @@ export class ComandasConsultarComponent implements OnInit {
   ngOnInit() {
     const empresa = this.loginService.getEmpresaSelecionada();
     this.cnpj = empresa?.CNPJ || null;
-    console.log('CNPJ logado:', this.cnpj);
-
+  
     if (this.cnpj) {
       this.carregarComandasEmAberto();
     }
+  
+    // Configuração para tornar o carrossel responsivo
+    this.responsiveOptions = [
+      {
+        breakpoint: '1400px',
+        numVisible: 8,
+        numScroll: 2
+      },
+      {
+        breakpoint: '1200px',
+        numVisible: 6,
+        numScroll: 2
+      },
+      {
+        breakpoint: '992px',
+        numVisible: 4,
+        numScroll: 2
+      },
+      {
+        breakpoint: '768px',
+        numVisible: 2,
+        numScroll: 1
+      },
+      {
+        breakpoint: '560px',
+        numVisible: 1,
+        numScroll: 1
+      }
+    ];
   }
+  
 
   carregarComandasEmAberto() {
     if (this.cnpj) {
       this.comandasService.getComandasAbertas(this.cnpj).subscribe({
         next: (response) => {
-          console.log('Resposta da API:', response); // Debug para ver os dados recebidos
+          console.log('Resposta da API:', response);
   
-          // Verifica se a resposta já é um array ou precisa acessar `data`
           const dadosRecebidos = Array.isArray(response) ? response : response.data;
   
           if (Array.isArray(dadosRecebidos)) {
@@ -54,5 +83,4 @@ export class ComandasConsultarComponent implements OnInit {
       });
     }
   }
-  
-}  
+}

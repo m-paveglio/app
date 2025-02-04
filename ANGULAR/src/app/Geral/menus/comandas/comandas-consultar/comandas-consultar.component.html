@@ -9,23 +9,20 @@
       </h3>
       <p-toast></p-toast>
 
-      <div class="comandas-container">
-        <!-- Listagem das comandas em aberto -->
-        <div *ngIf="comandasEmAberto && comandasEmAberto.length > 0">
-          <h3>Comandas em Aberto</h3>
-          <ul>
-            <li *ngFor="let comanda of comandasEmAberto">
-              <p><strong>Cliente:</strong> {{ comanda.CPF_CNPJ?.NOME || 'Nome não informado' }}</p>
-              <p><strong>Data de Abertura:</strong> {{ comanda.DATA_INICIO | date:'dd/MM/yyyy HH:mm' }}</p>
-              <p><strong>Status:</strong> Aberta</p>
-            </li>
-          </ul>
+      <div class="comandas-grid">
+        <!-- Exibir todas as comandas como quadradinhos menores -->
+        <div *ngFor="let comanda of comandasEmAberto" class="card-comanda">
+          <h4 class="text-center font-semibold">{{ comanda.CPF_CNPJ?.NOME || 'Nome não informado' }}</h4>
+          <p class="text-center text-gray-600 text-xs">
+            <strong>Data:</strong> {{ comanda.DATA_INICIO | date:'dd/MM/yyyy HH:mm' }}
+          </p>
+          <p class="text-center text-green-500 font-semibold text-xs">Status: Aberta</p>
         </div>
+      </div>
 
-        <!-- Caso não haja comandas em aberto -->
-        <div *ngIf="comandasEmAberto && comandasEmAberto.length === 0">
-          <p>Não há comandas em aberto.</p>
-        </div>
+      <!-- Caso não haja comandas em aberto -->
+      <div *ngIf="comandasEmAberto.length === 0" class="text-center mt-4">
+        <p class="text-gray-500">Não há comandas em aberto.</p>
       </div>
     </div>
   </div>

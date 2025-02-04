@@ -32,6 +32,7 @@ import { PessoasIncluirComponent } from './Geral/menus/pessoas/pessoas-incluir/p
 import { PessoasConsultarComponent } from './Geral/menus/pessoas/pessoas-consultar/pessoas-consultar.component';
 import { ComandasIncluirComponent } from './Geral/menus/comandas/comandas-incluir/comandas-incluir.component';
 import { ComandasConsultarComponent } from './Geral/menus/comandas/comandas-consultar/comandas-consultar.component';
+import { CarouselModule } from 'primeng/carousel';
 
 
 
@@ -74,7 +75,8 @@ import { ComandasConsultarComponent } from './Geral/menus/comandas/comandas-cons
     ConfirmDialogModule,
     TableModule,
     TabViewModule,
-    DialogModule
+    DialogModule,
+    CarouselModule
   
     
         
