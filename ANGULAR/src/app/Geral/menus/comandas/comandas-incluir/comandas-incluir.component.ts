@@ -32,8 +32,10 @@ interface Pessoa {
 export class ComandasIncluirComponent {
   novoCliente: string = ''; // Para criação de uma nova comanda
   cnpj: string | null = null; // CNPJ do prestador logado
+  CNPJ: string | null = null; // CNPJ do prestador logado
   cpfCnpjInput: string = ''; // Para entrada de CPF/CNPJ
   nomeCliente: string = ''; // Para entrada do nome do cliente
+  CPF_CNPJ_CLIENTE: string = '';
   enderecoCliente: string = ''; // Para entrada do endereço
   displayDialogCPF: boolean = false; // Controle do diálogo para CPF/CNPJ
   displayDialogEndereco: boolean = false; // Controle do diálogo para nome e endereço
@@ -58,14 +60,14 @@ export class ComandasIncluirComponent {
 
 
   ngOnInit() {
-    this.cnpj = this.loginService.getEmpresaSelecionada() || null;
+    const empresa = this.loginService.getEmpresaSelecionada();
+    this.cnpj = empresa?.CNPJ || null;  // Agora this.cnpj será apenas a string do CNPJ
     console.log("CNPJ do prestador logado:", this.cnpj);
   
-    // Se o CNPJ for indefinido, exiba um erro no console
     if (!this.cnpj) {
       console.warn("CNPJ não encontrado. O HTML pode estar oculto.");
     }
-  }
+}
 
   // Abre o diálogo para CPF/CNPJ
   openDialogCPF(isCpf: boolean) {
@@ -182,25 +184,8 @@ export class ComandasIncluirComponent {
     );
   }
 
-  // Método para cancelar a busca
-  cancelarBusca() {
-    this.cpfCnpjInput = ''; // Limpa o campo de CPF/CNPJ
-    this.displayDialogCPF = false; // Fecha o diálogo
-    console.log('Busca cancelada.');
-  }
 
-  // Método para selecionar o cliente
-  selecionarCliente() {
-    if (!this.cpfCnpjInput.trim()) {
-      console.warn('Por favor, informe o CPF/CNPJ antes de selecionar um cliente.');
-      return;
-    }
-
-    // Aqui você pode adicionar a lógica para preencher os dados do cliente após seleção
-    console.log('Cliente selecionado:', this.cpfCnpjInput);
-    this.displayDialogCPF = false; // Fecha o diálogo após selecionar o cliente
-    this.nomeCliente = 'Nome do Cliente'; // Exemplo de preenchimento após selecionar
-  }
+  // Método para selecionar o client
 
   // Salvar nome e endereço do cliente
   salvarEndereco() {
@@ -214,63 +199,67 @@ export class ComandasIncluirComponent {
   }
 
   // ✅ Criar uma nova comanda
-  criarComanda() {
-    // Certifique-se de que this.nomeCliente sempre tem um valor tratado corretamente
-    this.nomeCliente = this.nomeCliente?.trim() || '';
-
+  criarComanda(clienteSelecionado?: Pessoa) {
     console.log("Nome do cliente antes de criar comanda:", this.nomeCliente);
+    console.log("CPF/CNPJ antes de criar comanda:", this.CPF_CNPJ); // Verifica se está correto
+    console.log("CNPJ_PRESTADOR enviado:", this.cnpj);
 
-    // ✅ Permite criar comanda apenas com o nome do cliente
+    if (clienteSelecionado) {
+        this.nomeCliente = clienteSelecionado.NOME;
+        this.CPF_CNPJ = clienteSelecionado.CPF_CNPJ; // Aqui garante que CPF_CNPJ está correto
+        this.novaPessoa = { ...clienteSelecionado };
+    }
+
     if (!this.nomeCliente && !this.CPF_CNPJ?.trim()) {
-      this.showError('Informe pelo menos o nome do cliente ou um CPF/CNPJ antes de criar a comanda.');
-      return;
+        this.showError('Informe pelo menos o nome do cliente ou um CPF/CNPJ antes de criar a comanda.');
+        return;
     }
 
     if (!this.cnpj) {
-      this.showError('CNPJ do prestador não encontrado. Verifique se está logado corretamente.');
-      console.error('Erro: this.cnpj está indefinido.');
-      return;
+        this.showError('CNPJ do prestador não encontrado.');
+        console.error('Erro: this.cnpj está indefinido.');
+        return;
     }
 
     const novaComanda = {
-      CNPJ_PRESTADOR: this.cnpj || "CNPJ NÃO DEFINIDO",
+      CNPJ_PRESTADOR: this.cnpj,
       NOME: this.nomeCliente || "Cliente Desconhecido",
-      CPF_CNPJ_CLIENTE: this.CPF_CNPJ?.trim() || null, 
+      CPF_CNPJ: this.CPF_CNPJ?.trim() || null,
       EMAIL: this.novaPessoa?.EMAIL || null,
-      DDD: this.novaPessoa?.DDD || null,
-      TELEFONE_CELULAR: this.novaPessoa?.TELEFONE_CELULAR || null,
-      ENDERECO: {
-        CEP: this.novaPessoa?.CEP || null,
-        RUA_LOGRADOURO: this.novaPessoa?.RUA_LOGRADOURO || null,
-        NUMERO_LOGRADOURO: this.novaPessoa?.NUMERO_LOGRADOURO || null,
-        BAIRRO_LOGRADOURO: this.novaPessoa?.BAIRRO_LOGRADOURO || null,
-        COMPLEMENTO_LOGRADOURO: this.novaPessoa?.COMPLEMENTO_LOGRADOURO || null,
-        CIDADE: this.novaPessoa?.CIDADE || null,
-        UF: this.novaPessoa?.UF || null,
-        COD_IBGE: this.novaPessoa?.COD_IBGE || null
-      },
+      ENDERECO: this.novaPessoa?.CEP ? {
+          CEP: this.novaPessoa.CEP,
+          RUA_LOGRADOURO: this.novaPessoa.RUA_LOGRADOURO || null,
+          NUMERO_LOGRADOURO: this.novaPessoa.NUMERO_LOGRADOURO || null,
+          BAIRRO_LOGRADOURO: this.novaPessoa.BAIRRO_LOGRADOURO || null,
+          COMPLEMENTO_LOGRADOURO: this.novaPessoa.COMPLEMENTO_LOGRADOURO || null,
+          CIDADE: this.novaPessoa.CIDADE || null,
+          UF: this.novaPessoa.UF || null,
+          COD_IBGE: this.novaPessoa.COD_IBGE || null
+      } : null,
       DATA_INICIO: new Date(),
       DATA_FINAL: null,
       ITENS: []
-    };
+  };
 
     console.log("Criando comanda com:", novaComanda);
 
     this.comandasService.createComanda(novaComanda).subscribe({
-      next: (response) => {
-        console.log('Comanda criada com sucesso!', response);
-        this.showSuccess('Comanda criada com sucesso!');
-        this.nomeCliente = ''; // Limpa o campo de entrada
-        this.novaPessoa = {}; // Limpa os dados temporários
+        next: (response) => {
+            console.log('Comanda criada com sucesso!', response);
+            this.showSuccess('Comanda criada com sucesso!');
 
-        setTimeout(() => {
-          this.router.navigate(['dashboard/comandas/consultar']);
-        }, 2000);
-      },
-      error: (error) => {
-        console.error('Erro ao criar comanda:', error);
-        this.showError('Erro ao criar comanda. Verifique os dados e tente novamente.');
-      }
+            this.nomeCliente = ''; 
+            this.novaPessoa = {};
+            this.CPF_CNPJ = '';
+
+            setTimeout(() => {
+                this.router.navigate(['dashboard/comandas/consultar']);
+            }, 2000);
+        },
+        error: (error) => {
+            console.error('Erro ao criar comanda:', error);
+            this.showError('Erro ao criar comanda. Verifique os dados e tente novamente.');
+        }
     });
 }
 
@@ -284,9 +273,25 @@ export class ComandasIncluirComponent {
 
   selecionarpessoas(pessoa: Pessoa) {
     this.resultado = pessoa; 
-    this.nomeCliente = pessoa.NOME; // ✅ Agora armazena o nome do cliente
-    this.displayDialogUsuarios = false; // ✅ Fecha o diálogo após seleção
-    console.log("Cliente selecionado:", this.nomeCliente); // ✅ Debug para verificar
+    this.nomeCliente = pessoa.NOME; 
+    this.CPF_CNPJ_CLIENTE = pessoa.CPF_CNPJ; // Verifique se este valor está correto
+    this.novaPessoa = { ...pessoa }; // Armazena todos os dados da pessoa
+    this.displayDialogUsuarios = false;
+  
+    console.log("Cliente selecionado:", this.novaPessoa); 
+    console.log("CPF_CNPJ do cliente selecionado:", this.CPF_CNPJ_CLIENTE); // Debug para verificar
+  }
+
+  selecionarCliente() {
+    if (!this.cpfCnpjInput.trim()) {
+      console.warn('Por favor, informe o CPF/CNPJ antes de selecionar um cliente.');
+      return;
+    }
+
+    // Aqui você pode adicionar a lógica para preencher os dados do cliente após seleção
+    console.log('Cliente selecionado:', this.cpfCnpjInput);
+    this.displayDialogCPF = false; // Fecha o diálogo após selecionar o cliente
+    this.nomeCliente = 'Nome do Cliente'; // Exemplo de preenchimento após selecionar
   }
   
 
@@ -300,7 +305,6 @@ export class ComandasIncluirComponent {
     // Aqui você pode chamar um serviço para salvar os dados no backend
     this.displayDialogNovaPessoa = false; // Fecha o diálogo após salvar
   }
-
 
   buscarEnderecoPorCEP(cep: string) {
 

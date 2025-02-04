@@ -8,8 +8,7 @@ import { LoginService } from '../../../login/login.service';
   styleUrls: ['./comandas-consultar.component.css']
 })
 export class ComandasConsultarComponent implements OnInit {
-  comandasEmAberto: any[] = []; // Armazena as comandas em aberto
-  novoCliente: string = ''; // Para criação de uma nova comanda
+  comandasEmAberto: any[] = []; // Lista de comandas em aberto
   cnpj: string | null = null; // CNPJ do prestador logado
 
   constructor(
@@ -18,56 +17,42 @@ export class ComandasConsultarComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.cnpj = this.loginService.getEmpresaSelecionada()?.CNPJ;
-    console.log('CNPJ logado:', this.cnpj); // Debugging
+    const empresa = this.loginService.getEmpresaSelecionada();
+    this.cnpj = empresa?.CNPJ || null;
+    console.log('CNPJ logado:', this.cnpj);
+
     if (this.cnpj) {
       this.carregarComandasEmAberto();
     }
   }
 
-  // ✅ Carregar todas as comandas em aberto
   carregarComandasEmAberto() {
     if (this.cnpj) {
       this.comandasService.getComandasAbertas(this.cnpj).subscribe({
         next: (response) => {
-          this.comandasEmAberto = response.data; // Ajuste dependendo da estrutura do retorno
+          console.log('Resposta da API:', response); // Debug para ver os dados recebidos
+  
+          // Verifica se a resposta já é um array ou precisa acessar `data`
+          const dadosRecebidos = Array.isArray(response) ? response : response.data;
+  
+          if (Array.isArray(dadosRecebidos)) {
+            this.comandasEmAberto = dadosRecebidos.map((comanda: any) => ({
+              ...comanda,
+              CPF_CNPJ: comanda.CPF_CNPJ || {} // Evita erro caso CPF_CNPJ seja null
+            }));
+          } else {
+            console.error('Formato inesperado da API:', response);
+            this.comandasEmAberto = [];
+          }
+  
+          console.log('Comandas processadas:', this.comandasEmAberto);
         },
         error: (error) => {
-          console.error('Erro ao carregar comandas em aberto:', error);
+          console.error('Erro ao carregar comandas:', error);
+          this.comandasEmAberto = [];
         }
       });
     }
   }
-
-  // ✅ Criar uma nova comanda
-  criarComanda() {
-    if (!this.novoCliente.trim()) {
-      console.warn('Informe o nome do cliente antes de criar a comanda.');
-      return;
-    }
-
-    if (!this.cnpj) {
-      console.warn('CNPJ não encontrado.');
-      return;
-    }
-
-    const novaComanda = {
-      CNPJ_PRESTADOR: this.cnpj,
-      NOME_CLIENTE: this.novoCliente,
-      DATA_INICIAL: new Date(),
-      DATA_FINAL: null,
-      ITENS: []
-    };
-
-    this.comandasService.createComanda(novaComanda).subscribe({
-      next: () => {
-        console.log('Comanda criada com sucesso!');
-        this.novoCliente = ''; // Limpa o campo de entrada
-        this.carregarComandasEmAberto(); // Atualiza a lista de comandas abertas
-      },
-      error: (error) => {
-        console.error('Erro ao criar comanda:', error);
-      }
-    });
-  }
-}
+  
+}  
