@@ -1,32 +1,32 @@
-.comandas-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Distribuição flexível */
-    gap: 8px; /* Espaçamento menor entre os cartões */
-    justify-content: center;
-    padding: 5px;
-  }
-  
-  .card-comanda {
-    background-color: #ffffff;
-    border-radius: 8px;
-    padding: 6px;
-    text-align: center;
-    box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease-in-out;
-    min-height: 80px; /* Redução da altura */
-  }
-  
-  .card-comanda:hover {
-    transform: scale(1.03); /* Efeito de leve zoom ao passar o mouse */
-  }
-  
-  .card-comanda h4 {
-    font-size: 12px;
-    font-weight: bold;
-  }
-  
-  .card-comanda p {
-    font-size: 10px;
-    margin: 3px 0;
-  }
-  
+.surface-card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+  box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out;
+  min-height: 120px;
+}
+
+.surface-card:hover {
+  transform: scale(1.05); /* Efeito de leve zoom ao passar o mouse */
+}
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.text-500 {
+  color: #6b7280;
+}
+
+.text-900 {
+  color: #111827;
+}
+
+.border-round {
+  border-radius: 50%;
+}
