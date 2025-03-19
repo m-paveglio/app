@@ -68,14 +68,16 @@ const routes: Routes = [
         children: [
           { path: 'incluir', component: ComandasIncluirComponent },
           { path: 'consultar', component: ComandasConsultarComponent },
+          { path: 'consultar/:COD_COMANDA', component: ComandasConsultarComponent }
         ]
       },
+      
     ]
   }
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, { onSameUrlNavigation: 'reload' })],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }

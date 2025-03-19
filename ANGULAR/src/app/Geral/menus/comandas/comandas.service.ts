@@ -14,6 +14,10 @@ export class ComandasService { // Nome da classe corrigido (Padrão PascalCase)
     this.apiUrl = `${this.apiConfig.getBaseUrl()}/comandas`; // Construindo a URL com ApiConfigService
   }
 
+  addServicoToComanda(COD_COMANDA: string, servico: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${COD_COMANDA}/addServico`, servico);
+  }
+
   // ✅ Buscar comandas por CPF/CNPJ
   getComandas(CPF_CNPJ: string): Observable<{ data: any[] }> {
     return this.http.get<{ data: any[] }>(`${this.apiUrl}/CPF_CNPJ/${CPF_CNPJ}`)
@@ -53,6 +57,11 @@ export class ComandasService { // Nome da classe corrigido (Padrão PascalCase)
 
   getComandasAbertas(cnpj: string): Observable<{ data: any[] }> {
     return this.http.get<{ data: any[] }>(`${this.apiUrl}/EmAberto/${cnpj}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  getComanda(CNPJ: string, COD_COMANDA: string): Observable<{ data: any[] }> {
+    return this.http.get<{ data: any[] }>(`${this.apiUrl}/${COD_COMANDA}`)
       .pipe(catchError(this.handleError));
   }
 
