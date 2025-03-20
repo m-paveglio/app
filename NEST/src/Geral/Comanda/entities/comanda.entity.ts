@@ -14,23 +14,13 @@ export class Comandas {
   @Column({ type: 'text', length: 14, nullable: true })
   CPF_CNPJ: string;
 
-  @Column({ type: 'varchar', length: 100 })
+  @Column({ type: 'varchar', length: 100, nullable: true })
   NOME: string;
-
-  @ManyToOne(() => Servicos, (servico) => servico.COD_SERVICO, { eager: true })
-  @Column({ length: 20, nullable: true })
-  COD_SERVICO: string;
-
-  @Column('decimal', { precision: 10, scale: 2, nullable: true })
-  VALOR: number;
-
-  @Column('decimal', { precision: 10, scale: 2, nullable: true  })
-  QUANTIDADE: number;
 
   @Column('decimal', { precision: 10, scale: 2, nullable: true  })
   VALOR_FINAL: number;
 
-  @Column({ type: 'datetime', nullable: false })
+  @Column({ type: 'datetime', nullable: true })
   DATA_INICIO: Date;
 
   @Column({ type: 'datetime', nullable: true })

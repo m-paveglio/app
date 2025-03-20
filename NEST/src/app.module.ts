@@ -15,6 +15,7 @@ import { WebserviceModule } from './Geral/Nota-Fiscal/Nfse/webservice/webservice
 import { ServicosModule } from './Geral/Servicos/servicos.module';
 import { NfseModule } from './Geral/Nota-Fiscal/Nfse/nfse.module';
 import { ComandasModule } from './Geral/Comanda/comanda.module';
+import { ComandasXServicoModule } from './Geral/ComandaXservico/comandaXservico.module';
 
  
 
@@ -32,7 +33,8 @@ import { ComandasModule } from './Geral/Comanda/comanda.module';
     WebserviceModule,
     ServicosModule,
     NfseModule,
-    ComandasModule
+    ComandasModule,
+    ComandasXServicoModule
 
     ],
   controllers: [AppController],

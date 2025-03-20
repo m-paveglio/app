@@ -9,13 +9,26 @@ import { ApiConfigService } from '../../../api-config.service';
 })
 export class ComandasService { // Nome da classe corrigido (Padrão PascalCase)
   private apiUrl: string;
+  private apiUrl2: string;
 
   constructor(private http: HttpClient, private apiConfig: ApiConfigService) {
     this.apiUrl = `${this.apiConfig.getBaseUrl()}/comandas`; // Construindo a URL com ApiConfigService
+    this.apiUrl2 = `${this.apiConfig.getBaseUrl()}/comandasXservico`;
   }
 
-  addServicoToComanda(COD_COMANDA: string, servico: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/${COD_COMANDA}/addServico`, servico);
+  adicionarServico(CPF_CNPJ: string, COD_COMANDA: string, servico: any): Observable<any> {
+    return this.http.post(`${this.apiUrl2}/${COD_COMANDA}`, servico)
+      .pipe(catchError(this.handleError));
+  }
+
+  excluirServico(CNPJ: string, COD_COMANDA: string, COD_SERVICO: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl2}/${COD_COMANDA}/${COD_SERVICO}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  getComandaXservico(CPF_CNPJ: string, COD_COMANDA: string): Observable<{ data: any[] }> {
+    return this.http.get<{ data: any[] }>(`${this.apiUrl2}/${COD_COMANDA}`)
+      .pipe(catchError(this.handleError));
   }
 
   // ✅ Buscar comandas por CPF/CNPJ

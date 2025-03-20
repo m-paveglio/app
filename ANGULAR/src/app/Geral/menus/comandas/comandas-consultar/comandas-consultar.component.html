@@ -9,25 +9,29 @@
         COMANDAS EM ABERTO
       </h3>
       <p-toast></p-toast>
-
-      <div class="grid">
-        <div *ngFor="let comanda of comandasEmAberto" class="col-12 md:col-6 lg:col-3">
-          <div class="surface-card shadow-2 p-3 border-round hover:bg-gray-200 cursor-pointer"
-               (click)="abrirComanda(comanda)">
-            <div class="flex justify-content-between mb-3">
-              <div>
-                <span class="block text-500 font-medium mb-2">Cliente</span>
-                <div class="text-900 font-medium text-lg">{{ comanda.CPF_CNPJ?.NOME || 'Nome não informado' }}</div>
-              </div>
-              <div class="flex align-items-center justify-content-center bg-blue-100 border-round" style="width:2.5rem;height:2.5rem">
-                <i class="pi pi-user text-blue-500 text-xl"></i>
-              </div>
+  
+  <div class="grid">
+    <div *ngFor="let comanda of comandasEmAberto; let i = index" class="col-12 md:col-6 lg:col-3">
+      <div class="surface-card shadow-2 p-3 border-round hover:bg-gray-200 cursor-pointer relative">
+  
+        <div (click)="abrirComanda(comanda)">
+          <div class="flex justify-content-between mb-3">
+            <div>
+              <span class="block text-500 font-medium mb-2">Cliente</span>
+              <div class="text-900 font-medium text-lg">{{ comanda.CPF_CNPJ?.NOME || 'Nome não informado' }}</div>
             </div>
-            <p class="text-500 text-sm mb-1"><strong>Data:</strong> {{ comanda.DATA_INICIO | date:'dd/MM/yyyy HH:mm' }}</p>
-            <p class="text-green-500 font-medium text-sm">Status: Aberta</p>
+            <div class="flex align-items-center justify-content-center bg-blue-100 border-round" style="width:2.5rem;height:2.5rem">
+              <i class="pi pi-user text-blue-500 text-xl"></i>
+            </div>
           </div>
+          <p class="text-500 text-sm mb-1"><strong>Data:</strong> {{ comanda.DATA_INICIO | date:'dd/MM/yyyy HH:mm' }}</p>
+          <p class="text-green-500 font-medium text-sm">Status: Aberta</p>
         </div>
       </div>
+    </div>
+  </div>
+      
+
 
       <div *ngIf="comandasEmAberto.length === 0" class="text-center mt-4">
         <p class="text-gray-500">Não há comandas em aberto.</p>
@@ -37,34 +41,175 @@
 </div>
 
 <!-- Detalhes da comanda selecionada -->
-<div class="grid" *ngIf="selectedComanda">
-  <div class="col-12">
-    <div class="p-inputtext p-component p-element">
-      <h3
-        class="text-center"
-        [ngStyle]="{ backgroundColor: 'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)' }"
-      >
-        COMANDA
-      </h3>
-      <p-toast></p-toast>
+<div *ngIf="selectedComanda" class="p-inputtext p-component p-element">
+  <h3 class="text-center" [ngStyle]="{backgroundColor:'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}">
+      DADOS PRELIMINARES
+  </h3>
+  <p-toast></p-toast>
 
-      <div class="p-4">
-        <button pButton label="Voltar" icon="pi pi-arrow-left" class="p-button-text mb-3" (click)="voltar()"></button>
-        <h3>Detalhes da Comanda</h3>
-        <p><strong>Cliente:</strong> {{ selectedComanda.CPF_CNPJ?.NOME || 'Nome não informado' }}</p>
-        <p><strong>Data de Início:</strong> {{ selectedComanda.DATA_INICIO | date:'dd/MM/yyyy HH:mm' }}</p>
-        <p><strong>Status:</strong> <span class="text-green-500">Aberta</span></p>
-
-        <h4>Serviços:</h4>
-        <ul *ngIf="selectedComanda.SERVICOS && selectedComanda.SERVICOS.length > 0; else semServicos">
-          <li *ngFor="let servico of selectedComanda.SERVICOS">
-            {{ servico.nome }} - R$ {{ servico.valor | number:'1.2-2' }}
-          </li>
-        </ul>
-        <ng-template #semServicos>
-          <p class="text-gray-500">Nenhum serviço adicionado.</p>
-        </ng-template>
-      </div>
-    </div>
+  <!-- Botão Voltar alinhado à esquerda -->
+ <!-- Botões Voltar e Excluir Comanda -->
+ <div class="grid">
+  <div class="col-12 flex justify-content-between">
+      <button pButton label="Voltar" icon="pi pi-arrow-left" class="p-button-text mb-1" (click)="voltar()"></button>
+      <button pButton 
+              label="Excluir Comanda" 
+              icon="pi pi-trash" 
+              class="p-button-text p-button-danger mb-1" 
+              (click)="excluirComanda()">
+      </button>
   </div>
+</div>
+
+
+<!-- Diálogo de Confirmação -->
+<p-confirmDialog></p-confirmDialog>
+
+  <!-- Adicionando a grid ao redor dos inputs -->
+  <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
+      <div class="col-12 md:col-6">
+          <span class="p-float-label float-label-fixed">
+              <input id="cliente-input" type="text" pInputText class="p-inputtext p-component"
+                  [value]="selectedComanda.CPF_CNPJ?.NOME || ''" disabled />
+              <label for="cliente-input">Cliente</label>
+          </span>
+      </div>
+
+      <div class="col-12 md:col-1">
+        <span class="p-float-label float-label-fixed">
+            <input id="status-input" type="text" pInputText class="p-inputtext p-component text-green-500"
+                value="Aberta" disabled />
+            <label for="status-input">Status</label>
+        </span>
+    </div>
+
+      <div class="col-12 md:col-2">
+          <span class="p-float-label float-label-fixed">
+              <input id="data-inicio-input" type="text" pInputText class="p-inputtext p-component"
+                  [value]="selectedComanda.DATA_INICIO | date:'dd/MM/yyyy HH:mm'" disabled />
+              <label for="data-inicio-input">Data de Início</label>
+          </span>
+      </div>
+ 
+      <div class="col-12 md:col-6">
+        <span class="p-float-label">
+            <p-dropdown 
+                [options]="servicos" 
+                [(ngModel)]="servicoSelecionado" 
+                optionLabel="DESC_SERVICO"
+                placeholder="Selecione um serviço">
+                style="width: 100%;"
+            </p-dropdown>
+            <label>Adicionar Serviço</label>
+        </span>
+    </div>
+
+
+    <div class="btn-group field col-12 md:col-1 flex flex-row gap-3" role="group" aria-label="Third group">
+      <!-- Botão Salvar -->
+      <p-button 
+        icon="pi pi-plus"
+        severity="success"
+        label="Adicionar"
+        class="p-button-primary"
+        (click)="adicionarServico()"
+      ></p-button>
+    </div>
+</div>
+
+
+<h3 class="text-center" [ngStyle]="{backgroundColor:'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}">
+  SERVIÇOS
+</h3>
+<!-- Lista de serviços adicionados -->
+<!-- Lista de serviços adicionados -->
+<ul *ngIf="selectedComanda.SERVICOS && selectedComanda.SERVICOS.length > 0; else semServicos">
+  <li *ngFor="let servico of selectedComanda.SERVICOS; let i = index">
+    <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
+
+      <!-- Descrição do Serviço -->
+      <div class="p-col-12 p-md-4">
+        <span class="p-float-label float-label-fixed">
+          <input id="desc-servico-{{servico.COD_SERVICO}}"
+                 type="text" 
+                 pInputText 
+                 class="p-inputtext p-component"
+                 [value]="servico.servico.DESC_SERVICO"
+                 disabled />
+          <label for="desc-servico-{{servico.COD_SERVICO}}">Descrição Serviço</label>
+        </span>
+      </div>
+
+      <!-- Valor Unitário -->
+      <div class="p-col-12 p-md-2">
+        <span class="p-float-label float-label-fixed">
+          <input id="valor-{{servico.COD_SERVICO}}"
+                 type="text" 
+                 pInputText 
+                 class="p-inputtext p-component"
+                 [value]="formatCurrency(servico.VALOR)"
+                 disabled />
+          <label for="valor-{{servico.COD_SERVICO}}">Valor Unitário</label>
+        </span>
+      </div>
+
+      <!-- Quantidade com ícone de edição -->
+      <div class="p-col-12 p-md-2">
+        <span class="p-float-label float-label-fixed">
+          <input id="quantidade-{{servico.COD_SERVICO}}"
+                 type="number" 
+                 pInputText 
+                 class="p-inputtext p-component"
+                 [(ngModel)]="servico.QUANTIDADE"
+                 [disabled]="!servico.editando"
+                 (keyup.enter)="confirmarEdicao(servico, i)" />
+          <label for="quantidade-{{servico.COD_SERVICO}}">Quantidade</label>
+          <button *ngIf="!servico.editando" 
+                  pButton 
+                  type="button" 
+                  icon="pi pi-pencil" 
+                  class="p-button-text p-button-sm"
+                  (click)="habilitarEdicao(servico)">
+          </button>
+          <button *ngIf="servico.editando" 
+                  pButton 
+                  type="button" 
+                  icon="pi pi-check" 
+                  class="p-button-text p-button-sm p-button-success"
+                  (click)="confirmarEdicao(servico, i)">
+          </button>
+        </span>
+      </div>
+
+      <!-- Valor Final -->
+      <div class="p-col-12 p-md-2">
+        <span class="p-float-label float-label-fixed">
+          <input id="valor-final-{{servico.COD_SERVICO}}"
+                 type="text" 
+                 pInputText 
+                 class="p-inputtext p-component"
+                 [value]="formatCurrency(servico.VALOR_FINAL)"
+                 disabled />
+          <label for="valor-final-{{servico.COD_SERVICO}}">Valor Final</label>
+        </span>
+      </div>
+
+      <!-- Botão de Lixeira para Excluir Serviço -->
+      <div class="p-col-12 p-md-2">
+        <button pButton 
+                type="button" 
+                icon="pi pi-trash" 
+                class="p-button-text p-button-sm p-button-danger"
+                (click)="excluirServico(servico, i)">
+        </button>
+      </div>
+           
+
+    </div>
+  </li>
+</ul>
+
+<ng-template #semServicos>
+  <p class="text-gray-500">Nenhum serviço adicionado.</p>
+</ng-template>
 </div>

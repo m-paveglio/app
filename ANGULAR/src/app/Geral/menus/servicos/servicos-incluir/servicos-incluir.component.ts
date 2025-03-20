@@ -24,9 +24,23 @@ export class ServicosIncluirComponent {
   ) {}
 
 
-  async adicionarServico(): Promise<void> {
+  ngOnInit() {
+    const empresa = this.loginService.getEmpresaSelecionada();
+    this.cnpj = empresa?.CNPJ || null;  // Agora this.cnpj será apenas a string do CNPJ
+    console.log("CNPJ do prestador logado:", this.cnpj);
+  
     if (!this.cnpj) {
+      console.warn("CNPJ não encontrado. O HTML pode estar oculto.");
+    }
+}
+
+
+  async adicionarServico(): Promise<void> {
+    console.log('CNPJ:', this.cnpj);  // Verificar o valor de this.cnpj
+  
+    if (!this.cnpj || this.cnpj.trim() === '') {
       this.showError('CNPJ não encontrado para a empresa logada.');
+      console.error('Erro: this.cnpj está indefinido ou vazio.');
       return;
     }
   
@@ -51,10 +65,11 @@ export class ServicosIncluirComponent {
       this.resetForm();
     } catch (error) {
       this.showError('Erro ao salvar o serviço. Tente novamente.');
+      console.error('Erro:', error);
     } finally {
       this.isLoading = false;
     }
-  }  
+  }
 
   resetForm(): void {
     this.selectedServico = null;

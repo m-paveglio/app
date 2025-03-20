@@ -16,7 +16,6 @@
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  justify-content: center;
 }
 
 .text-500 {
@@ -29,4 +28,51 @@
 
 .border-round {
   border-radius: 50%;
+}
+
+.float-label-fixed label {
+  top: -0.75rem !important;
+  font-size: 0.75rem !important;
+} 
+
+/* Adiciona margem à direita do ícone de lápis */
+button.p-button-text {
+  margin-left: 0.5rem;
+}
+
+/* Alinha o ícone verticalmente com o campo de entrada */
+.p-float-label {
+  display: flex;
+  align-items: center;
+}
+
+/* Exemplo de personalização */
+.p-confirm-dialog {
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.p-confirm-dialog .p-dialog-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.p-confirm-dialog .p-dialog-content {
+  padding: 1.5rem;
+}
+
+::ng-deep p-dropdown {
+  width: 600px !important; /* Define um tamanho fixo */
+  max-width: 100%; /* Mantém responsivo */
+}
+
+/* Define cor cinza para todos os campos desabilitados */
+input:disabled,
+textarea:disabled,
+.p-inputtext:disabled,
+.p-dropdown .p-disabled {
+  background-color: #e0e0e0 !important; /* Cinza claro */
+  color: #757575 !important; /* Texto cinza escuro */
+  opacity: 1 !important; /* Remove a transparência */
+  cursor: not-allowed; /* Muda o cursor */
 }

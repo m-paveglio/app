@@ -11,15 +11,6 @@ export class CreateComandaDto {
   @IsString()
   NOME: string;
 
-  @IsString()
-  COD_SERVICO: string;
-
-  @IsDecimal()
-  VALOR: number;
-
-  @IsDecimal()
-  QUANTIDADE: number;
-
   @IsDecimal()
   VALOR_FINAL: number;
 
