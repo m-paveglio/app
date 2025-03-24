@@ -17,4 +17,13 @@ export class empresa {
   // Adicionando a coluna AMBIENTE_INTEGRACAO
   @Column({ type: 'text', nullable: true })
   AMBIENTE_INTEGRACAO: string; // Pode ser '1' ou '2', ou NULL
+
+  @Column({ type: 'blob', nullable: true })
+  certificado: Buffer;
+
+  @Column({ type: 'text', nullable: true }) // Melhor para armazenar hashes de senha
+  senha: string;  
+
+  @Column({ type: 'datetime', nullable: true}) // SQLite
+  data_upload: Date;
 }

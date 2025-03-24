@@ -33,14 +33,42 @@
             </span>
           </div>
 
-          <div class="btn-group field col-12 md:col-1 flex flex-wrap gap-3" role="group" aria-label="Third group">
-            <p-button icon="pi pi-save" severity="success" (click)="adicionarEmpresa()"></p-button>
-        </div>
+          <div class="field col-12 md:col-2">
+            <span class="p-float-label float-label-fixed">
+              <p-dropdown id="float-input" [ngStyle]="{'padding': '0px'}" [(ngModel)]="novaEmpresa.AMBIENTE_INTEGRACAO" name="AMBIENTE_INTEGRACAO" [options]="AMBIENTE_INTEGRACAO" optionLabel="nome" optionValue="codigo"></p-dropdown>
+              <label for="float-input">AMBIENTE INTEGRAÇÃO</label>
+            </span>
+          </div>
 
-          <div></div>
+          <div class="p-field p-col-12 p-md-4">
+            <span class="p-float-label float-label-fixed">
+              <p-fileUpload name="certificado" 
+                           (onSelect)="onCertificadoSelecionado($event)"
+                           [multiple]="false"
+                           accept=".pfx,.p12"
+                           maxFileSize="1000000"
+                           mode="basic"
+                           chooseLabel="Buscar Certificado"
+                           chooseIcon="pi pi-search"
+                           styleClass="p-button-rounded p-button-info">
+              </p-fileUpload>
+              <label>CERTIFICADO DIGITAL</label>
+            </span>
+          </div>
 
+          <div class="field col-12 md:col-2">
+            <span class="p-float-label float-label-fixed">
+              <input id="float-input" type="password" pinputtext="" class="p-inputtext p-component p-element p-filled"  [(ngModel)]="senhaCertificado" name="senhaCertificado" >
+              <label for="float-input">Senha</label>
+            </span>
+          </div>
+
+      
+                <div class="field col-12 md:col-1">
+          <p-button label="" icon="pi pi-save" severity="success" 
+                   (click)="adicionarEmpresa()"></p-button>
         </div>
       </div>
     </div>
   </div>
-
+</div>

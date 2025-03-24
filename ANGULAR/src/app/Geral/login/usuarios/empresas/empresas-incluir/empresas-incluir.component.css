@@ -2,3 +2,21 @@
   top: -0.75rem !important;
   font-size: 0.75rem !important;
 }
+
+/* Adicione ao seu arquivo CSS */
+.p-fileupload-content {
+  border: 1px dashed #ccc;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-top: 0.5rem;
+}
+
+.p-fileupload-content:hover {
+  border-color: #3b82f6;
+}
+
+.p-fileupload-buttonbar {
+  background: none;
+  border: none;
+  padding: 0;
+}

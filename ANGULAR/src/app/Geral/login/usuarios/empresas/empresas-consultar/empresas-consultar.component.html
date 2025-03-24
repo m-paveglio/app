@@ -139,6 +139,38 @@
                     </p-dropdown>
                 </div>
 
+                <div class="field col-12 md:col-2">
+                    <span class="p-float-label float-label-fixed">
+                        <!-- Campo de entrada que aparece somente quando editMode é falso -->
+                        <input
+                            *ngIf="!editMode"
+                            id="resultado-AMBIENTE_INTEGRACAO"
+                            type="text"
+                            pinputtext
+                            class="p-inputtext p-component p-element"
+                            [ngClass]="{ 'p-filled': true }"
+                            [style.backgroundColor]="'lightgray'"
+                            [value]="getINTEGRACAO(resultado.AMBIENTE_INTEGRACAO)"
+                            readonly>  <!-- Campo somente leitura -->
+                        <label for="resultado-AMBIENTE_INTEGRACAO">AMBIENTE INTEGRAÇÃO</label>
+                    </span>
+                
+                    <!-- Dropdown que aparece somente quando editMode é verdadeiro -->
+                    <p-dropdown
+                        *ngIf="editMode"
+                        id="AMBIENTE_INTEGRACAO-dropdown"
+                        [options]="AMBIENTE_INTEGRACAO"
+                        [(ngModel)]="resultado.AMBIENTE_INTEGRACAO"
+                        optionLabel="nome"
+                        optionValue="codigo"
+                        placeholder="Selecione"
+                        (onChange)="AMBIENTE_INTEGRACAO_NOME = getINTEGRACAO(resultado.AMBIENTE_INTEGRACAO)">
+                    </p-dropdown>
+                </div>
+
+        
+
+
                 <!-- Botões Editar, Salvar e Excluir -->
                 <div class="btn-group field col-12 md:col-2 flex flex-wrap gap-3" role="group" aria-label="Edit group">
                     <label for=""></label>
@@ -148,7 +180,6 @@
                 </div>
             </div>
         </div>
-
     </div>
   </div>
   

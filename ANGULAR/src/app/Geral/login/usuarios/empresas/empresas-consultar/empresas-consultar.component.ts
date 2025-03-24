@@ -29,6 +29,14 @@ export class EmpresasConsultarComponent {
   ];
   EmpresasEncontradas: any[] = [];
   OPTANTE_SN_nome: string = '';
+  AMBIENTE_INTEGRACAO = [
+    { nome: 'PRODUÇÃO', codigo: '1' },
+    { nome: 'HOMOLOGAÇÃO', codigo: '2' }
+  ];
+  AMBIENTE_INTEGRACAO_NOME: string = '';
+  selectedFile: File | null = null;
+  certificadoSelecionado: File | null = null;
+  senhaCertificado: string = '';
 
   constructor(
     private EmpresasService: EmpresasService,
@@ -110,7 +118,9 @@ export class EmpresasConsultarComponent {
       CNPJ: this.resultado.CNPJ,
       NOME: this.resultado.NOME,
       IM: this.resultado.IM,
-      OPTANTE_SN: this.resultado.OPTANTE_SN
+      OPTANTE_SN: this.resultado.OPTANTE_SN,
+      AMBIENTE_INTEGRACAO: this.resultado.AMBIENTE_INTEGRACAO
+      
     };
 
     this.EmpresasService.atualizarEmpresa(this.resultado.CNPJ, updatePayload).subscribe(
@@ -169,6 +179,11 @@ export class EmpresasConsultarComponent {
   getOptanteSN(codigo: string) {
     let OPTANTE_SN = this.OPTANTE_SN.find(u => u.codigo === codigo);
     return OPTANTE_SN ? OPTANTE_SN.nome : '';
+  }
+
+  getINTEGRACAO(codigo: string) {
+    let AMBIENTE_INTEGRACAO = this.AMBIENTE_INTEGRACAO.find(u => u.codigo === codigo);
+    return AMBIENTE_INTEGRACAO ? AMBIENTE_INTEGRACAO.nome : '';
   }
 
   excluirEmpresa(CNPJ: string) {

@@ -70,6 +70,35 @@ export class EmpresasService {
         }),
         catchError(this.handleError)
     );
+  }
+
+  uploadCertificado(cnpj: string, certificado: Uint8Array, senha: string): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', new Blob([certificado]), 'certificado.pfx');
+    formData.append('senha', senha);
+    
+    return this.http.post(`${this.apiUrl}/empresa/${cnpj}/upload-certificado`, formData);
+  }
+
+  // Método para enviar o arquivo .pfx
+  enviarCertificado(cnpj: string, file: File, senha: string): Observable<any> {
+    const url = `${this.apiUrl}/empresa/${cnpj}/upload-certificado`;
+    
+    const formData = new FormData();
+    formData.append('file', file, file.name);
+    formData.append('senha', senha);
+
+    return this.http.post(url, formData).pipe(
+      map(response => {
+        this.handleSuccess('Certificado enviado com sucesso!');
+        return response;
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  getUploadUrl(CNPJ: string): string {
+    return `${this.apiUrl}/empresa/${CNPJ}/upload-certificado`;
 }
 
   private handleError(error: any): Observable<never> {

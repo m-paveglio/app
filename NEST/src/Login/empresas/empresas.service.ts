@@ -6,6 +6,7 @@ import { CreateEmpresaDto } from './dto/create-empresa.dto';
 import { UpdateEmpresaDto } from './dto/update-empresa.dto';
 import { cnpj as cnpjValidator } from 'cpf-cnpj-validator';
 
+
 @Injectable()
 export class EmpresasService {
   constructor(
@@ -105,5 +106,48 @@ export class EmpresasService {
       },
     });
   }
+  
 
+  async salvarCertificado(cnpj: string, certificado: Buffer, senha: string) {
+    if (!cnpjValidator.isValid(cnpj)) {
+      throw new HttpException('CNPJ inválido', HttpStatus.BAD_REQUEST);
+    }
+    if (!certificado || !senha) {
+      throw new HttpException('Certificado e senha são obrigatórios', HttpStatus.BAD_REQUEST);
+    }
+    const hashSenha = await bcrypt.hash(senha, 10);
+    const existente = await this.empresaRepository.findOne({ where: { CNPJ: cnpj } });
+    if (existente) {
+      existente.certificado = certificado;
+      existente.senha = hashSenha;
+      existente.data_upload = new Date();
+      return this.empresaRepository.save(existente);
+    }
+    const novoCertificado = this.empresaRepository.create({ CNPJ: cnpj, certificado, senha: hashSenha, data_upload: new Date() });
+    return this.empresaRepository.save(novoCertificado);
+  }
+
+  async obterCertificado(cnpj: string): Promise<{ cnpj: string; certificadoBase64: string; senha: string; data_upload: Date }> {
+    const empresa = await this.empresaRepository.findOne({ where: { CNPJ: cnpj } });
+    if (!empresa || !empresa.certificado) {
+      throw new HttpException('Certificado não encontrado', HttpStatus.NOT_FOUND);
+    }
+    return {
+      cnpj: empresa.CNPJ,
+      certificadoBase64: empresa.certificado.toString('base64'),
+      senha: empresa.senha,
+      data_upload: empresa.data_upload,
+    };
+  }
+
+  async removerCertificado(cnpj: string) {
+    const empresa = await this.empresaRepository.findOne({ where: { CNPJ: cnpj } });
+    if (!empresa || !empresa.certificado) {
+      throw new HttpException('Certificado não encontrado', HttpStatus.NOT_FOUND);
+    }
+    empresa.certificado = null;
+    empresa.senha = null;
+    empresa.data_upload = null;
+    return this.empresaRepository.save(empresa);
+  }
 }

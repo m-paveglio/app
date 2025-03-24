@@ -33,6 +33,7 @@ import { PessoasConsultarComponent } from './Geral/menus/pessoas/pessoas-consult
 import { ComandasIncluirComponent } from './Geral/menus/comandas/comandas-incluir/comandas-incluir.component';
 import { ComandasConsultarComponent } from './Geral/menus/comandas/comandas-consultar/comandas-consultar.component';
 import { CarouselModule } from 'primeng/carousel';
+import { FileUploadModule } from 'primeng/fileupload';
 
 
 
@@ -76,7 +77,8 @@ import { CarouselModule } from 'primeng/carousel';
     TableModule,
     TabViewModule,
     DialogModule,
-    CarouselModule
+    CarouselModule,
+    FileUploadModule
   
     
         
