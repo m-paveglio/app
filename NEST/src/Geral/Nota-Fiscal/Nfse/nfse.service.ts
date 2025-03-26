@@ -12,7 +12,7 @@ import { WebserviceService } from './webservice/webservice.service';
 
 @Injectable()
 export class NfseService {
-  private readonly nfseEndpoint = 'https://www.issnetonline.com.br/homologaabrasf/webservicenfse204/nfse.asmx';
+  private readonly nfseEndpoint = 'https://nfse.issnetonline.com.br/abrasf204/santamaria/nfse.asmx';
   private cnpj: string | null = null;
   private inscricaoMunicipal: string | null = null;
   constructor(
