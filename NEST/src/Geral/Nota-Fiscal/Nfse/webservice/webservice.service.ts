@@ -1,6 +1,8 @@
 import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common';
 import { Webservice } from './entities/webservice.entity';
 import { Repository, Like } from 'typeorm';
+import { CreateWebserviceDto } from './dto/create-webservice.dto';
+import { UpdateWebserviceDto } from './dto/update-webservice.dto';
 
 @Injectable()
 export class WebserviceService {
@@ -54,16 +56,9 @@ export class WebserviceService {
   }
 
   // Cria ou atualiza um webservice
-  async atualizarWebservice(dados: Partial<Webservice>): Promise<Webservice> {
-    if (dados.ID) {
-      // Atualiza existente
-      await this.webserviceRepository.update({ ID: dados.ID }, dados);
-      return this.getWebservice(dados.ID);
-    } else {
-      // Cria novo
-      const novo = this.webserviceRepository.create(dados);
-      return this.webserviceRepository.save(novo);
-    }
+  async atualizarWebservice(id: number, dados: UpdateWebserviceDto): Promise<Webservice> {
+    await this.webserviceRepository.update({ ID: id }, dados);
+    return this.getWebservice(id);
   }
 
   // Remove um webservice
@@ -77,4 +72,10 @@ export class WebserviceService {
       );
     }
   }
+
+  async criarWebservice(dados: CreateWebserviceDto): Promise<Webservice> {
+    const novo = this.webserviceRepository.create(dados);
+    return this.webserviceRepository.save(novo);
+  }
+
 }

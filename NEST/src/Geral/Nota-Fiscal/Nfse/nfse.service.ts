@@ -3,19 +3,13 @@ import { HttpService } from '@nestjs/axios';
 import * as fs from 'fs';
 import * as https from 'https';
 import * as forge from 'node-forge';
-import { parseStringPromise, Builder } from 'xml2js';
+import { parseStringPromise } from 'xml2js';
 import * as crypto from 'crypto';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { NFSE } from './nfse.entity';
-import { v4 as uuidv4 } from 'uuid';
 import { EmpresasService } from 'src/Login/empresas/empresas.service';
 import { WebserviceService } from './webservice/webservice.service';
-import { DOMParser, XMLSerializer } from 'xmldom';
 import * as xmldom from 'xmldom';
-import * as xmlCrypto from 'xml-crypto';
-import * as xpath from 'xpath';
-
 
 @Injectable()
 export class NfseService {
@@ -32,9 +26,9 @@ export class NfseService {
     private readonly webserviceService: WebserviceService,
     
 
-    ) {}
+) {}
 
-    async enviarNfse(cnpj: string, xml: string): Promise<any> {
+async enviarNfse(cnpj: string, xml: string): Promise<any> {
       try {
         // 1. Busca a empresa pelo CNPJ
         const empresa = await this.empresasService.getEmpresa(cnpj);
@@ -77,9 +71,9 @@ export class NfseService {
         
         throw new Error(`Erro no envio da NFSe: ${error.message}`);
       }
-    }
+}
   
-    private async carregarCertificado(cnpj: string): Promise<{ privateKey: string; publicCert: string }> {
+private async carregarCertificado(cnpj: string): Promise<{ privateKey: string; publicCert: string }> {
       try {
         const { pfx, passphrase } = await this.empresasService.buscarCertificadoPorCnpj(cnpj);
         
@@ -106,9 +100,9 @@ export class NfseService {
         this.logger.error(`Erro ao carregar certificado: ${error.message}`);
         throw new Error(`Falha ao processar certificado digital: ${error.message}`);
       }
-    }
+}
   
-    async enviarLoteRps(dados: any): Promise<any> {
+async enviarLoteRps(dados: any): Promise<any> {
       const cnpjPrestador = dados.prestador?.cnpj;
       this.logger.debug(`Iniciando envio de lote RPS para CNPJ: ${cnpjPrestador}`);
       this.logger.verbose('Dados recebidos:', JSON.stringify(dados, null, 2));
@@ -235,9 +229,9 @@ export class NfseService {
           stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
         };
       }
-    }
+}
   
-    private async registrarFalha(cnpj: string, erro: string, dados: any): Promise<void> {
+private async registrarFalha(cnpj: string, erro: string, dados: any): Promise<void> {
       try {
         this.logger.error(`Registrando falha para CNPJ ${cnpj}: ${erro}`);
         
@@ -256,10 +250,9 @@ export class NfseService {
           stack: dbError.stack,
         });
       }
-    }
+}
 
-
-  private gerarXmlLoteRps(dados: any): string {
+private gerarXmlLoteRps(dados: any): string {
     return `
       <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:svc="http://nfse.abrasf.org.br">
         <soap:Body>
@@ -276,9 +269,9 @@ export class NfseService {
         </soap:Body>
       </soap:Envelope>
     `.trim();
-  }
+}
 
-  private gerarXmlEnvioLote(dados: any): string {
+private gerarXmlEnvioLote(dados: any): string {
     return `
       <EnviarLoteRpsEnvio xmlns="http://www.abrasf.org.br/nfse.xsd">
         <LoteRps versao="2.04">
@@ -368,14 +361,7 @@ private gerarXmlRps(rps: any, prestadorLote: any): string {
     `.trim();
 }
   
-  private extractCNPJFromCert(cert: forge.pki.Certificate): string | null {
-    const attrs = cert.subject.attributes;
-    const oid = '2.16.76.1.3.3'; // OID para CNPJ em certificados digitais brasileiros
-    const cnpjAttr = attrs.find(attr => attr.type === oid);
-    return cnpjAttr?.value || null;
-  }
-
-  private async assinarXml(xml: string, privateKey: string, publicCert: string): Promise<string> {
+private async assinarXml(xml: string, privateKey: string, publicCert: string): Promise<string> {
     try {
         const xmlDoc = new this.DOMParser().parseFromString(xml, "text/xml");
         
@@ -417,7 +403,7 @@ private gerarXmlRps(rps: any, prestadorLote: any): string {
     }
 }
 
-  private criarAssinaturaRps(nodeToSign: any, privateKey: string, publicCert: string): Node {
+private criarAssinaturaRps(nodeToSign: any, privateKey: string, publicCert: string): Node {
     // Canonicalizar o nó
     const canonicalXml = this.canonicalizeXml(nodeToSign);
     
@@ -461,9 +447,9 @@ private gerarXmlRps(rps: any, prestadorLote: any): string {
     `;
     
     return new this.DOMParser().parseFromString(signatureXml, "text/xml").documentElement;
-  }
+}
 
-  private criarAssinaturaLote(nodeToSign: any, privateKey: string, publicCert: string): Node {
+private criarAssinaturaLote(nodeToSign: any, privateKey: string, publicCert: string): Node {
     // Canonicalizar o nó
     const canonicalXml = this.canonicalizeXml(nodeToSign);
     
@@ -507,9 +493,9 @@ private gerarXmlRps(rps: any, prestadorLote: any): string {
     `;
     
     return new this.DOMParser().parseFromString(signatureXml, "text/xml").documentElement;
-  }
+}
 
-  private canonicalizeXml(node: any): string {
+private canonicalizeXml(node: any): string {
     // Implementação simplificada de canonicalização
     // Para produção, considere usar uma biblioteca específica como 'xml-c14n'
     const serializer = new this.XMLSerializer();
@@ -521,9 +507,9 @@ private gerarXmlRps(rps: any, prestadorLote: any): string {
     xml = xml.trim();
     
     return xml;
-  }
+}
 
-  private async enviarParaWebService(xml: string): Promise<string> {
+private async enviarParaWebService(xml: string): Promise<string> {
     const httpsAgent = new https.Agent({
       pfx: fs.readFileSync(process.env.CERTIFICADO_PATH),
       passphrase: process.env.CERTIFICADO_PASSPHRASE,
@@ -551,14 +537,14 @@ private gerarXmlRps(rps: any, prestadorLote: any): string {
       });
       throw new Error('Falha na comunicação com o WebService');
     }
-  }
+}
 
-  private extrairProtocolo(xmlResposta: string): string | null {
+private extrairProtocolo(xmlResposta: string): string | null {
     const match = xmlResposta.match(/<Protocolo>([^<]+)<\/Protocolo>/);
     return match ? match[1] : null;
-  }
+}
 
-  private async salvarNfse(dados: any, protocolo: string, xmlEnvio: string): Promise<NFSE> {
+private async salvarNfse(dados: any, protocolo: string, xmlEnvio: string): Promise<NFSE> {
     const rps = dados.rpsList?.[0] || {};
     const servico = rps.servico || {};
     const valores = servico.valores || {};
@@ -599,9 +585,9 @@ private gerarXmlRps(rps: any, prestadorLote: any): string {
     });
 
     return this.nfseRepository.save(nfse);
-  }
+}
   
-  async consultarSituacaoLote(protocolo: string, prestador: any): Promise<any> {
+async consultarSituacaoLote(protocolo: string, prestador: any): Promise<any> {
     const xml = `
       <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:svc="http://nfse.abrasf.org.br">
         <soap:Body>
@@ -622,14 +608,9 @@ private gerarXmlRps(rps: any, prestadorLote: any): string {
     const resposta = await this.enviarParaWebService(xml);
     await this.atualizarStatusNfse(protocolo, resposta);
     return resposta;
-  }
+}
 
-  private extrairStatusResposta(xmlResposta: string): string {
-    const match = xmlResposta.match(/<Situacao>([^<]+)<\/Situacao>/);
-    return match ? match[1] : 'DESCONHECIDO';
-  }
-
-  async consultarLoteRps(cnpjPrestador: string, inscricaoMunicipal: string, protocolo: string): Promise<any> {
+async consultarLoteRps(cnpjPrestador: string, inscricaoMunicipal: string, protocolo: string): Promise<any> {
     this.logger.debug(`[CONSULTA PROTOCOLO] Iniciando consulta para protocolo: ${protocolo}`);
     
     try {
@@ -719,7 +700,6 @@ private gerarXmlRps(rps: any, prestadorLote: any): string {
     }
 }
        
-
 private gerarXmlConsultaLote(cnpjPrestador: string, inscricaoMunicipal: string, protocolo: string): string {
   return `
       <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:svc="http://nfse.abrasf.org.br">
@@ -801,37 +781,6 @@ private async processarRespostaConsulta(xmlResposta: string): Promise<any> {
           stack: error.stack
       });
       throw new Error(`Falha ao processar resposta da consulta: ${error.message}`);
-  }
-}
-
-private extrairMensagensErro(resultado: any): Array<{codigo: string, mensagem: string, correcao: string}> {
-  try {
-      // Verifica se há mensagens de erro na estrutura padrão
-      const envelope = resultado.Envelope || resultado;
-      const body = envelope.Body || envelope;
-      const consultaResponse = body.ConsultarLoteRpsResponse || body;
-      const consultaResult = consultaResponse.ConsultarLoteRpsResposta || consultaResponse;
-      
-      if (!consultaResult.ListaMensagemRetorno) {
-          return [];
-      }
-
-      const mensagens = consultaResult.ListaMensagemRetorno.MensagemRetorno;
-      if (!mensagens) {
-          return [];
-      }
-
-      // Normaliza para array caso venha um único objeto
-      const mensagensArray = Array.isArray(mensagens) ? mensagens : [mensagens];
-      
-      return mensagensArray.map(msg => ({
-          codigo: msg.Codigo,
-          mensagem: msg.Mensagem,
-          correcao: msg.Correcao || ''
-      }));
-  } catch (e) {
-      this.logger.warn('Erro ao extrair mensagens de erro:', e);
-      return [];
   }
 }
 
@@ -930,5 +879,4 @@ async obterXmlResposta(protocolo: string): Promise<string | null> {
   
   return nfse?.XmlResposta || null;
 }
-
 }

@@ -34,6 +34,7 @@ import { ComandasIncluirComponent } from './Geral/menus/comandas/comandas-inclui
 import { ComandasConsultarComponent } from './Geral/menus/comandas/comandas-consultar/comandas-consultar.component';
 import { CarouselModule } from 'primeng/carousel';
 import { FileUploadModule } from 'primeng/fileupload';
+import { WebserviceConsultarComponent } from './Geral/menus/webservice/consultar/webservice-consultar.component';
 
 
 
@@ -57,7 +58,9 @@ import { FileUploadModule } from 'primeng/fileupload';
     PessoasIncluirComponent,
     PessoasConsultarComponent,
     ComandasIncluirComponent,
-    ComandasConsultarComponent
+    ComandasConsultarComponent,
+    WebserviceConsultarComponent
+    
     
         ],
   imports: [

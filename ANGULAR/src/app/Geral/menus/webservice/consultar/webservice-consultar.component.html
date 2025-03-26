@@ -1,0 +1,58 @@
+<p-confirmDialog></p-confirmDialog>
+<p-toast></p-toast>
+<div class="grid">
+  <div class="col-12">
+    <div class="p-inputtext p-component p-element">
+      <div class="grid">
+        <div class="col-12">
+          <h3 class="text-center" [ngStyle]="{
+            backgroundColor: 'var(--cyan-800)',
+            color: 'var(--primary-color-text)',
+            borderRadius: 'var(--border-radius)'
+          }">
+            WEBSERVICES
+          </h3>
+
+          <div>
+            <p-table [value]="webservices" [paginator]="true" [rows]="5" [loading]="isLoading">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>Nome da Cidade</th>
+                  <th>Link</th>
+                  <th>Ações</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-ws>
+                <tr>
+                  <td>
+                    <input *ngIf="ws.isEditing" type="text" [(ngModel)]="ws.NOME_CIDADE" class="p-inputtext" />
+                    <span *ngIf="!ws.isEditing">{{ ws.NOME_CIDADE }}</span>
+                  </td>
+
+                  <td>
+                    <input *ngIf="ws.isEditing" type="text" [(ngModel)]="ws.LINK" class="p-inputtext" />
+                    <span *ngIf="!ws.isEditing">{{ ws.LINK }}</span>
+                  </td>
+
+                  <td>
+                    <div class="flex gap-2">
+                      <ng-container *ngIf="ws.isEditing; else normalMode">
+                        <p-button icon="pi pi-save" severity="success" (click)="saveWebservice(ws)"></p-button>
+                        <p-button icon="pi pi-times" severity="warning" (click)="ws.isEditing = false"></p-button>
+                      </ng-container>
+
+                      <ng-template #normalMode>
+                        <p-button icon="pi pi-pencil" severity="info" (click)="ws.isEditing = true"></p-button>
+                        <p-button icon="pi pi-trash" severity="danger" (click)="confirmarExclusaoWebservice(ws)"></p-button>
+                      </ng-template>
+                    </div>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

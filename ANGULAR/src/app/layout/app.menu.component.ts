@@ -114,6 +114,18 @@ export class AppMenuComponent implements OnInit {
                             routerLink: ['comandas/consultar']
                           },
                         ]
+                      },
+
+                      { 
+                        label: 'Webservice', 
+                        icon: 'pi pi-fw pi-clipboard', 
+                        items: [
+                          {
+                            label: 'Consultar',
+                            icon: 'pi pi-fw pi-search',
+                            routerLink: ['webservice/consultar']
+                          },
+                        ]
                       }
                 
                 ]},

@@ -17,6 +17,7 @@ import { PessoasIncluirComponent } from './Geral/menus/pessoas/pessoas-incluir/p
 import { PessoasConsultarComponent } from './Geral/menus/pessoas/pessoas-consultar/pessoas-consultar.component';
 import { ComandasIncluirComponent } from './Geral/menus/comandas/comandas-incluir/comandas-incluir.component';
 import { ComandasConsultarComponent } from './Geral/menus/comandas/comandas-consultar/comandas-consultar.component';
+import { WebserviceConsultarComponent } from './Geral/menus/webservice/consultar/webservice-consultar.component';
 
 const routes: Routes = [
   { path: '', component: PagInicialComponent },
@@ -70,6 +71,12 @@ const routes: Routes = [
           { path: 'consultar', component: ComandasConsultarComponent },
           { path: 'consultar/:COD_COMANDA', component: ComandasConsultarComponent },
           { path: 'consultar/:CNPJ/:COD_COMANDA', component: ComandasConsultarComponent}
+        ]
+      },
+      { 
+        path: 'webservice', 
+        children: [
+          { path: 'consultar', component: WebserviceConsultarComponent },
         ]
       },
       

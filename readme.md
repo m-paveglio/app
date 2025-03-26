@@ -25,7 +25,7 @@ teste marlon
       "competencia": "2025-03-25",
       "servico": {
         "valores": {
-          "valorServicos": 1500.50,
+          "valorServicos": 1500.00,
           "valorDeducoes": 0.00,
           "valorPis": 9.90,
           "valorCofins": 45.60,

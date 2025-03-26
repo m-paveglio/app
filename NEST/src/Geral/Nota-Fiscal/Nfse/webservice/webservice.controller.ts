@@ -2,6 +2,9 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { WebserviceService } from './webservice.service';
 import { Webservice } from './entities/webservice.entity';
 import { NumericType } from 'typeorm';
+import { createPessoasDto } from 'src/Geral/Pessoas/dto/create-pessoas-dto';
+import { CreateWebserviceDto } from './dto/create-webservice.dto';
+import { UpdateWebserviceDto } from './dto/update-webservice.dto';
 
 @Controller('webservice')
 export class WebserviceController {
@@ -22,9 +25,19 @@ export class WebserviceController {
     return this.WebserviceService.searchWebserviceByName(NOME_CIDADE);
   }
 
-  @Post('atualizar')
-  async atualizarWebservice(@Body() dados: Partial<Webservice>) {
-    return this.WebserviceService.atualizarWebservice(dados);
+  @Post()
+  criarWebservice(@Body() dados: CreateWebserviceDto) {
+    return this.WebserviceService.criarWebservice(dados);
+  }
+
+  @Patch(':ID')
+  atualizarWebservice(@Param('ID') ID: number, @Body() dados: UpdateWebserviceDto) {
+    return this.WebserviceService.atualizarWebservice(ID, dados);
+  }
+
+  @Delete(':ID')
+  removerWebservice(@Param('ID') ID: number) {
+    return this.WebserviceService.removerWebservice(ID);
   }
 
 }
