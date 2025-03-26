@@ -6,12 +6,12 @@ export class NfseController {
   constructor(private readonly nfseService: NfseService) {}
 
   @Post('enviar-lote')
-  async enviarLoteRps(@Body() dados: any): Promise<any> {
+  async enviarLoteRps(@Body() dados: any) {
     return this.nfseService.enviarLoteRps(dados);
   }
 
   @Post('consultar-situacao')
-  async consultarSituacao(@Body() dados: any): Promise<any> {
-    return this.nfseService.consultarSituacao(dados);
+  async consultarSituacao(@Body() dados: { protocolo: string; prestador: any }) {
+    return this.nfseService.consultarSituacaoLote(dados.protocolo, dados.prestador);
   }
 }

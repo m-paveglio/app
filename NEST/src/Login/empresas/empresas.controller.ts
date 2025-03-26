@@ -57,12 +57,17 @@ export class EmpresasController {
     if (!file) {
       throw new Error('Nenhum arquivo foi enviado');
     }
-
-  // Chama o service para salvar no banco de dados
-  await this.EmpresasService.salvarCertificado(CNPJ, file.buffer, senha);
-
-  return { message: 'Certificado carregado e salvo no banco de dados com sucesso!' };
-}
+  
+    // Verificação simples do arquivo
+    if (file.buffer.length < 100) { // Tamanho mínimo arbitrário
+      throw new Error('Arquivo de certificado inválido ou corrompido');
+    }
+  
+    // Chama o service para salvar no banco de dados
+    await this.EmpresasService.salvarCertificado(CNPJ, file.buffer, senha);
+  
+    return { message: 'Certificado carregado e salvo no banco de dados com sucesso!' };
+  }
 
   @Get(':cnpj')
   async obterCertificado(@Param('cnpj') cnpj: string) {

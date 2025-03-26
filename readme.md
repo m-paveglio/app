@@ -4,48 +4,80 @@ teste marlon
     MODELO DE REQUISIÇÃO PARA TESTE DE NFSE
 
     {
-  "loteId": "lote_1",
-  "numeroLote": 1,
   "prestador": {
-    "cnpj": "32171364000120",
-    "inscricaoMunicipal": "1111111-0"
+    "cnpj": "44651080000110",
+    "inscricaoMunicipal": "12345",
+    "razaoSocial": "EMPRESA PRESTADORA LTDA"
   },
-  "quantidadeRps": 1,
-  "rps": {
-    "id": "rps_1",
-    "numero": 2,
-    "serie": "20",
-    "tipo": 1,
-    "dataEmissao": "2024-05-28",
-    "status": 1
+  "lote": {
+    "numeroLote": "1",
+    "quantidadeRps": "1"
   },
-  "competencia": "2024-05-28",
-  "servico": {
-    "valores": {
-      "valorServicos": 100.00
-    },
-    "issRetido": 2,
-    "itemListaServico": "01.06",
-    "codigoCnae": "6204000",
-    "codigoTributacaoMunicipio": "6204000",
-    "discriminacao": "TESTE DE DISCRIMINACAO",
-    "codigoMunicipio": "4316907",
-    "exigibilidadeISS": 1,
-    "municipioIncidencia": "4316907"
-  },
-  "tomador": {
-    "cpf": "03180448032",
-    "razaoSocial": "Marlon",
-    "endereco": {
-      "endereco": "rua são jose",
-      "numero": "370",
-      "complemento": "x",
-      "bairro": "rosário",
-      "codigoMunicipio": "4316907",
-      "uf": "RS",
-      "cep": "97010460"
+  "rpsList": [
+    {
+      "identificacao": {
+        "numero": "1",
+        "serie": "8",
+        "tipo": 1
+      },
+      "dataEmissao": "2025-03-25",
+      "status": 1,
+      "competencia": "2025-03-25",
+      "servico": {
+        "valores": {
+          "valorServicos": 1500.50,
+          "valorDeducoes": 0.00,
+          "valorPis": 9.90,
+          "valorCofins": 45.60,
+          "valorInss": 0.00,
+          "valorIr": 22.50,
+          "valorCsll": 15.30,
+          "outrasRetencoes": 0.00,
+          "valorIss": 75.03,
+          "aliquota": 0.05,
+          "descontoIncondicionado": 0.00,
+          "descontoCondicionado": 0.00
+        },
+        "issRetido": 2,
+        "responsavelRetencao": null,
+        "itemListaServico": "01.07",
+        "codigoCnae": "6201500",
+        "codigoTributacaoMunicipio": "620150001",
+        "discriminacao": "Desenvolvimento de software sob encomenda",
+        "codigoMunicipio": "4316907",
+        "exigibilidadeISS": 1,
+        "municipioIncidencia": "4316907"    
+      },
+      "tomador": {
+        "identificacao": {
+          "cnpj": "98765432000198",
+          "cpf": null,
+          "inscricaoMunicipal": null
+        },
+        "razaoSocial": "EMPRESA TOMADORA SA",
+        "endereco": {
+          "endereco": "Rua Exemplo",
+          "numero": "123",
+          "complemento": "Sala 45",
+          "bairro": "Centro",
+          "codigoMunicipio": "3550308",
+          "uf": "SP",
+          "cep": "01001000",
+          "codigoPais": null,
+          "enderecoCompletoExterior": null
+        },
+        "contato": {
+          "telefone": "11999998888",
+          "email": "contato@tomadora.com.br"
+        }
+      },
+      "intermediario": null,
+      "construcaoCivil": null,
+      "regimeEspecialTributacao": null,
+      "optanteSimplesNacional": 2,
+      "incentivoFiscal": 2
     }
-  },
-  "optanteSimplesNacional": 2,
-  "incentivoFiscal": 2
+  ],
+  "deducoes": [],
+  "evento": null
 }

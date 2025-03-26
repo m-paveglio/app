@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { Webservice } from 'src/Geral/Nota-Fiscal/Nfse/webservice/entities/webservice.entity';
+import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
 
 @Entity('EMPRESAS')
 export class empresa {
@@ -14,9 +15,13 @@ export class empresa {
   @Column({ type: 'text', length: 2 })
   OPTANTE_SN: string;
 
-  // Adicionando a coluna AMBIENTE_INTEGRACAO
-  @Column({ type: 'text', nullable: true })
-  AMBIENTE_INTEGRACAO: string; // Pode ser '1' ou '2', ou NULL
+  @Column({ nullable: true })
+  AMBIENTE_INTEGRACAO_ID: number;  // Armazena o ID do webservice
+
+  @ManyToOne(() => Webservice)
+  @JoinColumn({ name: 'AMBIENTE_INTEGRACAO_ID' })
+  AMBIENTE_INTEGRACAO: Webservice;  // Relação com a tabela WEBSERVICE
+
 
   @Column({ type: 'blob', nullable: true })
   certificado: Buffer;

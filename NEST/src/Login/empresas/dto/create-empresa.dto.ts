@@ -1,4 +1,4 @@
-import { IsString, Length } from 'class-validator';
+import { IsNumber, IsString, Length } from 'class-validator';
 
 export class CreateEmpresaDto {
   @IsString()
@@ -17,7 +17,6 @@ export class CreateEmpresaDto {
   @Length(2, 2)
   OPTANTE_SN: string;
 
-  @IsString()
-  @Length(1, 2)
-  AMBIENTE_INTEGRACAO: string;
+  @IsNumber()
+  AMBIENTE_INTEGRACAO_ID: number; // Corrigido para number e nome correto
 }

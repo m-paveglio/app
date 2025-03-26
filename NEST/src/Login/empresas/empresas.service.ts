@@ -19,22 +19,32 @@ export class EmpresasService {
     if (!cnpjValidator.isValid(empresaDto.CNPJ)) {
       throw new HttpException('CNPJ inválido', HttpStatus.BAD_REQUEST);
     }
-
+  
     const empresaFound = await this.empresaRepository.findOne({
-      where: {
-        CNPJ: empresaDto.CNPJ,
-      },
+      where: { CNPJ: empresaDto.CNPJ },
     });
-
+  
     if (empresaFound) {
       throw new HttpException('Empresa já existe', HttpStatus.CONFLICT);
     }
-
+  
     const newEmpresa = this.empresaRepository.create({
-      ...empresaDto,
+      CNPJ: empresaDto.CNPJ,
+      IM: empresaDto.IM,
+      NOME: empresaDto.NOME,
+      OPTANTE_SN: empresaDto.OPTANTE_SN,
+      AMBIENTE_INTEGRACAO_ID: empresaDto.AMBIENTE_INTEGRACAO_ID // Mapeado corretamente
     });
-
+  
     return this.empresaRepository.save(newEmpresa);
+  }
+
+  async getEmpresaComRelacionamento(cnpj: string): Promise<empresa> {
+    return this.empresaRepository.findOne({
+      where: { CNPJ: cnpj },
+      relations: ['AMBIENTE_INTEGRACAO'],
+      select: ['CNPJ', 'AMBIENTE_INTEGRACAO_ID']
+    });
   }
 
   getEmpresas() {
@@ -115,15 +125,20 @@ export class EmpresasService {
     if (!certificado || !senha) {
       throw new HttpException('Certificado e senha são obrigatórios', HttpStatus.BAD_REQUEST);
     }
-    const hashSenha = await bcrypt.hash(senha, 10);
+    // Remova o hash da senha - armazene a senha em texto plano (criptografada simetricamente se necessário)
     const existente = await this.empresaRepository.findOne({ where: { CNPJ: cnpj } });
     if (existente) {
       existente.certificado = certificado;
-      existente.senha = hashSenha;
+      existente.senha = senha; // Armazena a senha original
       existente.data_upload = new Date();
       return this.empresaRepository.save(existente);
     }
-    const novoCertificado = this.empresaRepository.create({ CNPJ: cnpj, certificado, senha: hashSenha, data_upload: new Date() });
+    const novoCertificado = this.empresaRepository.create({ 
+      CNPJ: cnpj, 
+      certificado, 
+      senha: senha, // Armazena a senha original
+      data_upload: new Date() 
+    });
     return this.empresaRepository.save(novoCertificado);
   }
 
@@ -150,4 +165,54 @@ export class EmpresasService {
     empresa.data_upload = null;
     return this.empresaRepository.save(empresa);
   }
+
+  async buscarCertificadoPorCnpj(cnpj: string): Promise<{ pfx: Buffer; passphrase: string }> {
+    cnpj = cnpj.replace(/\D/g, '');
+
+    if (!cnpjValidator.isValid(cnpj)) {
+      throw new HttpException('CNPJ inválido', HttpStatus.BAD_REQUEST);
+    }
+
+    const empresa = await this.empresaRepository.findOne({ 
+      where: { CNPJ: cnpj },
+      select: ['certificado', 'senha']
+    });
+
+    if (!empresa) {
+      throw new HttpException(`Empresa com CNPJ ${cnpj} não encontrada`, HttpStatus.NOT_FOUND);
+    }
+
+    if (!empresa.certificado) {
+      throw new HttpException(`Certificado digital não cadastrado para a empresa ${cnpj}`, HttpStatus.NOT_FOUND);
+    }
+
+    // Verifica se o certificado já é um Buffer ou precisa ser convertido
+    let pfxBuffer: Buffer;
+    if (typeof empresa.certificado === 'string') {
+      // Se for string, assumimos que está em base64
+      pfxBuffer = Buffer.from(empresa.certificado, 'base64');
+    } else if (empresa.certificado instanceof Buffer) {
+      // Se já for Buffer, usa diretamente
+      pfxBuffer = empresa.certificado;
+    } else {
+      // Outros tipos não são suportados
+      throw new HttpException('Formato de certificado inválido', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    // Verifica se a senha está criptografada
+    const isHashed = empresa.senha?.startsWith('$2b$');
+    const passphrase = isHashed ? await this.getDecryptedPassphrase(empresa.senha) : empresa.senha;
+
+    return {
+      pfx: pfxBuffer,
+      passphrase: passphrase || ''
+    };
+}
+
+  private async getDecryptedPassphrase(hashedPassphrase: string): Promise<string> {
+    // Implemente sua lógica para descriptografar a senha se necessário
+    // Esta é uma implementação simplificada - ajuste conforme sua segurança
+    return hashedPassphrase; // Retornando a senha como está (não recomendado para produção)
+  }
+
 }

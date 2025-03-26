@@ -3,12 +3,12 @@ import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 @Entity('WEBSERVICE')
 export class Webservice {
   @PrimaryGeneratedColumn()
-  ID: string
+  ID: number
 
-  @Column({ type: 'nvarchar', length: 50 })
+  @Column({ type: 'nvarchar', length: 50, nullable: true })
   NOME_CIDADE: string;
 
-  @Column({ type: 'nvarchar', length: 300 })
+  @Column({ type: 'nvarchar', length: 300, nullable: true  })
   LINK: string;
 
 }

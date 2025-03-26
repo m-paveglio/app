@@ -8,6 +8,7 @@ import { empresasProviders } from './entities/empresa.providers';
   imports: [DatabaseModule],
   controllers: [EmpresasController],
   providers: [ ...empresasProviders,
-    EmpresasService,]
+    EmpresasService,],
+    exports: [EmpresasService], // <-- Adicione essa linha
 })
 export class EmpresasModule {}

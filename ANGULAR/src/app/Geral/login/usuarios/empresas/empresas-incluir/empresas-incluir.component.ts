@@ -25,9 +25,11 @@ export class EmpresasIncluirComponent {
     { nome: 'NÃO OPTANTE', codigo: '0' }
   ];
 
-  AMBIENTE_INTEGRACAO = [
+  AMBIENTE_INTEGRACAO_ID = [
     { nome: 'PRODUÇÃO', codigo: '1' },
-    { nome: 'HOMOLOGAÇÃO', codigo: '2' }
+    { nome: 'HOMOLOGAÇÃO', codigo: '2' },
+    { nome: 'SM PROD', codigo: '3' },
+    { nome: 'SM HOMOL', codigo: '4' }
   ];
 
   constructor(
