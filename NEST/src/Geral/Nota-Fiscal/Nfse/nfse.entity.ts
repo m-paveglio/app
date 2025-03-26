@@ -262,5 +262,23 @@ export class NFSE {
 
   @Column({ type: 'text', nullable: true })
   Status: string;
+
+  @Column({ type: 'text', nullable: true })
+  XmlEnvio: string; // Armazenará o XML completo assinado que foi enviado
   
+  @Column({ type: 'datetime', nullable: true })
+  DataEnvio: Date; // Data/hora do envio
+
+  @Column({ type: 'datetime', nullable: true })
+  DataAutorizacao: Date; // Data de autorização
+
+  @Column({ type: 'text', nullable: true })
+  SituacaoNfse: string; // Situação da NFSe
+
+  @Column({ type: 'text', nullable: true })
+  XmlResposta: string; // Armazenará o XML completo da resposta
+
+  @Column({ type: 'datetime', nullable: true })
+  DataConsulta: Date; // Data/hora da última consulta
+
 }

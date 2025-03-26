@@ -174,43 +174,50 @@ export class NfseService {
         }
         this.logger.debug(`Endpoint obtido: ${webservice.LINK}`);
   
-        // 6. Enviar para o webservice
-        this.logger.debug('Enviando lote para o webservice...');
-        const response = await this.httpService.post(
-          webservice.LINK,
-          xmlAssinado,
-          {
+         // 6. Enviar para o webservice
+    this.logger.debug('Enviando lote para o webservice...');
+    const response = await this.httpService.post(
+        webservice.LINK,
+        xmlAssinado,
+        {
             headers: {
-              'Content-Type': 'text/xml;charset=utf-8',
-              'SOAPAction': 'http://nfse.abrasf.org.br/RecepcionarLoteRps',
+                'Content-Type': 'text/xml;charset=utf-8',
+                'SOAPAction': 'http://nfse.abrasf.org.br/RecepcionarLoteRps',
             },
             httpsAgent,
             timeout: 30000,
-          }
-        ).toPromise();
-        this.logger.debug('Resposta do webservice recebida');
-        this.logger.verbose('Resposta completa:', JSON.stringify(response.data, null, 2));
-  
-        // 7. Processar resposta
-        this.logger.debug('Processando resposta...');
-        const protocolo = this.extrairProtocolo(response.data);
-        if (!protocolo) {
-          throw new Error('Não foi possível obter o protocolo da resposta');
         }
-        this.logger.debug(`Protocolo obtido: ${protocolo}`);
-  
-        // 8. Salvar no banco
-        this.logger.debug('Salvando dados da NFSe no banco...');
-        const nfse = await this.salvarNfse(dados, protocolo);
-        this.logger.debug(`NFSe salva com ID: ${nfse.id}`);
-  
-        return {
-          success: true,
-          protocolo,
-          numeroLote: dados.lote?.numeroLote,
-          dataEnvio: new Date().toISOString(),
-          nfseId: nfse.id,
-        };
+    ).toPromise();
+    
+    // 7. Processar resposta
+    this.logger.debug('Processando resposta...');
+    const protocolo = this.extrairProtocolo(response.data);
+    
+    // 8. Salvar no banco (agora com o XML)
+    this.logger.debug('Salvando dados da NFSe no banco...');
+    const nfse = await this.salvarNfse(dados, protocolo, xmlAssinado); // Passa o xmlAssinado
+    
+     // 9. Consultar situação do lote (novo)
+     this.logger.debug('Iniciando consulta automática do protocolo...');
+     this.logger.log(`[CONSULTA PROTOCOLO] Protocolo recebido: ${protocolo}`);
+     
+     const resultadoConsulta = await this.consultarLoteRps(
+         dados.prestador.cnpj,
+         dados.prestador.inscricaoMunicipal,
+         protocolo
+     );
+
+     this.logger.log(`[CONSULTA PROTOCOLO] Resultado da consulta: ${JSON.stringify(resultadoConsulta)}`);
+
+        
+     return {
+      success: true,
+      protocolo,
+      numeroLote: dados.lote?.numeroLote,
+      dataEnvio: new Date().toISOString(),
+      nfseId: nfse.id,
+      consulta: resultadoConsulta
+  };
   
       } catch (error) {
         this.logger.error('Erro no envio do lote RPS:', {
@@ -551,7 +558,7 @@ private gerarXmlRps(rps: any, prestadorLote: any): string {
     return match ? match[1] : null;
   }
 
-  private async salvarNfse(dados: any, protocolo: string): Promise<NFSE> {
+  private async salvarNfse(dados: any, protocolo: string, xmlEnvio: string): Promise<NFSE> {
     const rps = dados.rpsList?.[0] || {};
     const servico = rps.servico || {};
     const valores = servico.valores || {};
@@ -586,6 +593,8 @@ private gerarXmlRps(rps: any, prestadorLote: any): string {
       OptanteSimplesNacional: rps.optanteSimplesNacional === '1' ? 1 : 2,
       IncentivoFiscal: rps.incentivoFiscal === '1' ? 1 : 2,
       Protocolo: protocolo,
+      XmlEnvio: xmlEnvio, // Armazena o XML completo
+      DataEnvio: new Date(), // Registra a data/hora do envio
       Status: 'PROCESSANDO',
     });
 
@@ -615,18 +624,311 @@ private gerarXmlRps(rps: any, prestadorLote: any): string {
     return resposta;
   }
 
-  private async atualizarStatusNfse(protocolo: string, resposta: any): Promise<void> {
-    const status = this.extrairStatusResposta(resposta);
-    if (status) {
-      await this.nfseRepository.update(
-        { Protocolo: protocolo } as any, // Usando 'as any' temporariamente ou defina o tipo correto
-        { Status: status }
-      );
-    }
-  }
-
   private extrairStatusResposta(xmlResposta: string): string {
     const match = xmlResposta.match(/<Situacao>([^<]+)<\/Situacao>/);
     return match ? match[1] : 'DESCONHECIDO';
   }
+
+  async consultarLoteRps(cnpjPrestador: string, inscricaoMunicipal: string, protocolo: string): Promise<any> {
+    this.logger.debug(`[CONSULTA PROTOCOLO] Iniciando consulta para protocolo: ${protocolo}`);
+    
+    try {
+        // 1. Validar dados de entrada
+        if (!cnpjPrestador || !inscricaoMunicipal || !protocolo) {
+            throw new Error('CNPJ, Inscrição Municipal e Protocolo são obrigatórios');
+        }
+
+        // 2. Gerar XML de consulta
+        this.logger.debug('[CONSULTA PROTOCOLO] Gerando XML de consulta...');
+        const xmlConsulta = this.gerarXmlConsultaLote(cnpjPrestador, inscricaoMunicipal, protocolo);
+        this.logger.verbose('[CONSULTA PROTOCOLO] XML gerado:', xmlConsulta);
+
+        // 3. Configurar agente HTTPS
+        this.logger.debug('Configurando agente HTTPS...');
+        const { pfx, passphrase } = await this.empresasService.buscarCertificadoPorCnpj(cnpjPrestador);
+        const httpsAgent = new https.Agent({
+            pfx,
+            passphrase,
+            rejectUnauthorized: false,
+            secureOptions: crypto.constants.SSL_OP_NO_SSLv3 | crypto.constants.SSL_OP_NO_TLSv1,
+        });
+
+        // 4. Obter endpoint do webservice
+        this.logger.debug('Obtendo endpoint do webservice...');
+        const empresa = await this.empresasService.getEmpresa(cnpjPrestador);
+        if (empresa instanceof HttpException || !empresa?.AMBIENTE_INTEGRACAO_ID) {
+            throw new Error('Empresa não encontrada ou ambiente de integração não configurado');
+        }
+
+        const webservice = await this.webserviceService.getWebservice(empresa.AMBIENTE_INTEGRACAO_ID);
+        if (!webservice?.LINK) {
+            throw new Error('Webservice de consulta não encontrado ou link não configurado');
+        }
+        this.logger.debug(`Endpoint obtido: ${webservice.LINK}`);
+
+        // 5. Enviar consulta
+        this.logger.debug('[CONSULTA PROTOCOLO] Enviando consulta para o webservice...');
+        const response = await this.httpService.post(
+            webservice.LINK,
+            xmlConsulta,
+            {
+                headers: {
+                    'Content-Type': 'text/xml;charset=utf-8',
+                    'SOAPAction': 'http://nfse.abrasf.org.br/ConsultarLoteRps',
+                },
+                httpsAgent,
+                timeout: 30000,
+            }
+        ).toPromise();
+        
+        this.logger.debug('[CONSULTA PROTOCOLO] Resposta do webservice recebida');
+        this.logger.verbose('[CONSULTA PROTOCOLO] Resposta completa:', response.data);
+
+        // 6. Processar resposta
+        this.logger.debug('[CONSULTA PROTOCOLO] Processando resposta...');
+        const resultado = await this.processarRespostaConsulta(response.data);
+
+        // 7. Salvar XML de resposta no banco de dados
+        await this.salvarRespostaConsulta(protocolo, response.data, resultado);
+
+        // 8. Retornar resultado formatado
+        return this.formatarResultadoConsulta(protocolo, resultado);
+
+    } catch (error) {
+        this.logger.error('[CONSULTA PROTOCOLO] Erro na consulta do lote RPS:', {
+            message: error.message,
+            stack: error.stack,
+            response: error.response?.data,
+        });
+
+        // Salvar resposta de erro se existir
+        if (error.response?.data) {
+            await this.salvarRespostaConsulta(
+                protocolo, 
+                error.response.data, 
+                { success: false, status: 'ERRO' }
+            );
+        }
+
+        throw {
+            success: false,
+            error: 'Falha na consulta do lote RPS',
+            message: error.message,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+        };
+    }
+}
+       
+
+private gerarXmlConsultaLote(cnpjPrestador: string, inscricaoMunicipal: string, protocolo: string): string {
+  return `
+      <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:svc="http://nfse.abrasf.org.br">
+          <soap:Body>
+              <svc:ConsultarLoteRps>
+                  <nfseCabecMsg>
+                      <cabecalho versao="2.04">
+                          <versaoDados>2.04</versaoDados>
+                      </cabecalho>
+                  </nfseCabecMsg>
+                  <nfseDadosMsg>
+                      <ConsultarLoteRpsEnvio xmlns="http://www.abrasf.org.br/nfse.xsd">
+                          <Prestador>
+                              <CpfCnpj>
+                                  <Cnpj>${cnpjPrestador}</Cnpj>
+                              </CpfCnpj>
+                              <InscricaoMunicipal>${inscricaoMunicipal}</InscricaoMunicipal>
+                          </Prestador>
+                          <Protocolo>${protocolo}</Protocolo>
+                      </ConsultarLoteRpsEnvio>
+                  </nfseDadosMsg>
+              </svc:ConsultarLoteRps>
+          </soap:Body>
+      </soap:Envelope>
+  `.trim();
+}
+
+private async processarRespostaConsulta(xmlResposta: string): Promise<any> {
+  try {
+      // Converter XML para objeto JavaScript
+      const resultado = await parseStringPromise(xmlResposta, {
+          explicitArray: false,
+          ignoreAttrs: true,
+          tagNameProcessors: [name => name.replace(/^[a-zA-Z]+:/, '')] // Remove todos os namespaces
+      });
+
+      // Debug: Log da estrutura completa recebida
+      this.logger.verbose('[CONSULTA PROTOCOLO] Estrutura completa da resposta:', JSON.stringify(resultado, null, 2));
+
+      // Extrair a parte relevante da resposta
+      const resposta = resultado?.Envelope?.Body?.ConsultarLoteRpsResponse?.ConsultarLoteRpsResposta;
+      
+      if (!resposta) {
+          throw new Error('Estrutura da resposta inválida');
+      }
+
+      // Verificar se há mensagens de erro
+      if (resposta.ListaMensagemRetorno?.MensagemRetorno) {
+          const mensagens = Array.isArray(resposta.ListaMensagemRetorno.MensagemRetorno) 
+              ? resposta.ListaMensagemRetorno.MensagemRetorno
+              : [resposta.ListaMensagemRetorno.MensagemRetorno];
+          
+          return {
+              success: false,
+              status: resposta.Situacao || 'ERRO',
+              mensagens: mensagens.map(msg => ({
+                  codigo: msg.Codigo,
+                  mensagem: msg.Mensagem,
+                  correcao: msg.Correcao || ''
+              }))
+          };
+      }
+
+      // Se não houver erros, processar como sucesso
+      const nfse = resposta.CompNfse?.Nfse?.InfNfse || {};
+      
+      return {
+          success: true,
+          status: resposta.Situacao || 'PROCESSADO',
+          numeroNfse: nfse.Numero,
+          codigoVerificacao: nfse.CodigoVerificacao,
+          dataEmissao: nfse.DataEmissao,
+          dadosCompletos: nfse
+      };
+
+  } catch (error) {
+      this.logger.error('Erro ao processar resposta:', {
+          message: error.message,
+          stack: error.stack
+      });
+      throw new Error(`Falha ao processar resposta da consulta: ${error.message}`);
+  }
+}
+
+private extrairMensagensErro(resultado: any): Array<{codigo: string, mensagem: string, correcao: string}> {
+  try {
+      // Verifica se há mensagens de erro na estrutura padrão
+      const envelope = resultado.Envelope || resultado;
+      const body = envelope.Body || envelope;
+      const consultaResponse = body.ConsultarLoteRpsResponse || body;
+      const consultaResult = consultaResponse.ConsultarLoteRpsResposta || consultaResponse;
+      
+      if (!consultaResult.ListaMensagemRetorno) {
+          return [];
+      }
+
+      const mensagens = consultaResult.ListaMensagemRetorno.MensagemRetorno;
+      if (!mensagens) {
+          return [];
+      }
+
+      // Normaliza para array caso venha um único objeto
+      const mensagensArray = Array.isArray(mensagens) ? mensagens : [mensagens];
+      
+      return mensagensArray.map(msg => ({
+          codigo: msg.Codigo,
+          mensagem: msg.Mensagem,
+          correcao: msg.Correcao || ''
+      }));
+  } catch (e) {
+      this.logger.warn('Erro ao extrair mensagens de erro:', e);
+      return [];
+  }
+}
+
+private async atualizarStatusNfse(protocolo: string, status: string): Promise<void> {
+  try {
+      await this.nfseRepository.update(
+          { Protocolo: protocolo },
+          { 
+              Status: status,
+              DataAutorizacao: new Date(),
+              SituacaoNfse: status
+          }
+      );
+      this.logger.debug(`Status atualizado para: ${status}`);
+  } catch (error) {
+      this.logger.error('Erro ao atualizar status da NFSe:', error);
+      throw new Error(`Falha ao atualizar status: ${error.message}`);
+  }
+}
+
+async consultarPorProtocolo(protocolo: string): Promise<any> {
+  this.logger.log(`[CONSULTA MANUAL] Iniciando consulta manual para protocolo: ${protocolo}`);
+  
+  try {
+      // Buscar a NFSe no banco para obter os dados do prestador
+      const nfse = await this.nfseRepository.findOne({ 
+          where: { Protocolo: protocolo } 
+      });
+
+      if (!nfse) {
+          throw new Error('NFSe não encontrada para o protocolo informado');
+      }
+
+      this.logger.debug(`[CONSULTA MANUAL] Dados encontrados: CNPJ ${nfse.CnpjPrestador}, IM ${nfse.InscricaoMunicipalPrestador}`);
+      
+      // Realizar a consulta
+      return await this.consultarLoteRps(
+          nfse.CnpjPrestador,
+          nfse.InscricaoMunicipalPrestador,
+          protocolo
+      );
+  } catch (error) {
+      this.logger.error('[CONSULTA MANUAL] Erro na consulta manual:', error);
+      throw new Error(`Falha na consulta manual: ${error.message}`);
+  }
+}
+
+private async salvarRespostaConsulta(protocolo: string, xmlResposta: string, resultado: any): Promise<void> {
+  try {
+      this.logger.debug('[CONSULTA PROTOCOLO] Salvando resposta no banco...');
+      
+      await this.nfseRepository.update(
+          { Protocolo: protocolo },
+          { 
+              XmlResposta: xmlResposta,
+              DataConsulta: new Date(),
+              Status: resultado.status || 'ERRO',
+              SituacaoNfse: resultado.status || 'ERRO',
+              InformacoesComplementares: !resultado.success && resultado.mensagens 
+                  ? JSON.stringify(resultado.mensagens)
+                  : undefined
+          }
+      );
+
+      this.logger.debug('[CONSULTA PROTOCOLO] Resposta salva com sucesso no banco');
+  } catch (dbError) {
+      this.logger.error('[CONSULTA PROTOCOLO] Erro ao salvar resposta no banco:', dbError);
+      // Não lançar erro para não interromper o fluxo principal
+  }
+}
+
+private formatarResultadoConsulta(protocolo: string, resultado: any): any {
+  if (!resultado.success) {
+      this.logger.warn('[CONSULTA PROTOCOLO] Webservice retornou erros:', resultado.mensagens);
+      return {
+          success: false,
+          protocolo,
+          mensagens: resultado.mensagens,
+          status: resultado.status || 'ERRO'
+      };
+  }
+
+  this.logger.log('[CONSULTA PROTOCOLO] Consulta realizada com sucesso');
+  return {
+      success: true,
+      protocolo,
+      ...resultado
+  };
+}
+
+async obterXmlResposta(protocolo: string): Promise<string | null> {
+  const nfse = await this.nfseRepository.findOne({ 
+      where: { Protocolo: protocolo },
+      select: ['XmlResposta']
+  });
+  
+  return nfse?.XmlResposta || null;
+}
+
 }
