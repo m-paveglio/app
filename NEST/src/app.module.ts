@@ -16,6 +16,7 @@ import { ServicosModule } from './Geral/Servicos/servicos.module';
 import { NfseModule } from './Geral/Nota-Fiscal/Nfse/nfse.module';
 import { ComandasModule } from './Geral/Comanda/comanda.module';
 import { ComandasXServicoModule } from './Geral/ComandaXservico/comandaXservico.module';
+import { RpsModule } from './Geral/Nota-Fiscal/Nfse/RpsDisponivel/Rps.module';
 
  
 
@@ -34,7 +35,8 @@ import { ComandasXServicoModule } from './Geral/ComandaXservico/comandaXservico.
     ServicosModule,
     NfseModule,
     ComandasModule,
-    ComandasXServicoModule
+    ComandasXServicoModule,
+    RpsModule
 
     ],
   controllers: [AppController],
