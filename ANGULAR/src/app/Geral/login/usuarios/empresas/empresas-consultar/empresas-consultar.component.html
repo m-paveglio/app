@@ -141,7 +141,7 @@
 
                 <div class="field col-12 md:col-2">
                     <span class="p-float-label float-label-fixed">
-                        <!-- Campo de entrada que aparece somente quando editMode é falso -->
+                        <!-- Modo visualização -->
                         <input
                             *ngIf="!editMode"
                             id="resultado-AMBIENTE_INTEGRACAO"
@@ -150,23 +150,30 @@
                             class="p-inputtext p-component p-element"
                             [ngClass]="{ 'p-filled': true }"
                             [style.backgroundColor]="'lightgray'"
-                            [value]="getINTEGRACAO(resultado.AMBIENTE_INTEGRACAO)"
-                            readonly>  <!-- Campo somente leitura -->
+                            [value]="getNomeWebservice(resultado.AMBIENTE_INTEGRACAO_ID)"
+                            readonly>
                         <label for="resultado-AMBIENTE_INTEGRACAO">AMBIENTE INTEGRAÇÃO</label>
                     </span>
                 
-                    <!-- Dropdown que aparece somente quando editMode é verdadeiro -->
+                    <!-- Modo edição -->
                     <p-dropdown
                         *ngIf="editMode"
                         id="AMBIENTE_INTEGRACAO-dropdown"
-                        [options]="AMBIENTE_INTEGRACAO"
-                        [(ngModel)]="resultado.AMBIENTE_INTEGRACAO"
-                        optionLabel="nome"
-                        optionValue="codigo"
-                        placeholder="Selecione"
-                        (onChange)="AMBIENTE_INTEGRACAO_NOME = getINTEGRACAO(resultado.AMBIENTE_INTEGRACAO)">
+                        [options]="webservicesDisponiveis"
+                        [(ngModel)]="resultado.AMBIENTE_INTEGRACAO_ID"
+                        optionLabel="NOME_CIDADE"
+                        optionValue="ID"
+                        placeholder="Selecione o WebService"
+                        (onChange)="onAmbienteIntegracaoChange($event)">
+                        <ng-template let-ws pTemplate="item">
+                            <div>
+                                <div>{{ws.NOME_CIDADE}}</div>
+                                <small class="text-sm text-color-secondary">ID: {{ws.ID}}</small>
+                            </div>
+                        </ng-template>
                     </p-dropdown>
                 </div>
+                
 
         
 

@@ -272,93 +272,166 @@ private gerarXmlLoteRps(dados: any): string {
 }
 
 private gerarXmlEnvioLote(dados: any): string {
-    return `
-      <EnviarLoteRpsEnvio xmlns="http://www.abrasf.org.br/nfse.xsd">
-        <LoteRps versao="2.04">
-          <NumeroLote>${dados.lote.numeroLote}</NumeroLote>
-          <Prestador>
-            <CpfCnpj>
-              ${dados.prestador.cnpj ? `<Cnpj>${dados.prestador.cnpj}</Cnpj>` : ''}
-              ${dados.prestador.cpf ? `<Cpf>${dados.prestador.cpf}</Cpf>` : ''}
-            </CpfCnpj>
-            <InscricaoMunicipal>${dados.prestador.inscricaoMunicipal}</InscricaoMunicipal>
-          </Prestador>
-          <QuantidadeRps>${dados.lote.quantidadeRps}</QuantidadeRps>
-          <ListaRps>
-            ${dados.rpsList.map(rps => this.gerarXmlRps(rps, dados.prestador)).join('')}
-          </ListaRps>
-        </LoteRps>
-      </EnviarLoteRpsEnvio>
-    `.trim();
+  // Função auxiliar para formatar tags condicionais sem espaços
+  const formatTag = (condition: any, tag: string, content: string, indentLevel: number) => {
+      if (!condition) return '';
+      const indent = '  '.repeat(indentLevel);
+      return `${indent}<${tag}>${content}</${tag}>\n`;
+  };
+
+  let xml = `<EnviarLoteRpsEnvio xmlns="http://www.abrasf.org.br/nfse.xsd">
+              <LoteRps versao="2.04">
+                <NumeroLote>${dados.lote.numeroLote}</NumeroLote>
+                <Prestador>
+                  <CpfCnpj>
+              ${formatTag(dados.prestador.cnpj, 'Cnpj', dados.prestador.cnpj, 4)}\
+              ${formatTag(dados.prestador.cpf, 'Cpf', dados.prestador.cpf, 4)}\
+                  </CpfCnpj>
+                  <InscricaoMunicipal>${dados.prestador.inscricaoMunicipal}</InscricaoMunicipal>
+                </Prestador>
+                <QuantidadeRps>${dados.lote.quantidadeRps}</QuantidadeRps>
+                <ListaRps>
+              ${dados.rpsList.map(rps => this.gerarXmlRps(rps, dados.prestador)).join('')}\
+                </ListaRps>
+              </LoteRps>
+              </EnviarLoteRpsEnvio>`;
+
+  // Remove linhas vazias que possam ter sido criadas
+  return xml.split('\n').filter(line => line.trim() !== '').join('\n');
 }
 
 private gerarXmlRps(rps: any, prestadorLote: any): string {
-    // Usa o prestador do RPS se existir, senão usa o prestador do lote
-    const prestador = rps.prestador || prestadorLote || {};
-    const tomador = rps.tomador || {};
-    const tomadorIdentificacao = tomador.identificacao || {};
-    const tomadorEndereco = tomador.endereco || {};
-    const servico = rps.servico || {};
-    const valores = servico.valores || {};
-  
-    return `
-      <Rps>
-        <InfDeclaracaoPrestacaoServico>
-          <Rps>
-            <IdentificacaoRps>
-              <Numero>${rps.identificacao?.numero || ''}</Numero>
-              <Serie>${rps.identificacao?.serie || '1'}</Serie>
-              <Tipo>${rps.identificacao?.tipo || '1'}</Tipo>
-            </IdentificacaoRps>
-            <DataEmissao>${rps.dataEmissao || new Date().toISOString()}</DataEmissao>
-            <Status>${rps.status || '1'}</Status>
-          </Rps>
-          <Competencia>${rps.competencia || new Date().toISOString().split('T')[0]}</Competencia>
-          <Servico>
-            <Valores>
-              <ValorServicos>${valores.valorServicos || '0.00'}</ValorServicos>
-              ${valores.valorDeducoes ? `<ValorDeducoes>${valores.valorDeducoes}</ValorDeducoes>` : ''}
-              <ValorIss>${valores.valorIss || '0.00'}</ValorIss>
-            </Valores>
-            <IssRetido>${servico.issRetido || '2'}</IssRetido>
-            <ItemListaServico>${servico.itemListaServico || ''}</ItemListaServico>
-            <CodigoCnae>${servico.codigoCnae || ''}</CodigoCnae>
-            <CodigoTributacaoMunicipio>${servico.codigoTributacaoMunicipio || ''}</CodigoTributacaoMunicipio>
-            <Discriminacao>${servico.discriminacao || ''}</Discriminacao>
-            <CodigoMunicipio>${servico.codigoMunicipio || ''}</CodigoMunicipio>
-            <ExigibilidadeISS>${servico.exigibilidadeISS || ''}</ExigibilidadeISS>
-            <MunicipioIncidencia>${servico.municipioIncidencia || ''}</MunicipioIncidencia>
-          </Servico>
-          <Prestador>
-            <CpfCnpj>
-              ${prestador.cnpj ? `<Cnpj>${prestador.cnpj}</Cnpj>` : ''}
-              ${prestador.cpf ? `<Cpf>${prestador.cpf}</Cpf>` : ''}
-            </CpfCnpj>
-            <InscricaoMunicipal>${prestador.inscricaoMunicipal || ''}</InscricaoMunicipal>
-          </Prestador>
-          <TomadorServico>
-            <IdentificacaoTomador>
-              <CpfCnpj>
-                ${tomadorIdentificacao.cnpj ? `<Cnpj>${tomadorIdentificacao.cnpj}</Cnpj>` : ''}
-                ${tomadorIdentificacao.cpf ? `<Cpf>${tomadorIdentificacao.cpf}</Cpf>` : ''}
-              </CpfCnpj>
-            </IdentificacaoTomador>
-            <RazaoSocial>${tomador.razaoSocial || ''}</RazaoSocial>
-            <Endereco>
-              <Endereco>${tomadorEndereco.endereco || ''}</Endereco>
-              <Numero>${tomadorEndereco.numero || ''}</Numero>
-              ${tomadorEndereco.complemento ? `<Complemento>${tomadorEndereco.complemento}</Complemento>` : ''}
-              <Bairro>${tomadorEndereco.bairro || ''}</Bairro>
-              <CodigoMunicipio>${tomadorEndereco.codigoMunicipio || ''}</CodigoMunicipio>
-              <Uf>${tomadorEndereco.uf || ''}</Uf>
-              <Cep>${tomadorEndereco.cep || ''}</Cep>
-            </Endereco>
-          </TomadorServico>
-          <OptanteSimplesNacional>${rps.optanteSimplesNacional || '2'}</OptanteSimplesNacional>
-          <IncentivoFiscal>${rps.incentivoFiscal || '2'}</IncentivoFiscal>
-        </InfDeclaracaoPrestacaoServico>
-      </Rps>
-    `.trim();
+  // Usa o prestador do RPS se existir, senão usa o prestador do lote
+  const prestador = rps.prestador || prestadorLote || {};
+  const tomador = rps.tomador || {};
+  const tomadorIdentificacao = tomador.identificacao || {};
+  const tomadorEndereco = tomador.endereco || {};
+  const tomadorEnderecoExterior = tomador.enderecoExterior || {};
+  const servico = rps.servico || {};
+  const valores = servico.valores || {};
+
+  // Função para formatar corretamente as tags condicionais
+  const formatConditionalTag = (condition: any, tag: string, content: string, level: number) => {
+      if (!condition) return '';
+      const indent = '  '.repeat(level);
+      return `${indent}<${tag}>${content}</${tag}>\n`;
+  };
+
+  // Função para blocos condicionais mais complexos
+  const formatConditionalBlock = (condition: any, content: string, level: number) => {
+      if (!condition) return '';
+      const indent = '  '.repeat(level);
+      return `${indent}${content}\n`;
+  };
+
+  let xml = `
+              <Rps>
+              <InfDeclaracaoPrestacaoServico>
+                <Rps>
+                  <IdentificacaoRps>
+                    <Numero>${rps.identificacao?.numero || ''}</Numero>
+                    <Serie>${rps.identificacao?.serie || '1'}</Serie>
+                    <Tipo>${rps.identificacao?.tipo || '1'}</Tipo>
+                  </IdentificacaoRps>
+                  <DataEmissao>${rps.dataEmissao || new Date().toISOString()}</DataEmissao>
+                  <Status>${rps.status || '1'}</Status>
+                </Rps>
+                <Competencia>${rps.competencia || new Date().toISOString().split('T')[0]}</Competencia>
+                <Servico>
+                  <Valores>
+                    <ValorServicos>${valores.valorServicos || '0.00'}</ValorServicos>
+              ${valores.valorDeducoes ? `        <ValorDeducoes>${valores.valorDeducoes}</ValorDeducoes>\n` : ''}\
+              ${valores.valorPis ? `        <ValorPis>${valores.valorPis}</ValorPis>\n` : ''}\
+              ${valores.valorCofins ? `        <ValorCofins>${valores.valorCofins}</ValorCofins>\n` : ''}\
+              ${valores.valorInss ? `        <ValorInss>${valores.valorInss}</ValorInss>\n` : ''}\
+              ${valores.valorIr ? `        <ValorIr>${valores.valorIr}</ValorIr>\n` : ''}\
+              ${valores.valorCsll ? `        <ValorCsll>${valores.valorCsll}</ValorCsll>\n` : ''}\
+              ${valores.outrasRetencoes ? `        <OutrasRetencoes>${valores.outrasRetencoes}</OutrasRetencoes>\n` : ''}\
+              ${valores.valTotTributos ? `        <ValTotTributos>${valores.valTotTributos}</ValTotTributos>\n` : ''}\
+              ${valores.valorIss ? `        <ValorIss>${valores.valorIss}</ValorIss>\n` : ''}\
+              ${valores.aliquota ? `        <Aliquota>${valores.aliquota}</Aliquota>\n` : ''}\
+              ${valores.descontoIncondicionado ? `        <DescontoIncondicionado>${valores.descontoIncondicionado}</DescontoIncondicionado>\n` : ''}\
+              ${valores.descontoCondicionado ? `        <DescontoCondicionado>${valores.descontoCondicionado}</DescontoCondicionado>\n` : ''}\
+                  </Valores>
+                  <IssRetido>${servico.issRetido || '2'}</IssRetido>
+              ${valores.responsavelRetencao ? `      <ResponsavelRetencao>${valores.responsavelRetencao}</ResponsavelRetencao>\n` : ''}\
+                  <ItemListaServico>${servico.itemListaServico || ''}</ItemListaServico>
+                  <CodigoCnae>${servico.codigoCnae || ''}</CodigoCnae>
+                  <CodigoTributacaoMunicipio>${servico.codigoTributacaoMunicipio || ''}</CodigoTributacaoMunicipio>
+              ${valores.codigoNbs ? `      <CodigoNbs>${valores.codigoNbs}</CodigoNbs>\n` : ''}\
+                  <Discriminacao>${servico.discriminacao || ''}</Discriminacao>
+                  <CodigoMunicipio>${servico.codigoMunicipio || ''}</CodigoMunicipio>
+                  <ExigibilidadeISS>${servico.exigibilidadeISS || ''}</ExigibilidadeISS>
+                  <MunicipioIncidencia>${servico.municipioIncidencia || ''}</MunicipioIncidencia>
+                </Servico>
+                <Prestador>
+                  <CpfCnpj>
+              ${prestador.cnpj ? `        <Cnpj>${prestador.cnpj}</Cnpj>\n` : ''}\
+              ${prestador.cpf ? `        <Cpf>${prestador.cpf}</Cpf>\n` : ''}\
+                  </CpfCnpj>
+                  <InscricaoMunicipal>${prestador.inscricaoMunicipal || ''}</InscricaoMunicipal>
+                </Prestador>
+                <TomadorServico>
+              `;
+
+                // Seção do Tomador - Lógica condicional
+                if (tomador.nifTomador) {
+                    xml += `      <NifTomador>${tomador.nifTomador}</NifTomador>\n`;
+                    xml += tomador.razaoSocial ? `      <RazaoSocial>${tomador.razaoSocial}</RazaoSocial>\n` : '';
+                    
+                    if (tomadorEnderecoExterior.codigoPais || tomadorEnderecoExterior.enderecoCompletoExterior) {
+                        xml += `      <EnderecoExterior>\n`;
+                        xml += tomadorEnderecoExterior.codigoPais ? `        <CodigoPais>${tomadorEnderecoExterior.codigoPais}</CodigoPais>\n` : '';
+                        xml += tomadorEnderecoExterior.enderecoCompletoExterior ? `        <EnderecoCompletoExterior>${tomadorEnderecoExterior.enderecoCompletoExterior}</EnderecoCompletoExterior>\n` : '';
+                        xml += `      </EnderecoExterior>\n`;
+                    }
+                } else {
+                    if (tomadorIdentificacao.cnpj || tomadorIdentificacao.cpf) {
+                        xml += `      <IdentificacaoTomador>\n`;
+                        xml += `        <CpfCnpj>\n`;
+                        xml += tomadorIdentificacao.cnpj ? `          <Cnpj>${tomadorIdentificacao.cnpj}</Cnpj>\n` : '';
+                        xml += (!tomadorIdentificacao.cnpj && tomadorIdentificacao.cpf) ? `          <Cpf>${tomadorIdentificacao.cpf}</Cpf>\n` : '';
+                        xml += `        </CpfCnpj>\n`;
+                        xml += tomadorIdentificacao.inscricaoMunicipal ? `        <InscricaoMunicipal>${tomadorIdentificacao.inscricaoMunicipal}</InscricaoMunicipal>\n` : '';
+                        xml += `      </IdentificacaoTomador>\n`;
+                        
+                        xml += tomador.razaoSocial ? `      <RazaoSocial>${tomador.razaoSocial}</RazaoSocial>\n` : '';
+                        
+                        xml += `      <Endereco>\n`;
+                        xml += `        <Endereco>${tomadorEndereco.endereco || ''}</Endereco>\n`;
+                        xml += `        <Numero>${tomadorEndereco.numero || ''}</Numero>\n`;
+                        xml += tomadorEndereco.complemento ? `        <Complemento>${tomadorEndereco.complemento}</Complemento>\n` : '';
+                        xml += `        <Bairro>${tomadorEndereco.bairro || ''}</Bairro>\n`;
+                        xml += `        <CodigoMunicipio>${tomadorEndereco.codigoMunicipio || ''}</CodigoMunicipio>\n`;
+                        xml += `        <Uf>${tomadorEndereco.uf || ''}</Uf>\n`;
+                        xml += `        <Cep>${tomadorEndereco.cep || ''}</Cep>\n`;
+                        xml += `      </Endereco>\n`;
+                    } else if (tomadorEnderecoExterior.codigoPais || tomadorEnderecoExterior.enderecoCompletoExterior) {
+                        xml += `      <EnderecoExterior>\n`;
+                        xml += tomadorEnderecoExterior.codigoPais ? `        <CodigoPais>${tomadorEnderecoExterior.codigoPais}</CodigoPais>\n` : '';
+                        xml += tomadorEnderecoExterior.enderecoCompletoExterior ? `        <EnderecoCompletoExterior>${tomadorEnderecoExterior.enderecoCompletoExterior}</EnderecoCompletoExterior>\n` : '';
+                        xml += `      </EnderecoExterior>\n`;
+                    }
+                }
+
+                // Contato (opcional)
+                if (tomador.contato?.telefone || tomador.contato?.email) {
+                    xml += `      <Contato>\n`;
+                    xml += tomador.contato.telefone ? `        <Telefone>${tomador.contato.telefone}</Telefone>\n` : '';
+                    xml += tomador.contato.email ? `        <Email>${tomador.contato.email}</Email>\n` : '';
+                    xml += `      </Contato>\n`;
+                }
+
+                // Final do XML
+                xml += `    </TomadorServico>
+                <OptanteSimplesNacional>${rps.optanteSimplesNacional || '2'}</OptanteSimplesNacional>
+                <IncentivoFiscal>${rps.incentivoFiscal || '2'}</IncentivoFiscal>
+              ${rps.informacoesComplementares ? `    <InformacoesComplementares>${rps.informacoesComplementares}</InformacoesComplementares>\n` : ''}\
+              </InfDeclaracaoPrestacaoServico>
+              </Rps>`;
+
+  // Remove possíveis linhas vazias que possam ter sobrado
+  return xml.split('\n').filter(line => line.trim() !== '').join('\n');
 }
   
 private async assinarXml(xml: string, privateKey: string, publicCert: string): Promise<string> {

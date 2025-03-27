@@ -18,24 +18,40 @@ export class EmpresasIncluirComponent {
   uploadedFiles: File[] = [];
   senhaCertificado: string = '';
   cnpjEmpresa: string = '';
-
+  AMBIENTE_INTEGRACAO_ID: any[] = [];
 
   OPTANTE_SN = [
     { nome: 'OPTANTE', codigo: '1' },
     { nome: 'NÃO OPTANTE', codigo: '0' }
   ];
 
-  AMBIENTE_INTEGRACAO_ID = [
-    { nome: 'PRODUÇÃO', codigo: '1' },
-    { nome: 'HOMOLOGAÇÃO', codigo: '2' },
-    { nome: 'SM PROD', codigo: '3' },
-    { nome: 'SM HOMOL', codigo: '4' }
-  ];
-
   constructor(
     private empresasService: EmpresasService,
     private messageService: MessageService
   ) {}
+
+  ngOnInit() {
+    this.carregarWebservicesDisponiveis();
+  }
+
+  carregarWebservicesDisponiveis() {
+    this.empresasService.getWebservices().subscribe(
+      (webservices) => {
+        // Transforma os webservices em opções para o dropdown
+        this.AMBIENTE_INTEGRACAO_ID = webservices.map(ws => ({
+          nome: ws.NOME_CIDADE, // Usando NOME_CIDADE como mostrado no retorno
+          codigo: ws.ID,        // Usando ID como identificador
+          originalData: ws      // Mantém os dados originais se precisar
+        }));
+        
+        console.log('Webservices carregados:', this.AMBIENTE_INTEGRACAO_ID); // Para debug
+      },
+      (error) => {
+        console.error('Erro ao carregar webservices:', error);
+        this.showError('Erro ao carregar ambientes de integração disponíveis');
+      }
+    );
+  }
 
 
   onCertificadoSelecionado(event: any): void {

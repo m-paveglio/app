@@ -11,4 +11,7 @@ export class Webservice {
   @Column({ type: 'nvarchar', length: 300, nullable: true  })
   LINK: string;
 
+  @Column({ type: 'nvarchar', length: 50, nullable: true })
+  SERIE_RPS: string;
+
 }

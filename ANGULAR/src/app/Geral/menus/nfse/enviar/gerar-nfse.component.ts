@@ -1,48 +1,256 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { NfseService } from '../nfse.service';
+import { MessageService } from 'primeng/api';
+import { LoginService } from '../../../login/login.service';
+import { EmpresasService } from '../../../login/usuarios/empresas/empresas.service';
 
 @Component({
   selector: 'app-gerar-nfse',
   templateUrl: './gerar-nfse.component.html',
-  styleUrls: ['./gerar-nfse.component.css']
+  styleUrls: ['./gerar-nfse.component.css'],
+  providers: [MessageService]
 })
-export class GerarNfseComponent {
-  nfseData = {
-    numero: '',
-    serie: '',
-    tipo: '',
-    dataEmissao: '',
-    status: '',
-    competencia: '',
-    valorServicos: '',
-    valorDeducoes: '',
-    valorPis: '',
-    valorCofins: '',
-    valorInss: '',
-    tomadorCpfCnpj: '',
-    tomadorRazaoSocial: '',
-    tomadorEndereco: '',
-    tomadorCep: '',
-    tomadorEmail: ''
-  };
-
-  isEnvioSucesso: boolean = false;
+export class GerarNfseComponent implements OnInit {
   exibirMensagem: boolean = false;
+  isEnvioSucesso: boolean = false;
   mensagem: string = '';
+  loading = false;
 
-  onSubmit() {
-    console.log('Dados enviados:', this.nfseData);
+  nfseData = {
+    identificacao: {
+      numero: '',
+      serie: '1',
+      tipo: '1'
+    },
+    dataEmissao: new Date().toISOString().split('T')[0],
+    status: '1',
+    competencia: new Date().toISOString().split('T')[0],
+    servico: {
+      itemListaServico: '',
+      codigoCnae: '',
+      codigoTributacaoMunicipio: '',
+      discriminacao: '',
+      codigoMunicipio: '',
+      exigibilidadeISS: '',
+      municipioIncidencia: '',
+      valores: {
+        valorServicos: '0.00',
+        valorDeducoes: '',
+        valorPis: '',
+        valorCofins: '',
+        valorInss: '',
+        valorIr: '',
+        valorCsll: '',
+        outrasRetencoes: '',
+        valorIss: '',
+        aliquota: '',
+        descontoIncondicionado: '',
+        descontoCondicionado: '',
+        issRetido: '2'
+      }
+    },
+    tomador: {
+      identificacao: {
+        cpf: '',
+        cnpj: '',
+        inscricaoMunicipal: ''
+      },
+      razaoSocial: '',
+      endereco: {
+        endereco: '',
+        numero: '',
+        complemento: '',
+        bairro: '',
+        codigoMunicipio: '',
+        uf: '',
+        cep: ''
+      },
+      contato: {
+        telefone: '',
+        email: ''
+      },
+      nifTomador: ''
+    },
+    incentivoFiscal: '2',
+    informacoesComplementares: '',
+    optanteSimplesNacional: ''
+  };
+  
+  cnpj: string | null = null;
+  empresaSelecionada: any = null;
+  inscricaoMunicipalManual: string = '';
 
-    // Simular envio ao backend
-    this.isEnvioSucesso = this.enviarDadosParaBackend(this.nfseData);
-    this.exibirMensagem = true;
-    this.mensagem = this.isEnvioSucesso
-      ? 'Nota fiscal enviada com sucesso!'
-      : 'Erro ao enviar a nota fiscal.';
+  constructor(
+    private nfseService: NfseService,
+    private messageService: MessageService,
+    private loginService: LoginService,
+    private empresaService: EmpresasService
+  ) {}
+
+  ngOnInit(): void {
+    // Obter o CNPJ da empresa logada
+    const empresa = this.loginService.getEmpresaSelecionada();
+    this.cnpj = empresa?.CNPJ || null;
+    
+    // Verificar se o CNPJ está disponível antes de tentar carregar os dados
+    if (this.cnpj) {
+      this.carregarDadosEmpresa();
+    } else {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Atenção',
+        detail: 'Nenhuma empresa selecionada para emissão de NFSe'
+      });
+    }
   }
 
-  enviarDadosParaBackend(dados: any): boolean {
-    // TODO: Implementar envio ao backend
-    console.log('Enviando dados ao backend:', dados);
-    return true; // Simulação de sucesso
+  carregarDadosEmpresa(): void {
+    if (!this.cnpj) return;
+    
+    this.loading = true;
+    this.empresaService.buscarPorCnpj(this.cnpj).subscribe({
+      next: (empresa) => {
+        this.empresaSelecionada = empresa;
+        console.log('Dados completos da empresa:', {
+          cnpj: this.empresaSelecionada.CNPJ,
+          inscricaoMunicipal: this.empresaSelecionada.IM,
+          optanteSimplesNacional: this.empresaSelecionada.OPTANTE_SN
+        });
+        this.loading = false;
+      },
+      error: (err) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Não foi possível carregar os dados da empresa'
+        });
+        this.loading = false;
+      }
+    });
+  }
+
+  onSubmit(): void {
+    if (!this.empresaSelecionada) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Erro',
+        detail: 'Nenhuma empresa selecionada para emissão da NFSe'
+      });
+    if (!this.empresaSelecionada.OPTANTE_SN) {
+      this.messageService.add({
+         severity: 'warn',
+         summary: 'Atenção',
+        detail: 'Status do Simples Nacional não definido para esta empresa. Usando valor padrão (Não optante).'
+        });
+      }
+      return;
+      
+    }
+  
+    this.loading = true;
+    
+    // Agora usando IM que é o nome correto do campo
+    const prestador = {
+      cnpj: this.empresaSelecionada.CNPJ,
+      inscricaoMunicipal: this.empresaSelecionada.IM // Campo agora é IM
+    };
+
+    // Obter o valor do Simples Nacional da empresa (1 para Sim, 2 para Não)
+    const optanteSimplesNacional = this.empresaSelecionada.OPTANTE_SN || '2';
+  
+    console.log('Dados do prestador a serem enviados:', prestador);
+
+    // Mapear os dados do formulário
+    const dadosEnvio = {
+      identificacao: {
+        numero: this.nfseData.identificacao.numero,
+        serie: this.nfseData.identificacao.serie,
+        tipo: this.nfseData.identificacao.tipo
+      },
+      dataEmissao: this.nfseData.dataEmissao,
+      status: this.nfseData.status,
+      competencia: this.nfseData.competencia,
+      servico: {
+        ...this.nfseData.servico,
+        valores: {
+          ...this.nfseData.servico.valores
+        }
+      },
+      prestador: {
+        cnpj: this.empresaSelecionada.CNPJ,
+        inscricaoMunicipal: this.empresaSelecionada.IM
+      },
+      tomador: {
+        ...this.nfseData.tomador
+      },
+      optanteSimplesNacional: optanteSimplesNacional, // Agora vindo da empresa
+      incentivoFiscal: this.nfseData.incentivoFiscal,
+      informacoesComplementares: this.nfseData.informacoesComplementares
+    };
+
+    // Remover campos vazios
+    const dadosLimpos = this.removerCamposVazios(dadosEnvio);
+
+    console.log('Dados a serem enviados:', dadosLimpos);
+
+    this.nfseService.enviarNfse(dadosLimpos).subscribe({
+      next: () => {
+        this.isEnvioSucesso = true;
+        this.exibirMensagem = true;
+        this.mensagem = 'NFSe emitida com sucesso!';
+        this.loading = false;
+      },
+      error: (err) => {
+        this.isEnvioSucesso = false;
+        this.exibirMensagem = true;
+        this.mensagem = 'Falha ao emitir NFSe: ' + err.message;
+        this.loading = false;
+      }
+    });
+  }
+
+  private removerCamposVazios(obj: any): any {
+    if (obj === null || obj === undefined) {
+      return undefined;
+    }
+    
+    if (typeof obj !== 'object') {
+      return obj;
+    }
+    
+    if (Array.isArray(obj)) {
+      return obj.map(this.removerCamposVazios).filter(item => item !== undefined);
+    }
+    
+    const result: any = {};
+    Object.keys(obj).forEach(key => {
+      // Mantém o objeto prestador completo
+      if (key === 'prestador') {
+        result[key] = {
+          cnpj: obj[key].cnpj || '',
+          inscricaoMunicipal: obj[key].inscricaoMunicipal || ''
+        };
+        return;
+      }
+      
+      const value = this.removerCamposVazios(obj[key]);
+      if (value !== undefined && value !== '' && !(typeof value === 'object' && Object.keys(value).length === 0)) {
+        result[key] = value;
+      }
+    });
+    
+    return Object.keys(result).length > 0 ? result : undefined;
+  }
+  
+
+  formatarCpfCnpj(event: any): void {
+    let value = event.target.value.replace(/\D/g, '');
+    if (value.length <= 11) {
+      this.nfseData.tomador.identificacao.cpf = value;
+      this.nfseData.tomador.identificacao.cnpj = '';
+    } else {
+      this.nfseData.tomador.identificacao.cnpj = value;
+      this.nfseData.tomador.identificacao.cpf = '';
+    }
   }
 }

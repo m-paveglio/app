@@ -1,7 +1,7 @@
 <div class="grid" *ngIf="nfseData">
   <div class="col-12">
     <div class="p-inputtext p-component p-element">
-      <h5
+      <h3
         class="text-center"
         [ngStyle]="{
           backgroundColor: 'var(--cyan-800)',
@@ -10,82 +10,78 @@
         }"
       >
         EMISSÃO DE NOTA FISCAL
-      </h5>
+      </h3>
 
       <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
-        <!-- Número do RPS -->
-        <div class="field col-12 md:col-1">
-          <span class="p-float-label">
-            <input
-              id="numero"
-              type="text"
-              pInputText
-              class="p-inputtext p-component p-element p-filled"
-              [(ngModel)]="nfseData.numero"
-              name="numero"
-            />
-            <label for="numero">Número</label>
-          </span>
+
+        <div class="card p-3">
+          <h3>Dados do RPS</h3>
+          <div class="grid">
+            <!-- Número do RPS -->
+            <div class="field col-12 md:col-6">
+              <span class="p-float-label">
+                <input
+                  id="numero"
+                  type="text"
+                  pInputText
+                  class="p-inputtext p-component p-element p-filled"
+                  [(ngModel)]="nfseData.identificacao.numero"
+                  name="numero"
+                />
+                <label for="numero">Número</label>
+              </span>
+            </div>
+        
+            <!-- Série do RPS -->
+            <div class="field col-12 md:col-6">
+              <span class="p-float-label">
+                <input
+                  id="serie"
+                  type="text"
+                  pInputText
+                  class="p-inputtext p-component p-element p-filled"
+                  [(ngModel)]="nfseData.identificacao.serie"
+                  name="serie"
+                />
+                <label for="serie">Série</label>
+              </span>
+            </div>
+          </div>
         </div>
 
-        <!-- Série do RPS -->
-        <div class="field col-12 md:col-1">
-          <span class="p-float-label">
-            <input
-              id="serie"
-              type="text"
-              pInputText
-              class="p-inputtext p-component p-element p-filled"
-              [(ngModel)]="nfseData.serie"
-              name="serie"
-            />
-            <label for="serie">Série</label>
-          </span>
-        </div>
-
-        <!-- Tipo -->
-        <div class="field col-12 md:col-1">
-          <span class="p-float-label">
-            <input
-              id="tipo"
-              type="text"
-              pInputText
-              class="p-inputtext p-component p-element p-filled"
-              [(ngModel)]="nfseData.tipo"
-              name="tipo"
-            />
-            <label for="tipo">Tipo</label>
-          </span>
-        </div>
-
-        <!-- Data de Emissão -->
-        <div class="field col-12 md:col-2">
-          <span class="p-float-label">
-            <input
-              id="dataEmissao"
-              type="date"
-              pInputText
-              class="p-inputtext p-component p-element p-filled"
-              [(ngModel)]="nfseData.dataEmissao"
-              name="dataEmissao"
-            />
-            <label for="dataEmissao">Data de Emissão</label>
-          </span>
-        </div>
-
-        <!-- Competência -->
-        <div class="field col-12 md:col-2">
-          <span class="p-float-label">
-            <input
-              id="competencia"
-              type="date"
-              pInputText
-              class="p-inputtext p-component p-element p-filled"
-              [(ngModel)]="nfseData.competencia"
-              name="competencia"
-            />
-            <label for="competencia">Competência</label>
-          </span>
+        <div class="card p-3">
+          <h3>Datas</h3>
+          <div class="grid gap-3">
+            <!-- Data de Emissão -->
+            <div class="field col-12 md:col-4">
+              <span class="p-float-label">
+                <input
+                  id="dataEmissao"
+                  type="date"
+                  pInputText
+                  class="p-inputtext p-component p-element p-filled"
+                  [(ngModel)]="nfseData.dataEmissao"
+                  name="dataEmissao"
+                />
+                <label for="dataEmissao">Data de Emissão</label>
+              </span>
+            </div>
+        
+            <!-- Competência -->
+            <div class="field col-12 md:col-4">
+              <span class="p-float-label">
+                <input
+                  id="competencia"
+                  type="date"
+                  pInputText
+                  class="p-inputtext p-component p-element p-filled"
+                  [(ngModel)]="nfseData.competencia"
+                  name="competencia"
+                />
+                <label for="competencia">Competência</label>
+              </span>
+            </div>
+          </div>
         </div>
 
         <!-- Valor dos Serviços -->
@@ -96,7 +92,7 @@
               type="text"
               pInputText
               class="p-inputtext p-component p-element p-filled"
-              [(ngModel)]="nfseData.valorServicos"
+              [(ngModel)]="nfseData.servico.valores.valorServicos"
               name="valorServicos"
             />
             <label for="valorServicos">Valor dos Serviços</label>
@@ -112,7 +108,7 @@
               type="text"
               pInputText
               class="p-inputtext p-component p-element p-filled"
-              [(ngModel)]="nfseData.valorDeducoes"
+              [(ngModel)]="nfseData.servico.valores.valorDeducoes"
               name="valorDeducoes"
             />
             <label for="valorDeducoes">Valor Deduções</label>
@@ -125,7 +121,7 @@
               type="text"
               pInputText
               class="p-inputtext p-component p-element p-filled"
-              [(ngModel)]="nfseData.valorPis"
+              [(ngModel)]="nfseData.servico.valores.valorPis"
               name="valorPis"
             />
             <label for="valorPis">Valor PIS</label>
@@ -138,7 +134,7 @@
               type="text"
               pInputText
               class="p-inputtext p-component p-element p-filled"
-              [(ngModel)]="nfseData.valorCofins"
+              [(ngModel)]="nfseData.servico.valores.valorCofins"
               name="valorCofins"
             />
             <label for="valorCofins">Valor COFINS</label>
@@ -151,7 +147,7 @@
               type="text"
               pInputText
               class="p-inputtext p-component p-element p-filled"
-              [(ngModel)]="nfseData.valorInss"
+              [(ngModel)]="nfseData.servico.valores.valorInss"
               name="valorInss"
             />
             <label for="valorInss">Valor INSS</label>
@@ -167,7 +163,8 @@
               type="text"
               pInputText
               class="p-inputtext p-component p-element p-filled"
-              [(ngModel)]="nfseData.tomadorCpfCnpj"
+              [ngModel]="nfseData.tomador.identificacao.cpf || nfseData.tomador.identificacao.cnpj"
+              (ngModelChange)="formatarCpfCnpj($event)"
               name="tomadorCpfCnpj"
             />
             <label for="tomadorCpfCnpj">CPF/CNPJ</label>
@@ -180,7 +177,7 @@
               type="text"
               pInputText
               class="p-inputtext p-component p-element p-filled"
-              [(ngModel)]="nfseData.tomadorRazaoSocial"
+              [(ngModel)]="nfseData.tomador.razaoSocial"
               name="tomadorRazaoSocial"
             />
             <label for="tomadorRazaoSocial">Razão Social</label>
@@ -193,7 +190,7 @@
               type="text"
               pInputText
               class="p-inputtext p-component p-element p-filled"
-              [(ngModel)]="nfseData.tomadorEndereco"
+              [(ngModel)]="nfseData.tomador.endereco.endereco"
               name="tomadorEndereco"
             />
             <label for="tomadorEndereco">Endereço</label>
@@ -206,7 +203,7 @@
               type="text"
               pInputText
               class="p-inputtext p-component p-element p-filled"
-              [(ngModel)]="nfseData.tomadorCep"
+              [(ngModel)]="nfseData.tomador.endereco.cep"
               name="tomadorCep"
             />
             <label for="tomadorCep">CEP</label>
@@ -215,39 +212,190 @@
         <div class="field col-12 md:col-2">
           <span class="p-float-label">
             <input
-              id="tomadorEmail"
+              id="tomadoremail"
               type="text"
               pInputText
               class="p-inputtext p-component p-element p-filled"
-              [(ngModel)]="nfseData.tomadorEmail"
-              name="tomadorEmail"
+              [(ngModel)]="nfseData.tomador.contato.email"
+              name="tomadoremail"
             />
-            <label for="tomadorEmail">Email</label>
+            <label for="tomadoremail">Email</label>
           </span>
         </div>
 
-        <!-- Botão Enviar -->
-        <div
-          class="btn-group field col-12 md:col-2 flex flex-wrap gap-3 justify-content-center"
-          role="group"
-          aria-label="Third group"
-        >
+        <!-- Código CNAE -->
+        <div class="field col-12 md:col-2">
+          <span class="p-float-label">
+            <input
+              id="codigoCnae"
+              type="text"
+              pInputText
+              [(ngModel)]="nfseData.servico.codigoCnae"
+              name="codigoCnae"
+            />
+            <label for="codigoCnae">Código CNAE</label>
+          </span>
+        </div>
+
+        <!-- Código de Tributação -->
+        <div class="field col-12 md:col-2">
+          <span class="p-float-label">
+            <input
+              id="codigoTributacao"
+              type="text"
+              pInputText
+              [(ngModel)]="nfseData.servico.codigoTributacaoMunicipio"
+              name="codigoTributacao"
+            />
+            <label for="codigoTributacao">Cód. Tributação</label>
+          </span>
+        </div>
+
+        <!-- Discriminação do Serviço -->
+        <div class="field col-12">
+          <span class="p-float-label">
+            <textarea
+              id="discriminacao"
+              rows="3"
+              pInputTextarea
+              [(ngModel)]="nfseData.servico.discriminacao"
+              name="discriminacao"
+            ></textarea>
+            <label for="discriminacao">Discriminação do Serviço</label>
+          </span>
+        </div>
+
+        <!-- Código do Município -->
+        <div class="field col-12 md:col-2">
+          <span class="p-float-label">
+            <input
+              id="codigoMunicipio"
+              type="text"
+              pInputText
+              [(ngModel)]="nfseData.servico.codigoMunicipio"
+              name="codigoMunicipio"
+            />
+            <label for="codigoMunicipio">Cód. Município</label>
+          </span>
+        </div>
+
+        <!-- Município de Incidência -->
+        <div class="field col-12 md:col-2">
+          <span class="p-float-label">
+            <input
+              id="municipioIncidencia"
+              type="text"
+              pInputText
+              [(ngModel)]="nfseData.servico.municipioIncidencia"
+              name="municipioIncidencia"
+            />
+            <label for="municipioIncidencia">Mun. Incidência</label>
+          </span>
+        </div>
+
+        <!-- IR, CSLL e Outras Retenções -->
+        <div class="field col-12 md:col-2">
+          <span class="p-float-label">
+            <input
+              id="valorIr"
+              type="text"
+              pInputText
+              [(ngModel)]="nfseData.servico.valores.valorIr"
+              name="valorIr"
+            />
+            <label for="valorIr">Valor IR</label>
+          </span>
+        </div>
+
+        <div class="field col-12 md:col-2">
+          <span class="p-float-label">
+            <input
+              id="valorCsll"
+              type="text"
+              pInputText
+              [(ngModel)]="nfseData.servico.valores.valorCsll"
+              name="valorCsll"
+            />
+            <label for="valorCsll">Valor CSLL</label>
+          </span>
+        </div>
+
+        <div class="field col-12 md:col-2">
+          <span class="p-float-label">
+            <input
+              id="outrasRetencoes"
+              type="text"
+              pInputText
+              [(ngModel)]="nfseData.servico.valores.outrasRetencoes"
+              name="outrasRetencoes"
+            />
+            <label for="outrasRetencoes">Outras Retenções</label>
+          </span>
+        </div>
+
+        <!-- Alíquota e Descontos -->
+        <div class="field col-12 md:col-2">
+          <span class="p-float-label">
+            <input
+              id="aliquota"
+              type="text"
+              pInputText
+              [(ngModel)]="nfseData.servico.valores.aliquota"
+              name="aliquota"
+            />
+            <label for="aliquota">Alíquota (%)</label>
+          </span>
+        </div>
+
+        <div class="field col-12 md:col-2">
+          <span class="p-float-label">
+            <input
+              id="descontoIncondicionado"
+              type="text"
+              pInputText
+              [(ngModel)]="nfseData.servico.valores.descontoIncondicionado"
+              name="descontoIncondicionado"
+            />
+            <label for="descontoIncondicionado">Desc. Incond.</label>
+          </span>
+        </div>
+
+        <div class="field col-12 md:col-2">
+          <span class="p-float-label">
+            <input
+              id="descontoCondicionado"
+              type="text"
+              pInputText
+              [(ngModel)]="nfseData.servico.valores.descontoCondicionado"
+              name="descontoCondicionado"
+            />
+            <label for="descontoCondicionado">Desc. Condic.</label>
+          </span>
+        </div>
+
+        <!-- Informações Complementares -->
+        <div class="field col-12">
+          <span class="p-float-label">
+            <textarea
+              id="informacoesComplementares"
+              rows="2"
+              pInputTextarea
+              [(ngModel)]="nfseData.informacoesComplementares"
+              name="informacoesComplementares"
+            ></textarea>
+            <label for="informacoesComplementares">Informações Complementares</label>
+          </span>
+        </div>
+
+        <!-- Botão de envio -->
+        <div class="field col-12">
           <p-button
             icon="pi pi-check"
-            severity="success"
-            label="Emitir Nota Fiscal"
+            label="Emitir NFSe"
             (click)="onSubmit()"
+            [loading]="loading"
           ></p-button>
         </div>
-      </div>
-
-      <!-- Mensagem de Retorno -->
-      <div
-        *ngIf="exibirMensagem"
-        class="mt-4"
-        [ngClass]="{ 'text-success': isEnvioSucesso, 'text-danger': !isEnvioSucesso }"
-      >
-        {{ mensagem }}
       </div>
     </div>
   </div>

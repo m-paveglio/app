@@ -29,14 +29,12 @@ export class EmpresasConsultarComponent {
   ];
   EmpresasEncontradas: any[] = [];
   OPTANTE_SN_nome: string = '';
-  AMBIENTE_INTEGRACAO = [
-    { nome: 'PRODUÇÃO', codigo: '1' },
-    { nome: 'HOMOLOGAÇÃO', codigo: '2' }
-  ];
   AMBIENTE_INTEGRACAO_NOME: string = '';
   selectedFile: File | null = null;
   certificadoSelecionado: File | null = null;
   senhaCertificado: string = '';
+  webservicesDisponiveis: any[] = []; // Nova propriedade para armazenar webservices
+  AMBIENTE_INTEGRACAO_ID: any[] = []; // Agora será populado dinamicamente
 
   constructor(
     private EmpresasService: EmpresasService,
@@ -45,6 +43,41 @@ export class EmpresasConsultarComponent {
     private confirmationService: ConfirmationService,
     private cd: ChangeDetectorRef
   ) {}
+
+  ngOnInit() {
+    this.carregarWebservicesDisponiveis();
+  }
+
+  carregarWebservicesDisponiveis() {
+    this.EmpresasService.getWebservices().subscribe(
+      (webservices) => {
+        this.webservicesDisponiveis = webservices; // Armazena a lista original
+        console.log('Webservices carregados:', this.webservicesDisponiveis);
+        
+        // Atualiza a visualização se necessário
+        if (this.resultado && this.resultado.AMBIENTE_INTEGRACAO_ID) {
+          this.cd.detectChanges(); // Força a detecção de mudanças
+        }
+      },
+      (error) => {
+        console.error('Erro ao carregar webservices:', error);
+        this.showError('Erro ao carregar ambientes de integração disponíveis');
+        this.webservicesDisponiveis = []; // Limpa a lista em caso de erro
+      }
+    );
+  }
+
+  getNomeWebservice(id: number): string {
+    if (!id) return 'Não selecionado';
+    
+    // Verifica se webservicesDisponiveis está carregado
+    if (!this.webservicesDisponiveis || this.webservicesDisponiveis.length === 0) {
+      return 'Carregando...';
+    }
+    
+    const ws = this.webservicesDisponiveis.find(w => w.ID === id);
+    return ws ? ws.NOME_CIDADE : `WebService ID: ${id}`;
+  }
 
   buscarEmpresa() {
     // Verifica se o CNPJ está preenchido e válido para busca por CNPJ
@@ -119,10 +152,9 @@ export class EmpresasConsultarComponent {
       NOME: this.resultado.NOME,
       IM: this.resultado.IM,
       OPTANTE_SN: this.resultado.OPTANTE_SN,
-      AMBIENTE_INTEGRACAO: this.resultado.AMBIENTE_INTEGRACAO
-      
+      AMBIENTE_INTEGRACAO_ID: this.resultado.AMBIENTE_INTEGRACAO_ID // Campo corrigido
     };
-
+  
     this.EmpresasService.atualizarEmpresa(this.resultado.CNPJ, updatePayload).subscribe(
       () => {
         this.editMode = false;
@@ -130,11 +162,7 @@ export class EmpresasConsultarComponent {
       },
       (error) => {
         console.error('Erro ao atualizar empresa:', error);
-        if (error.error && error.error.message) {
-          this.processarErro(error.error.message);
-        } else {
-          this.showError('Erro ao atualizar empresa');
-        }
+        this.showError('Erro ao atualizar empresa');
       }
     );
   }
@@ -182,7 +210,7 @@ export class EmpresasConsultarComponent {
   }
 
   getINTEGRACAO(codigo: string) {
-    let AMBIENTE_INTEGRACAO = this.AMBIENTE_INTEGRACAO.find(u => u.codigo === codigo);
+    let AMBIENTE_INTEGRACAO = this.AMBIENTE_INTEGRACAO_ID.find(u => u.codigo === codigo);
     return AMBIENTE_INTEGRACAO ? AMBIENTE_INTEGRACAO.nome : '';
   }
 
@@ -198,6 +226,13 @@ export class EmpresasConsultarComponent {
       }
     );
   }
+
+
+// Método chamado quando o webservice é alterado
+onAmbienteIntegracaoChange(event: any) {
+  // Você pode adicionar lógica adicional aqui se necessário
+  console.log('WebService selecionado:', event.value);
+}
 
   confirmarExclusao() {
     this.confirmationService.confirm({
@@ -235,4 +270,5 @@ export class EmpresasConsultarComponent {
       }
     );
   }
+
 }

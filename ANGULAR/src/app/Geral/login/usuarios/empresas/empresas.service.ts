@@ -119,6 +119,12 @@ export class EmpresasService {
  
   }
 
+  getWebservices(): Observable<any[]> {  // ← Mudou de { data: any[] } para any[]
+    return this.http.get<any[]>(`${this.apiUrl}/webservice`);  // Remove o tipo { data: any[] }
+  }
+
+  
+
   /*exportarRelatorio(): Observable<any> {
     const url = `${this.apiUrl}/empresa/export/excel`; // Corrigido
     return this.http.get(url).pipe(

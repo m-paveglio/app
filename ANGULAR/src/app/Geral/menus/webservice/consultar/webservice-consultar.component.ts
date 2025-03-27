@@ -57,7 +57,8 @@ export class WebserviceConsultarComponent implements OnInit {
       const dadosParaEnviar = {
         ID: webservice.ID,
         NOME_CIDADE: webservice.NOME_CIDADE,
-        LINK: webservice.LINK
+        LINK: webservice.LINK,
+        SERIE_RPS: webservice.SERIE_RPS
       };
   
       await this.webserviceService.updateWebservice(webservice.ID, dadosParaEnviar).toPromise();

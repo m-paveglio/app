@@ -19,6 +19,7 @@
                 <tr>
                   <th>Nome da Cidade</th>
                   <th>Link</th>
+                  <th>Série RPS</th>
                   <th>Ações</th>
                 </tr>
               </ng-template>
@@ -32,6 +33,11 @@
                   <td>
                     <input *ngIf="ws.isEditing" type="text" [(ngModel)]="ws.LINK" class="p-inputtext" />
                     <span *ngIf="!ws.isEditing">{{ ws.LINK }}</span>
+                  </td>
+
+                  <td>
+                    <input *ngIf="ws.isEditing" type="text" [(ngModel)]="ws.SERIE_RPS" class="p-inputtext" />
+                    <span *ngIf="!ws.isEditing">{{ ws.SERIE_RPS }}</span>
                   </td>
 
                   <td>
