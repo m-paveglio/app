@@ -3,6 +3,7 @@ import { NfseService } from '../nfse.service';
 import { MessageService } from 'primeng/api';
 import { LoginService } from '../../../login/login.service';
 import { EmpresasService } from '../../../login/usuarios/empresas/empresas.service';
+import { WebserviceService } from '../../webservice/webservice.service';
 
 @Component({
   selector: 'app-gerar-nfse',
@@ -19,7 +20,7 @@ export class GerarNfseComponent implements OnInit {
   nfseData = {
     identificacao: {
       numero: '',
-      serie: '1',
+      serie: '',
       tipo: '1'
     },
     dataEmissao: new Date().toISOString().split('T')[0],
@@ -79,12 +80,14 @@ export class GerarNfseComponent implements OnInit {
   cnpj: string | null = null;
   empresaSelecionada: any = null;
   inscricaoMunicipalManual: string = '';
+  serieRPS: string = '';
 
   constructor(
     private nfseService: NfseService,
     private messageService: MessageService,
     private loginService: LoginService,
-    private empresaService: EmpresasService
+    private empresaService: EmpresasService,
+    private webserviceService: WebserviceService
   ) {}
 
   ngOnInit(): void {
@@ -106,25 +109,47 @@ export class GerarNfseComponent implements OnInit {
 
   carregarDadosEmpresa(): void {
     if (!this.cnpj) return;
-    
+  
     this.loading = true;
     this.empresaService.buscarPorCnpj(this.cnpj).subscribe({
       next: (empresa) => {
         this.empresaSelecionada = empresa;
-        console.log('Dados completos da empresa:', {
-          cnpj: this.empresaSelecionada.CNPJ,
-          inscricaoMunicipal: this.empresaSelecionada.IM,
-          optanteSimplesNacional: this.empresaSelecionada.OPTANTE_SN
-        });
+        console.log('Dados da empresa:', empresa); // Log completo
+        
+        if (empresa.AMBIENTE_INTEGRACAO_ID) {
+          this.carregarSerieRPS(empresa.AMBIENTE_INTEGRACAO_ID);
+        }
         this.loading = false;
       },
       error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Não foi possível carregar os dados da empresa'
-        });
+        console.error('Erro ao carregar empresa:', err);
         this.loading = false;
+      }
+    });
+  }
+
+  carregarSerieRPS(ambienteIntegracaoId: number): void {
+    this.webserviceService.getWebservice(ambienteIntegracaoId).subscribe({
+      next: (resposta: any) => {
+        console.log('Resposta completa do webservice:', resposta);
+        
+        // Verificação priorizando SERIE_RPS exatamente como vem da API
+        const serie = resposta.SERIE_RPS || // Primeiro tenta o formato exato
+                     resposta.serieRPS || 
+                     resposta.SerieRPS || 
+                     resposta.serie_rps || 
+                     resposta.serie ||
+                     '1';
+  
+        this.serieRPS = serie;
+        this.nfseData.identificacao.serie = serie; // Atualiza também o formulário
+        
+        console.log('Série definida como:', this.serieRPS);
+      },
+      error: (err) => {
+        console.error('Erro ao buscar série:', err);
+        this.serieRPS = '1';
+        this.nfseData.identificacao.serie = '1';
       }
     });
   }
@@ -136,35 +161,40 @@ export class GerarNfseComponent implements OnInit {
         summary: 'Erro',
         detail: 'Nenhuma empresa selecionada para emissão da NFSe'
       });
-    if (!this.empresaSelecionada.OPTANTE_SN) {
-      this.messageService.add({
-         severity: 'warn',
-         summary: 'Atenção',
-        detail: 'Status do Simples Nacional não definido para esta empresa. Usando valor padrão (Não optante).'
+      return;
+    }
+
+      // Verificação adicional da série
+      if (this.serieRPS === '1') {
+        console.warn('Série está com valor padrão "1" - resposta da API:', {
+          empresa: this.empresaSelecionada,
+          ambienteId: this.empresaSelecionada?.AMBIENTE_INTEGRACAO_ID
         });
       }
-      return;
-      
+
+    if (!this.empresaSelecionada.OPTANTE_SN) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Atenção',
+        detail: 'Status do Simples Nacional não definido para esta empresa. Usando valor padrão (Não optante).'
+      });
     }
-  
+    
+
     this.loading = true;
     
-    // Agora usando IM que é o nome correto do campo
     const prestador = {
       cnpj: this.empresaSelecionada.CNPJ,
-      inscricaoMunicipal: this.empresaSelecionada.IM // Campo agora é IM
+      inscricaoMunicipal: this.empresaSelecionada.IM
     };
 
-    // Obter o valor do Simples Nacional da empresa (1 para Sim, 2 para Não)
     const optanteSimplesNacional = this.empresaSelecionada.OPTANTE_SN || '2';
-  
-    console.log('Dados do prestador a serem enviados:', prestador);
 
-    // Mapear os dados do formulário
+    // Usar a série obtida do webservice
     const dadosEnvio = {
       identificacao: {
         numero: this.nfseData.identificacao.numero,
-        serie: this.nfseData.identificacao.serie,
+        serie: this.serieRPS, // Usa a série obtida
         tipo: this.nfseData.identificacao.tipo
       },
       dataEmissao: this.nfseData.dataEmissao,

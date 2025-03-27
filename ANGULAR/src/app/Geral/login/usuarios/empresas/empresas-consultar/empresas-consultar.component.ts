@@ -25,7 +25,7 @@ export class EmpresasConsultarComponent {
   editMode = false;
   OPTANTE_SN = [
     { nome: 'OPTANTE', codigo: '1' },
-    { nome: 'NÃO OPTANTE', codigo: '0' }
+    { nome: 'NÃO OPTANTE', codigo: '2' }
   ];
   EmpresasEncontradas: any[] = [];
   OPTANTE_SN_nome: string = '';

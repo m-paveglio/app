@@ -20,6 +20,10 @@ private apiUrl: string;
     return this.http.get<any[]>(`${this.apiUrl}/`);  // Remove o tipo { data: any[] }
   }
 
+  getWebservice(ID: number) {
+    return this.http.get(`${this.apiUrl}/${ID}`);
+  }
+
   createWebservice(webservice: any): Observable<any> {
     return this.http.post(`${this.apiUrl}`, webservice);
   }

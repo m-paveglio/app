@@ -22,7 +22,7 @@ export class EmpresasIncluirComponent {
 
   OPTANTE_SN = [
     { nome: 'OPTANTE', codigo: '1' },
-    { nome: 'NÃO OPTANTE', codigo: '0' }
+    { nome: 'NÃO OPTANTE', codigo: '2' }
   ];
 
   constructor(

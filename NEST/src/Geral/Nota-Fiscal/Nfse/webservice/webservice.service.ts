@@ -20,7 +20,6 @@ export class WebserviceService {
   async getWebservice(id: number): Promise<Webservice> {
     const webservice = await this.webserviceRepository.findOne({
       where: { ID: id },
-      select: ['ID', 'LINK']
     });
   
     if (!webservice) {
