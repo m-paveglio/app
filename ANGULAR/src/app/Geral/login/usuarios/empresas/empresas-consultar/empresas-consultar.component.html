@@ -174,16 +174,60 @@
                     </p-dropdown>
                 </div>
                 
-
-        
+                            <!-- Certificado Digital -->
+                <div class="field col-12 md:col-2">
+                    <span class="p-float-label float-label-fixed">
+                    <p-fileUpload name="certificado" 
+                                (onSelect)="onCertificadoSelecionado($event)"
+                                [multiple]="false"
+                                accept=".pfx,.p12"
+                                maxFileSize="1000000"
+                                mode="basic"
+                                chooseLabel="Buscar Certificado"
+                                chooseIcon="pi pi-search"
+                                styleClass="p-button p-button-info"
+                                [disabled]="!editMode">
+                    </p-fileUpload>
+                    <label>CERTIFICADO DIGITAL</label>
+                    <small *ngIf="certificadoEnviado" class="text-sm text-color-success" style="display: block; margin-top: 5px;">
+                        <i class="pi pi-check-circle"></i> CERTIFICADO ENVIADO
+                    </small>
+                    </span>
+                </div>
+                
+                <!-- Senha do Certificado -->
+                <div class="field col-12 md:col-2">
+                    <span class="p-float-label float-label-fixed">
+                    <input id="senha-certificado" type="text" pinputtext="" 
+                            class="p-inputtext p-component p-element"
+                            [value]="senhaCertificado ? '••••••••' : ''"
+                            readonly
+                            [style.backgroundColor]="'lightgray'">
+                    <label for="senha-certificado">SENHA DO CERTIFICADO</label>
+                    </span>
+                </div>
+                
+                <!-- Data de Upload -->
+                <div class="field col-12 md:col-2" *ngIf="dataUploadCertificado">
+                    <span class="p-float-label float-label-fixed">
+                    <input id="data-upload" type="text" pinputtext="" 
+                            class="p-inputtext p-component p-element"
+                            [value]="dataUploadCertificado | date: 'dd/MM/yyyy HH:mm'"
+                            readonly
+                            [style.backgroundColor]="'lightgray'">
+                    <label for="data-upload">DATA DO UPLOAD</label>
+                    </span>
+                </div>
+                       
 
 
                 <!-- Botões Editar, Salvar e Excluir -->
-                <div class="btn-group field col-12 md:col-2 flex flex-wrap gap-3" role="group" aria-label="Edit group">
-                    <label for=""></label>
+                <!-- No grupo de botões, adicione: -->
+                <div class="btn-group field col-12 md:col-3 flex flex-wrap gap-3" role="group" aria-label="Edit group">
                     <p-button *ngIf="!editMode" icon="pi pi-pencil" severity="info" (click)="editarEmpresa(resultado.CNPJ)"></p-button>
                     <p-button *ngIf="editMode" icon="pi pi-save" severity="success" (click)="salvarEmpresa()"></p-button>
-                    <p-button icon="pi pi-trash" severity="danger" (click)="confirmarExclusao()"></p-button>
+                    <p-button *ngIf="editMode" icon="pi pi-times" severity="warning" (click)="cancelarEdicao()"></p-button>
+                    <p-button *ngIf="!editMode" icon="pi pi-trash" severity="danger" (click)="confirmarExclusao()"></p-button>
                 </div>
             </div>
         </div>

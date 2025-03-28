@@ -34,7 +34,12 @@ export class EmpresasConsultarComponent {
   certificadoSelecionado: File | null = null;
   senhaCertificado: string = '';
   webservicesDisponiveis: any[] = []; // Nova propriedade para armazenar webservices
-  AMBIENTE_INTEGRACAO_ID: any[] = []; // Agora será populado dinamicamente
+  AMBIENTE_INTEGRACAO_ID: any[] = []; // Agora será populado dinamicamente]
+  certificadoCarregado: boolean = false;
+  // Adicione estas variáveis na classe
+  dataUploadCertificado: string | null = null;
+  certificadoEnviado: boolean = false;
+  valoresOriginais: any = {};
 
   constructor(
     private EmpresasService: EmpresasService,
@@ -96,16 +101,21 @@ export class EmpresasConsultarComponent {
       this.showError('CNPJ inválido!');
       return;
     }
-
+  
     this.EmpresasService.buscarPorCnpj(this.CNPJ).subscribe(
       (data) => {
         if (data && Object.keys(data).length > 0) {
           this.resultado = data;
-
-          // Converte TIPO_USER para exibir o nome correspondente em outra propriedade
+          
+          // Carrega os dados do certificado na primeira consulta
+          this.certificadoEnviado = !!data.certificado;
+          this.senhaCertificado = data.senha || '';
+          this.dataUploadCertificado = data.data_upload || null;
+          
+          // Converte OPTANTE_SN para exibir o nome correspondente
           const OPTANTE_SN = this.OPTANTE_SN.find(t => t.codigo === this.resultado.OPTANTE_SN);
           this.resultado.OPTANTE_SN_nome = OPTANTE_SN ? OPTANTE_SN.nome : '';
-
+  
           console.log(this.resultado);
         } else {
           this.showError('Empresa não existe no banco de dados.');
@@ -125,9 +135,17 @@ export class EmpresasConsultarComponent {
       (data) => {
         if (data) {
           if (Array.isArray(data) && data.length > 0) {
-            this.resultado = data;
+            // Para busca por nome, não carregamos certificado até selecionar um CNPJ
+            this.EmpresasEncontradas = data.map(empresa => ({
+              ...empresa,
+              OPTANTE_SN_nome: this.getOptanteSN(empresa.OPTANTE_SN)
+            }));
           } else if (!Array.isArray(data)) {
             this.resultado = data;
+            // Carrega certificado se retornar direto um resultado
+            this.certificadoEnviado = !!data.certificado;
+            this.senhaCertificado = data.senha || '';
+            this.dataUploadCertificado = data.data_upload || null;
           }
         } else {
           this.showError('Empresa não encontrada pelo nome.');
@@ -141,7 +159,6 @@ export class EmpresasConsultarComponent {
       }
     );
   }
-
   isCnpjValido(cnpjStr: string): boolean {
     return cnpj.isValid(cnpjStr); // Validação usando a biblioteca
   }
@@ -152,13 +169,18 @@ export class EmpresasConsultarComponent {
       NOME: this.resultado.NOME,
       IM: this.resultado.IM,
       OPTANTE_SN: this.resultado.OPTANTE_SN,
-      AMBIENTE_INTEGRACAO_ID: this.resultado.AMBIENTE_INTEGRACAO_ID // Campo corrigido
+      AMBIENTE_INTEGRACAO_ID: this.resultado.AMBIENTE_INTEGRACAO_ID
     };
-  
+    
     this.EmpresasService.atualizarEmpresa(this.resultado.CNPJ, updatePayload).subscribe(
       () => {
         this.editMode = false;
         this.showSuccess('Empresa atualizada com sucesso!');
+        
+        // Se tem certificado para enviar, faz o upload
+        if (this.certificadoSelecionado && this.senhaCertificado) {
+          this.enviarCertificado();
+        }
       },
       (error) => {
         console.error('Erro ao atualizar empresa:', error);
@@ -167,13 +189,24 @@ export class EmpresasConsultarComponent {
     );
   }
 
+  get senhaMascarada(): string {
+    return this.senhaCertificado ? '********' : '';
+  }
+
 
   selecionarEmpresa(empresa: any) {
-    // Define o usuário selecionado como o `resultado`
     this.EmpresasService.buscarPorCnpj(empresa.CNPJ).subscribe(
       (data) => {
         this.resultado = data;
-        this.EmpresasEncontradas = []; // Limpa a lista de opções
+        this.EmpresasEncontradas = [];
+        
+        // Verifica se tem certificado
+        this.certificadoEnviado = !!data.certificado;
+        this.senhaCertificado = data.senha || '';
+        this.dataUploadCertificado = data.data_upload || null;
+        
+        // Sempre azul, independente de ter certificado
+        this.certificadoCarregado = true;
       },
       (error) => {
         console.error('Erro ao selecionar empresa:', error);
@@ -227,12 +260,11 @@ export class EmpresasConsultarComponent {
     );
   }
 
-
 // Método chamado quando o webservice é alterado
-onAmbienteIntegracaoChange(event: any) {
-  // Você pode adicionar lógica adicional aqui se necessário
-  console.log('WebService selecionado:', event.value);
-}
+  onAmbienteIntegracaoChange(event: any) {
+    // Você pode adicionar lógica adicional aqui se necessário
+    console.log('WebService selecionado:', event.value);
+  }
 
   confirmarExclusao() {
     this.confirmationService.confirm({
@@ -259,16 +291,85 @@ onAmbienteIntegracaoChange(event: any) {
       (data) => {
         this.resultado = data;
         this.editMode = true;
+        this.certificadoCarregado = true;
+        this.certificadoEnviado = !!data.certificado;
+        
+        // Salva os valores originais para possível cancelamento
+        this.valoresOriginais = {
+          ...data,
+          senha: this.senhaCertificado,
+          data_upload: this.dataUploadCertificado
+        };
       },
       (error) => {
         console.error('Erro ao editar Empresa:', error);
-        if (error.error && error.error.message) {
-          this.processarErro(error.error.message);
-        } else {
-          this.showError('Erro ao buscar Empresa para edição.');
-        }
+        this.showError('Erro ao buscar Empresa para edição.');
       }
     );
   }
+
+  onCertificadoSelecionado(event: any): void {
+    if (event.files && event.files.length > 0) {
+      this.certificadoSelecionado = event.files[0];
+      this.certificadoCarregado = true;
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Certificado selecionado',
+        detail: this.certificadoSelecionado?.name || 'Arquivo sem nome'
+      });
+    }
+  }
+
+  enviarCertificado(): void {
+    if (!this.resultado?.CNPJ) {
+      this.showError('CNPJ não disponível');
+      return;
+    }
+  
+    if (!this.certificadoSelecionado) {
+      this.showError('Selecione um certificado primeiro');
+      return;
+    }
+  
+    if (!this.senhaCertificado) {
+      this.showError('Informe a senha do certificado');
+      return;
+    }
+  
+    this.EmpresasService.enviarCertificado(
+      this.resultado.CNPJ,
+      this.certificadoSelecionado,
+      this.senhaCertificado
+    ).subscribe({
+      next: () => {
+        this.showSuccess('Certificado enviado com sucesso');
+        this.certificadoCarregado = true;
+      },
+      error: (err) => {
+        this.showError('Falha ao enviar certificado: ' + (err.error?.message || err.message));
+      }
+    });
+  }
+
+  cancelarEdicao() {
+    if (this.resultado?.CNPJ) {
+      this.EmpresasService.buscarPorCnpj(this.resultado.CNPJ).subscribe(
+        (data) => {
+          this.resultado = data;
+          this.editMode = false;
+          this.certificadoEnviado = !!data.certificado;
+          this.senhaCertificado = data.senha || '';
+          this.dataUploadCertificado = data.data_upload || null;
+        },
+        (error) => {
+          console.error('Erro ao cancelar edição:', error);
+          this.showError('Erro ao cancelar edição');
+        }
+      );
+    } else {
+      this.editMode = false;
+    }
+  }
+  
 
 }

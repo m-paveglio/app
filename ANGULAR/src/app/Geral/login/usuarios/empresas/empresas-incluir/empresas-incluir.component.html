@@ -33,7 +33,7 @@
             </span>
           </div>
 
-          <div class="field col-12 md:col-2">
+          <div class="field col-12 md:col-4">
             <span class="p-float-label float-label-fixed">
               <p-dropdown 
                 id="float-input" 
@@ -56,8 +56,8 @@
               <label for="float-input">AMBIENTE INTEGRAÇÃO</label>
             </span>
           </div>
-
-          <div class="p-field p-col-12 p-md-4">
+          
+          <div class="field col-12 md:col-2">
             <span class="p-float-label float-label-fixed">
               <p-fileUpload name="certificado" 
                            (onSelect)="onCertificadoSelecionado($event)"
@@ -67,16 +67,17 @@
                            mode="basic"
                            chooseLabel="Buscar Certificado"
                            chooseIcon="pi pi-search"
-                           styleClass="p-button-rounded p-button-info">
+                           styleClass="p-button p-button-info">
               </p-fileUpload>
               <label>CERTIFICADO DIGITAL</label>
             </span>
           </div>
 
+
           <div class="field col-12 md:col-2">
             <span class="p-float-label float-label-fixed">
               <input id="float-input" type="password" pinputtext="" class="p-inputtext p-component p-element p-filled"  [(ngModel)]="senhaCertificado" name="senhaCertificado" >
-              <label for="float-input">Senha</label>
+              <label for="float-input">SENHA DO CERTIFICADO</label>
             </span>
           </div>
 
