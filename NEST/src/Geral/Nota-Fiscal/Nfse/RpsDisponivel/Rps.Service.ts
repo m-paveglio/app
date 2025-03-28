@@ -301,4 +301,36 @@ private criarAssinatura(nodeToSign: any, privateKeyPem: string, publicCertPem: s
       throw new Error(`Falha ao processar resposta: ${error.message}`);
     }
   }
+
+  async buscarPrimeiroRpsDisponivel(cnpj: string): Promise<number | null> {
+    try {
+      this.logger.debug(`Buscando primeiro RPS disponível para CNPJ: ${cnpj}`);
+      
+      // Reutiliza a função existente para buscar todos os RPS disponíveis
+      const todosRps = await this.consultarRpsDisponiveis(cnpj);
+      
+      if (todosRps.length === 0) {
+        this.logger.debug('Nenhum RPS disponível encontrado');
+        return null;
+      }
+      
+      // Retorna o primeiro RPS (já está ordenado pelo método consultarRpsDisponiveis)
+      const primeiroRps = todosRps[0];
+      this.logger.debug(`Primeiro RPS disponível encontrado: ${primeiroRps}`);
+      
+      return primeiroRps;
+    } catch (error) {
+      this.logger.error('Erro ao buscar primeiro RPS:', {
+        message: error.message,
+        stack: error.stack
+      });
+      
+      throw error instanceof HttpException 
+        ? error 
+        : new HttpException(
+            'Falha ao buscar primeiro RPS disponível',
+            HttpStatus.INTERNAL_SERVER_ERROR
+          );
+    }
+  }
 }

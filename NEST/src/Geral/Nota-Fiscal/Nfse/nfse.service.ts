@@ -10,6 +10,7 @@ import { NFSE } from './nfse.entity';
 import { EmpresasService } from 'src/Login/empresas/empresas.service';
 import { WebserviceService } from './webservice/webservice.service';
 import * as xmldom from 'xmldom';
+import { RpsService } from './RpsDisponivel/rps.service';
 
 @Injectable()
 export class NfseService {
@@ -103,27 +104,79 @@ private async carregarCertificado(cnpj: string): Promise<{ privateKey: string; p
 }
   
 async enviarLoteRps(dados: any): Promise<any> {
-      const cnpjPrestador = dados.prestador?.cnpj;
-      this.logger.debug(`Iniciando envio de lote RPS para CNPJ: ${cnpjPrestador}`);
-      this.logger.verbose('Dados recebidos:', JSON.stringify(dados, null, 2));
-  
-      try {
+    const cnpjPrestador = dados.prestador?.cnpj;
+    this.logger.debug(`Iniciando envio de lote RPS para CNPJ: ${cnpjPrestador}`);
+    this.logger.verbose('Dados recebidos:', JSON.stringify(dados, null, 2));
+
+    try {
         if (!cnpjPrestador) {
-          throw new Error('CNPJ do prestador não informado');
+            throw new Error('CNPJ do prestador não informado');
         }
-        if (!dados.rpsList?.length) {
-          throw new Error('Pelo menos um RPS deve ser informado');
+
+        // 1. Verificar e buscar RPS disponível se necessário
+        if (!dados.rpsList?.length || !dados.rpsList[0]?.identificacao?.numero) {
+            
+            const rpsService = new RpsService(
+                this.httpService,
+                this.empresasService,
+                this.webserviceService
+            );
+
+
+            if (!dados.rpsList?.[0]?.identificacao?.serie) {
+              // Verifica se está usando a estrutura antiga (dados diretos)
+              if (dados.identificacao?.serie) {
+                  // Migra para a nova estrutura
+                  dados.rpsList = [{
+                      identificacao: {
+                          serie: dados.identificacao.serie,
+                          tipo: dados.identificacao.tipo
+                      },
+                      dataEmissao: dados.dataEmissao,
+                      status: dados.status,
+                      // ... outros campos
+                  }];
+              } else {
+                  throw new Error('Série do RPS não informada. Este campo é obrigatório');
+              }
+          }
+          
+            if (!dados.rpsList?.length || !dados.rpsList[0]?.identificacao?.numero) {
+            const primeiroRps = await rpsService.buscarPrimeiroRpsDisponivel(cnpjPrestador);
+            
+            dados.rpsList = [{
+              ...dados.rpsList?.[0] || {}, // Mantém todos os dados existentes
+              identificacao: {
+                  ...dados.rpsList?.[0]?.identificacao || {}, // Mantém série, tipo, etc.
+                  numero: primeiroRps // Apenas atualiza o número
+              }
+          }];
+      }
+
+
+            if (!dados.lote?.numeroLote) {
+                const now = new Date();
+                dados.lote = {
+                    numeroLote: now.getTime().toString(),
+                    quantidadeRps: 1
+                };
+                this.logger.debug(`Número de lote gerado automaticamente: ${dados.lote.numeroLote}`);
+            }
         }
-  
-        // 1. Carregar certificado
-        this.logger.debug('Carregando certificado digital...');
-        const certificado = await this.carregarCertificado(cnpjPrestador);
-        this.logger.debug('Certificado carregado com sucesso');
-  
-        // 2. Gerar XML
-        this.logger.debug('Gerando XML do lote RPS...');
-        const xml = this.gerarXmlLoteRps(dados);
-        this.logger.verbose('XML gerado:', xml);
+
+      // DEBUG: Verificar os dados antes de gerar o XML
+      this.logger.debug('Dados do RPS que será enviado:', JSON.stringify(dados.rpsList, null, 2));
+
+      // 2. Carregar certificado
+      this.logger.debug('Carregando certificado digital...');
+      const certificado = await this.carregarCertificado(cnpjPrestador);
+      this.logger.debug('Certificado carregado com sucesso');
+
+      // Restante do método continua igual...
+      // 3. Gerar XML
+      this.logger.debug('Gerando XML do lote RPS...');
+      const xml = this.gerarXmlLoteRps(dados);
+      this.logger.verbose('XML gerado:', xml);
   
               // 3. Assinar XML
           this.logger.debug('Assinando XML...');
@@ -309,6 +362,7 @@ private gerarXmlRps(rps: any, prestadorLote: any): string {
   const tomadorEnderecoExterior = tomador.enderecoExterior || {};
   const servico = rps.servico || {};
   const valores = servico.valores || {};
+  const serieRps = rps.identificacao.serie;
 
   // Função para formatar corretamente as tags condicionais
   const formatConditionalTag = (condition: any, tag: string, content: string, level: number) => {
@@ -324,13 +378,17 @@ private gerarXmlRps(rps: any, prestadorLote: any): string {
       return `${indent}${content}\n`;
   };
 
+  if (!rps.identificacao?.serie) {
+    throw new Error('Série do RPS não informada. A série é obrigatória e deve ser definida pelo usuário');
+  }
+
   let xml = `
               <Rps>
               <InfDeclaracaoPrestacaoServico>
                 <Rps>
                   <IdentificacaoRps>
                     <Numero>${rps.identificacao?.numero || ''}</Numero>
-                    <Serie>${rps.identificacao?.serie || '1'}</Serie>
+                    <Serie>${serieRps}</Serie>
                     <Tipo>${rps.identificacao?.tipo || '1'}</Tipo>
                   </IdentificacaoRps>
                   <DataEmissao>${rps.dataEmissao || new Date().toISOString()}</DataEmissao>
