@@ -5,6 +5,9 @@ export class pessoas {
   @PrimaryColumn({ length: 14, unique: true })
   CPF_CNPJ: string;
 
+  @Column({ type: 'varchar', length: 100, nullable: true})
+  IM: string;
+
   @Column({ type: 'varchar', length: 100 })
   NOME: string;
 

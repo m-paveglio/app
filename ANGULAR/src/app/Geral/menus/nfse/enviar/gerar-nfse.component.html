@@ -1,4 +1,4 @@
-<div class="grid" *ngIf="nfseData">
+<div class="grid p-fluid p-formgrid" *ngIf="nfseData">
   <div class="col-12">
     <div class="p-inputtext p-component p-element">
       <h3
@@ -12,13 +12,21 @@
         EMISSÃO DE NOTA FISCAL
       </h3>
 
-      <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
-
-        <div class="card p-3">
-          <h3>Datas</h3>
-          <div class="grid gap-3">
+      <div class="grid p-fluid p-formgrid p-3">
+        <div class="card col-12 md:col-3">
+          <h5
+          h5 class="text-center mb-5"
+          [ngStyle]="{
+            backgroundColor: 'var(--cyan-800)',
+            color: 'var(--primary-color-text)',
+            borderRadius: 'var(--border-radius)'
+          }">
+        
+         DATAS
+        </h5>
+          <div class="grid gap-12">
             <!-- Data de Emissão -->
-            <div class="field col-12 md:col-4">
+            <div class="field col-12 md:col-6">
               <span class="p-float-label">
                 <input
                   id="dataEmissao"
@@ -33,7 +41,7 @@
             </div>
         
             <!-- Competência -->
-            <div class="field col-12 md:col-4">
+            <div class="field col-12 md:col-6">
               <span class="p-float-label">
                 <input
                   id="competencia"
@@ -49,6 +57,302 @@
           </div>
         </div>
 
+        <div class="card col-12 md:col-9">
+          <h5 class="text-center mb-5" 
+              [ngStyle]="{
+                backgroundColor: 'var(--cyan-800)',
+                color: 'var(--primary-color-text)',
+                borderRadius: 'var(--border-radius)'
+              }">
+            LOCALIZAÇÃO
+          </h5>
+          <div class="grid gap-12">
+            <!-- UF Prestação -->
+            <div class="field col-12 md:col-2">
+              <span class="p-float-label">
+                <p-dropdown id="ufPrestacao"
+                            [options]="ufs" 
+                            [(ngModel)]="ufSelecionadaPrestacao"
+                            (onChange)="filtrarCidadesPrestacao($event.value)"
+                            styleClass="w-full">
+                  <ng-template pTemplate="item" let-uf>
+                    {{ uf }}
+                  </ng-template>
+                </p-dropdown>
+                <label for="ufPrestacao">UF</label>
+              </span>
+            </div>
+        
+            <!-- Cidade Prestação -->
+            <div class="field col-12 md:col-4">
+              <span class="p-float-label">
+                <p-dropdown id="municipioPrestacao"
+                            [options]="filteredCidadesPrestacao" 
+                            [(ngModel)]="selectedCidadePrestacao"
+                            optionLabel="NOME_CIDADE"
+                            [disabled]="!ufSelecionadaPrestacao"
+                            styleClass="w-full">
+                  <ng-template pTemplate="item" let-cidade>
+                    <span class="block whitespace-nowrap">{{ cidade.NOME_CIDADE }}</span>
+                  </ng-template>
+                </p-dropdown>
+                <label for="municipioPrestacao">Cidade Prestação</label>
+              </span>
+            </div>
+        
+            <!-- UF Incidência -->
+            <div class="field col-12 md:col-2">
+              <span class="p-float-label">
+                <p-dropdown id="ufIncidencia"
+                            [options]="ufs" 
+                            [(ngModel)]="ufSelecionadaIncidencia"
+                            (onChange)="filtrarCidadesIncidencia($event.value)"
+                            styleClass="w-full">
+                  <ng-template pTemplate="item" let-uf>
+                    {{ uf }}
+                  </ng-template>
+                </p-dropdown>
+                <label for="ufIncidencia">UF</label>
+              </span>
+            </div>
+        
+            <!-- Cidade Incidência -->
+            <div class="field col-12 md:col-4">
+              <span class="p-float-label">
+                <p-dropdown id="municipioIncidencia"
+                            [options]="filteredCidadesIncidencia" 
+                            [(ngModel)]="selectedCidadeIncidencia"
+                            optionLabel="NOME_CIDADE"
+                            [disabled]="!ufSelecionadaIncidencia"
+                            styleClass="w-full">
+                  <ng-template pTemplate="item" let-cidade>
+                    <span class="block whitespace-nowrap">{{ cidade.NOME_CIDADE }}</span>
+                  </ng-template>
+                </p-dropdown>
+                <label for="municipioIncidencia">Cidade Incidência</label>
+              </span>
+            </div>
+          </div>
+        </div>
+
+      <div class="card p-3">
+        <h5 class="text-center mb-5" 
+            [ngStyle]="{
+              backgroundColor: 'var(--cyan-800)',
+              color: 'var(--primary-color-text)',
+              borderRadius: 'var(--border-radius)'
+            }">
+          TOMADOR
+        </h5>
+        
+        <!-- Seção de Dados Pessoais -->
+        <div class="grid gap-12">
+          <!-- CPF/CNPJ -->
+          <div class="field col-12 md:col-3">
+            <span class="p-float-label">
+              <input
+                id="tomadorCpfCnpj"
+                type="text"
+                pInputText
+                class="p-inputtext p-component p-element p-filled"
+                mask="000.000.000-00 || 00.000.000/0000-00"
+                [ngModel]="nfseData.tomador.identificacao.cpf || nfseData.tomador.identificacao.cnpj"
+                (ngModelChange)="formatarCpfCnpj($event)"
+                name="tomadorCpfCnpj"
+                (keydown.enter)="buscarPorCpf(nfseData.tomador.identificacao.cpf || nfseData.tomador.identificacao.cnpj)"
+              />
+              <label for="tomadorCpfCnpj">CPF/CNPJ</label>
+            </span>
+          </div>
+
+          <div class="field col-12 md:col-3">
+            <span class="p-float-label">
+              <input
+                id="tomadorInscricaoMunicipal"
+                type="text"
+                pInputText
+                class="p-inputtext p-component p-element p-filled"
+                [(ngModel)]="nfseData.tomador.identificacao.inscricaoMunicipal"
+                name="tomadorInscricaoMunicipal"
+              />
+              <label for="tomadorInscricaoMunicipal">Inscrição Municipal</label>
+            </span>
+          </div>
+      
+          <!-- Razão Social -->
+          <div class="field col-12 md:col-6">
+            <span class="p-float-label">
+              <input
+                id="tomadorRazaoSocial"
+                type="text"
+                pInputText
+                class="p-inputtext p-component p-element p-filled"
+                [(ngModel)]="nfseData.tomador.razaoSocial"
+                name="tomadorRazaoSocial"
+              />
+              <label for="tomadorRazaoSocial">Razão Social</label>
+            </span>
+          </div>
+      
+          <!-- Contatos -->
+          <div class="field col-12 md:col-4">
+            <span class="p-float-label">
+              <input
+                id="tomadorEmail"
+                type="text"
+                pInputText
+                class="p-inputtext p-component p-element p-filled"
+                [(ngModel)]="nfseData.tomador.contato.email"
+                name="tomadorEmail"
+              />
+              <label for="tomadorEmail">E-mail</label>
+            </span>
+          </div>
+      
+          <div class="field col-12 md:col-3">
+            <span class="p-float-label">
+              <input
+                id="tomadorTelefone"
+                type="text"
+                pInputText
+                class="p-inputtext p-component p-element p-filled"
+                mask="0 0000-0000"
+                [(ngModel)]="nfseData.tomador.contato.telefone"
+                name="tomadorTelefone"
+              />
+              <label for="tomadorTelefone">Celular</label>
+            </span>
+          </div>
+        </div>
+      
+        <!-- Seção de Endereço -->
+        <h5 class="text-center mb-5 mt-5" 
+            [ngStyle]="{
+              backgroundColor: 'var(--cyan-800)',
+              color: 'var(--primary-color-text)',
+              borderRadius: 'var(--border-radius)'
+            }">
+          ENDEREÇO
+        </h5>
+        
+        <div class="grid gap-12">
+          <!-- CEP -->
+          <div class="field col-12 md:col-2">
+            <span class="p-float-label">
+              <input
+                id="tomadorCep"
+                type="text"
+                pInputText
+                class="p-inputtext p-component p-element p-filled"
+                mask="00000-000"
+                [(ngModel)]="nfseData.tomador.endereco.cep"
+                name="tomadorCep"
+                (blur)="buscarEnderecoPorCEP(nfseData.tomador.endereco.cep)"
+              />
+              <label for="tomadorCep">CEP</label>
+            </span>
+          </div>
+      
+          <!-- Logradouro -->
+          <div class="field col-12 md:col-6">
+            <span class="p-float-label">
+              <input
+                id="tomadorLogradouro"
+                type="text"
+                pInputText
+                class="p-inputtext p-component p-element p-filled"
+                [(ngModel)]="nfseData.tomador.endereco.endereco"
+                name="tomadorLogradouro"
+              />
+              <label for="tomadorLogradouro">Logradouro</label>
+            </span>
+          </div>
+      
+          <!-- Número -->
+          <div class="field col-12 md:col-1">
+            <span class="p-float-label">
+              <input
+                id="tomadorNumero"
+                type="text"
+                pInputText
+                class="p-inputtext p-component p-element p-filled"
+                [(ngModel)]="nfseData.tomador.endereco.numero"
+                name="tomadorNumero"
+              />
+              <label for="tomadorNumero">Número</label>
+            </span>
+          </div>
+      
+          <!-- Bairro -->
+          <div class="field col-12 md:col-3">
+            <span class="p-float-label">
+              <input
+                id="tomadorBairro"
+                type="text"
+                pInputText
+                class="p-inputtext p-component p-element p-filled"
+                [(ngModel)]="nfseData.tomador.endereco.bairro"
+                name="tomadorBairro"
+              />
+              <label for="tomadorBairro">Bairro</label>
+            </span>
+          </div>
+      
+          <!-- Complemento -->
+          <div class="field col-12 md:col-3">
+            <span class="p-float-label">
+              <input
+                id="tomadorComplemento"
+                type="text"
+                pInputText
+                class="p-inputtext p-component p-element p-filled"
+                [(ngModel)]="nfseData.tomador.endereco.complemento"
+                name="tomadorComplemento"
+              />
+              <label for="tomadorComplemento">Complemento</label>
+            </span>
+          </div>
+
+          <input type="hidden" [(ngModel)]="nfseData.tomador.endereco.codigoMunicipio" name="tomadorCodigoMunicipio">
+
+          <!-- Cidade - Campo visível para seleção -->
+          <div class="field col-12 md:col-3">
+            <span class="p-float-label">
+              <input
+                id="tomadorCidade"
+                type="text"
+                pInputText
+                class="p-inputtext p-component p-element p-filled"
+                [(ngModel)]="nomeCidadeTomador"
+                name="tomadorCidade"
+                readonly
+              />
+              <label for="tomadorCidade">Cidade</label>
+            </span>
+          </div>
+      
+          <!-- UF -->
+          <div class="field col-12 md:col-1">
+            <span class="p-float-label">
+              <input
+                id="tomadorUf"
+                type="text"
+                pInputText
+                class="p-inputtext p-component p-element p-filled"
+                [(ngModel)]="nfseData.tomador.endereco.uf"
+                (ngModelChange)="atualizarCidadesTomador()"
+                name="tomadorUf"
+                maxlength="2"
+              />
+              <label for="tomadorUf">UF</label>
+            </span>
+          </div>
+        </div>
+      </div>
+
+
+
+        
         <!-- Valor dos Serviços -->
         <div class="field col-12 md:col-2">
           <span class="p-float-label">
@@ -120,73 +424,7 @@
         </div>
 
         <!-- Campos do tomador do serviço -->
-        <h6 class="col-12 mt-4">Tomador do Serviço</h6>
-        <div class="field col-12 md:col-2">
-          <span class="p-float-label">
-            <input
-              id="tomadorCpfCnpj"
-              type="text"
-              pInputText
-              class="p-inputtext p-component p-element p-filled"
-              [ngModel]="nfseData.tomador.identificacao.cpf || nfseData.tomador.identificacao.cnpj"
-              (ngModelChange)="formatarCpfCnpj($event)"
-              name="tomadorCpfCnpj"
-            />
-            <label for="tomadorCpfCnpj">CPF/CNPJ</label>
-          </span>
-        </div>
-        <div class="field col-12 md:col-3">
-          <span class="p-float-label">
-            <input
-              id="tomadorRazaoSocial"
-              type="text"
-              pInputText
-              class="p-inputtext p-component p-element p-filled"
-              [(ngModel)]="nfseData.tomador.razaoSocial"
-              name="tomadorRazaoSocial"
-            />
-            <label for="tomadorRazaoSocial">Razão Social</label>
-          </span>
-        </div>
-        <div class="field col-12 md:col-2">
-          <span class="p-float-label">
-            <input
-              id="tomadorEndereco"
-              type="text"
-              pInputText
-              class="p-inputtext p-component p-element p-filled"
-              [(ngModel)]="nfseData.tomador.endereco.endereco"
-              name="tomadorEndereco"
-            />
-            <label for="tomadorEndereco">Endereço</label>
-          </span>
-        </div>
-        <div class="field col-12 md:col-2">
-          <span class="p-float-label">
-            <input
-              id="tomadorCep"
-              type="text"
-              pInputText
-              class="p-inputtext p-component p-element p-filled"
-              [(ngModel)]="nfseData.tomador.endereco.cep"
-              name="tomadorCep"
-            />
-            <label for="tomadorCep">CEP</label>
-          </span>
-        </div>
-        <div class="field col-12 md:col-2">
-          <span class="p-float-label">
-            <input
-              id="tomadoremail"
-              type="text"
-              pInputText
-              class="p-inputtext p-component p-element p-filled"
-              [(ngModel)]="nfseData.tomador.contato.email"
-              name="tomadoremail"
-            />
-            <label for="tomadoremail">Email</label>
-          </span>
-        </div>
+        
 
         <!-- Código CNAE -->
         <div class="field col-12 md:col-2">
@@ -364,4 +602,3 @@
       </div>
     </div>
   </div>
-</div>

@@ -12,7 +12,9 @@
           }">
             WEBSERVICES
           </h3>
-
+          <div class="flex justify-content-end mb-3">
+            <p-button label="Adicionar Novo" icon="pi pi-plus" (click)="addNewWebservice()"></p-button>
+          </div>
           <div>
             <p-table [value]="webservices" [paginator]="true" [rows]="5" [loading]="isLoading">
               <ng-template pTemplate="header">
@@ -44,7 +46,7 @@
                     <div class="flex gap-2">
                       <ng-container *ngIf="ws.isEditing; else normalMode">
                         <p-button icon="pi pi-save" severity="success" (click)="saveWebservice(ws)"></p-button>
-                        <p-button icon="pi pi-times" severity="warning" (click)="ws.isEditing = false"></p-button>
+                        <p-button icon="pi pi-times" severity="warning" (click)="cancelEdit(ws)"></p-button>
                       </ng-container>
 
                       <ng-template #normalMode>

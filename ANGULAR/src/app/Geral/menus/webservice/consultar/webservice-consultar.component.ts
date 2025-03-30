@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { WebserviceService } from '../webservice.service';
 import { MessageService, ConfirmationService } from 'primeng/api';
 
+
 @Component({
   selector: 'app-webservice-consultar',
   templateUrl: './webservice-consultar.component.html',
@@ -22,6 +23,26 @@ export class WebserviceConsultarComponent implements OnInit {
   ngOnInit(): void {
     this.loadWebservice();
   }
+
+  addNewWebservice(): void {
+    this.webservices.unshift({
+      NOME_CIDADE: '',
+      LINK: '',
+      SERIE_RPS: '',
+      isEditing: true  // Já abre direto no modo de edição
+    });
+  }
+
+  
+  cancelEdit(webservice: any): void {
+    if (!webservice.ID) {
+      // Remove o novo registro não salvo
+      this.webservices = this.webservices.filter(ws => ws !== webservice);
+    } else {
+      webservice.isEditing = false;
+    }
+  }
+  
 
   async loadWebservice(): Promise<void> {
     this.isLoading = true;
@@ -45,38 +66,43 @@ export class WebserviceConsultarComponent implements OnInit {
       this.isLoading = false;
     }
   }
+  
 
   async saveWebservice(webservice: any): Promise<void> {
-    if (!webservice || !webservice.ID) {
-      this.showError('Erro: Webservice inválido.');
-      return;
-    }
+    const isNew = !webservice.ID;
+  
+    const dadosParaEnviar = {
+      NOME_CIDADE: webservice.NOME_CIDADE,
+      LINK: webservice.LINK,
+      SERIE_RPS: webservice.SERIE_RPS
+    };
   
     try {
-      // Cria um novo objeto sem as propriedades de controle da interface
-      const dadosParaEnviar = {
-        ID: webservice.ID,
-        NOME_CIDADE: webservice.NOME_CIDADE,
-        LINK: webservice.LINK,
-        SERIE_RPS: webservice.SERIE_RPS
-      };
-  
-      await this.webserviceService.updateWebservice(webservice.ID, dadosParaEnviar).toPromise();
-      
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Sucesso',
-        detail: 'Webservice atualizado com sucesso!',
-      });
+      if (isNew) {
+        const newWs = await this.webserviceService.createWebservice(dadosParaEnviar).toPromise();
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Sucesso',
+          detail: 'Webservice criado com sucesso!'
+        });
+        // Atualiza a lista após criação
+        this.loadWebservice();
+      } else {
+        await this.webserviceService.updateWebservice(webservice.ID, dadosParaEnviar).toPromise();
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Sucesso',
+          detail: 'Webservice atualizado com sucesso!'
+        });
+      }
       
       webservice.isEditing = false;
-      this.loadWebservice(); // Recarrega os dados para garantir sincronização
-      
     } catch (error) {
-      this.showError('Erro ao salvar o webservice. Tente novamente.');
+      this.showError(`Erro ao ${isNew ? 'criar' : 'atualizar'} o webservice. Tente novamente.`);
       console.error('Erro detalhado:', error);
     }
   }
+
 
   confirmarExclusaoWebservice(webservice: any) {
     this.confirmationService.confirm({

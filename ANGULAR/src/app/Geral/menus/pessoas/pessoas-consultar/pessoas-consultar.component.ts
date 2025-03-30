@@ -5,6 +5,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 // Interface para tipar os dados da pessoa
 interface Pessoa {
   CPF: string;
+  IM: string;
   CPF_CNPJ: string; // Adicionado
   NOME: string;
   EMAIL?: string;
@@ -40,6 +41,7 @@ export class PessoasConsultarComponent {
   resultados: Pessoa = {
     CPF: '',
     CPF_CNPJ: '',
+    IM: '',
     NOME: '',
     EMAIL: '',
     TIPO_USER: '',

@@ -268,16 +268,12 @@ private criarAssinatura(nodeToSign: any, privateKeyPem: string, publicCertPem: s
 
   private async processarResposta(xmlResposta: string): Promise<number[]> {
     try {
-      this.logger.debug('Processando resposta XML');
-      this.logger.verbose('Resposta (início):', xmlResposta.substring(0, 300000) + '...');
 
       const resultado = await parseStringPromise(xmlResposta, {
         explicitArray: false,
         ignoreAttrs: true,
         tagNameProcessors: [name => name.replace(/^[a-zA-Z]+:/, '')]
       });
-
-      this.logger.verbose('Estrutura parseada:', JSON.stringify(resultado, null, 2));
 
       const listaRps = resultado?.Envelope?.Body?.ConsultarRpsDisponivelResponse?.ConsultarRpsDisponivelResposta?.ListaRpsDisponivel?.RpsDisponivel;
       

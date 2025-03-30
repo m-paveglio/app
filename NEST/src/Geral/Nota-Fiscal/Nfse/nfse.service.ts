@@ -28,7 +28,7 @@ export class NfseService {
     
 
 ) {}
-
+ 
 async enviarNfse(cnpj: string, xml: string): Promise<any> {
       try {
         // 1. Busca a empresa pelo CNPJ
@@ -104,26 +104,25 @@ private async carregarCertificado(cnpj: string): Promise<{ privateKey: string; p
 }
   
 async enviarLoteRps(dados: any): Promise<any> {
-    const cnpjPrestador = dados.prestador?.cnpj;
-    this.logger.debug(`Iniciando envio de lote RPS para CNPJ: ${cnpjPrestador}`);
-    this.logger.verbose('Dados recebidos:', JSON.stringify(dados, null, 2));
+  const cnpjPrestador = dados.prestador?.cnpj;
+  this.logger.debug(`Iniciando envio de lote RPS para CNPJ: ${cnpjPrestador}`);
+  this.logger.verbose('Dados recebidos:', JSON.stringify(dados, null, 2));
 
-    try {
-        if (!cnpjPrestador) {
-            throw new Error('CNPJ do prestador não informado');
-        }
+  try {
+      if (!cnpjPrestador) {
+          throw new Error('CNPJ do prestador não informado');
+      }
 
-        // 1. Verificar e buscar RPS disponível se necessário
-        if (!dados.rpsList?.length || !dados.rpsList[0]?.identificacao?.numero) {
-            
-            const rpsService = new RpsService(
-                this.httpService,
-                this.empresasService,
-                this.webserviceService
-            );
+      // 1. Verificar e buscar RPS disponível se necessário
+      if (!dados.rpsList?.length || !dados.rpsList[0]?.identificacao?.numero) {
+          
+          const rpsService = new RpsService(
+              this.httpService,
+              this.empresasService,
+              this.webserviceService
+          );
 
-
-            if (!dados.rpsList?.[0]?.identificacao?.serie) {
+          if (!dados.rpsList?.[0]?.identificacao?.serie) {
               // Verifica se está usando a estrutura antiga (dados diretos)
               if (dados.identificacao?.serie) {
                   // Migra para a nova estrutura
@@ -141,28 +140,27 @@ async enviarLoteRps(dados: any): Promise<any> {
               }
           }
           
-            if (!dados.rpsList?.length || !dados.rpsList[0]?.identificacao?.numero) {
-            const primeiroRps = await rpsService.buscarPrimeiroRpsDisponivel(cnpjPrestador);
-            
-            dados.rpsList = [{
-              ...dados.rpsList?.[0] || {}, // Mantém todos os dados existentes
-              identificacao: {
-                  ...dados.rpsList?.[0]?.identificacao || {}, // Mantém série, tipo, etc.
-                  numero: primeiroRps // Apenas atualiza o número
-              }
-          }];
+          if (!dados.rpsList?.length || !dados.rpsList[0]?.identificacao?.numero) {
+              const primeiroRps = await rpsService.buscarPrimeiroRpsDisponivel(cnpjPrestador);
+              
+              dados.rpsList = [{
+                  ...dados.rpsList?.[0] || {}, // Mantém todos os dados existentes
+                  identificacao: {
+                      ...dados.rpsList?.[0]?.identificacao || {}, // Mantém série, tipo, etc.
+                      numero: primeiroRps // Apenas atualiza o número
+                  }
+              }];
+          }
+
+          // MODIFICAÇÃO AQUI - Usar o número do RPS como número do lote
+          if (!dados.lote?.numeroLote) {
+              dados.lote = {
+                  numeroLote: dados.rpsList[0].identificacao.numero.toString(), // Usa o número do RPS
+                  quantidadeRps: 1
+              };
+              this.logger.debug(`Número de lote definido como número do RPS: ${dados.lote.numeroLote}`);
+          }
       }
-
-
-            if (!dados.lote?.numeroLote) {
-                const now = new Date();
-                dados.lote = {
-                    numeroLote: now.getTime().toString(),
-                    quantidadeRps: 1
-                };
-                this.logger.debug(`Número de lote gerado automaticamente: ${dados.lote.numeroLote}`);
-            }
-        }
 
       // DEBUG: Verificar os dados antes de gerar o XML
       this.logger.debug('Dados do RPS que será enviado:', JSON.stringify(dados.rpsList, null, 2));
@@ -430,58 +428,61 @@ private gerarXmlRps(rps: any, prestadorLote: any): string {
                   <InscricaoMunicipal>${prestador.inscricaoMunicipal || ''}</InscricaoMunicipal>
                 </Prestador>
                 <TomadorServico>
-              `;
+              `; 
 
-                // Seção do Tomador - Lógica condicional
-                if (tomador.nifTomador) {
-                    xml += `      <NifTomador>${tomador.nifTomador}</NifTomador>\n`;
-                    xml += tomador.razaoSocial ? `      <RazaoSocial>${tomador.razaoSocial}</RazaoSocial>\n` : '';
-                    
-                    if (tomadorEnderecoExterior.codigoPais || tomadorEnderecoExterior.enderecoCompletoExterior) {
-                        xml += `      <EnderecoExterior>\n`;
-                        xml += tomadorEnderecoExterior.codigoPais ? `        <CodigoPais>${tomadorEnderecoExterior.codigoPais}</CodigoPais>\n` : '';
-                        xml += tomadorEnderecoExterior.enderecoCompletoExterior ? `        <EnderecoCompletoExterior>${tomadorEnderecoExterior.enderecoCompletoExterior}</EnderecoCompletoExterior>\n` : '';
-                        xml += `      </EnderecoExterior>\n`;
-                    }
-                } else {
-                    if (tomadorIdentificacao.cnpj || tomadorIdentificacao.cpf) {
-                        xml += `      <IdentificacaoTomador>\n`;
-                        xml += `        <CpfCnpj>\n`;
-                        xml += tomadorIdentificacao.cnpj ? `          <Cnpj>${tomadorIdentificacao.cnpj}</Cnpj>\n` : '';
-                        xml += (!tomadorIdentificacao.cnpj && tomadorIdentificacao.cpf) ? `          <Cpf>${tomadorIdentificacao.cpf}</Cpf>\n` : '';
-                        xml += `        </CpfCnpj>\n`;
-                        xml += tomadorIdentificacao.inscricaoMunicipal ? `        <InscricaoMunicipal>${tomadorIdentificacao.inscricaoMunicipal}</InscricaoMunicipal>\n` : '';
-                        xml += `      </IdentificacaoTomador>\n`;
-                        
-                        xml += tomador.razaoSocial ? `      <RazaoSocial>${tomador.razaoSocial}</RazaoSocial>\n` : '';
-                        
-                        xml += `      <Endereco>\n`;
-                        xml += `        <Endereco>${tomadorEndereco.endereco || ''}</Endereco>\n`;
-                        xml += `        <Numero>${tomadorEndereco.numero || ''}</Numero>\n`;
-                        xml += tomadorEndereco.complemento ? `        <Complemento>${tomadorEndereco.complemento}</Complemento>\n` : '';
-                        xml += `        <Bairro>${tomadorEndereco.bairro || ''}</Bairro>\n`;
-                        xml += `        <CodigoMunicipio>${tomadorEndereco.codigoMunicipio || ''}</CodigoMunicipio>\n`;
-                        xml += `        <Uf>${tomadorEndereco.uf || ''}</Uf>\n`;
-                        xml += `        <Cep>${tomadorEndereco.cep || ''}</Cep>\n`;
-                        xml += `      </Endereco>\n`;
-                    } else if (tomadorEnderecoExterior.codigoPais || tomadorEnderecoExterior.enderecoCompletoExterior) {
-                        xml += `      <EnderecoExterior>\n`;
-                        xml += tomadorEnderecoExterior.codigoPais ? `        <CodigoPais>${tomadorEnderecoExterior.codigoPais}</CodigoPais>\n` : '';
-                        xml += tomadorEnderecoExterior.enderecoCompletoExterior ? `        <EnderecoCompletoExterior>${tomadorEnderecoExterior.enderecoCompletoExterior}</EnderecoCompletoExterior>\n` : '';
-                        xml += `      </EnderecoExterior>\n`;
-                    }
-                }
+// Seção do Tomador - Versão otimizada
+if (tomador.nifTomador) {
+    xml += tomador.nifTomador ? `      <NifTomador>${tomador.nifTomador}</NifTomador>\n` : '';
+    xml += tomador.razaoSocial ? `      <RazaoSocial>${tomador.razaoSocial}</RazaoSocial>\n` : '';
+    
+    if (tomadorEnderecoExterior.codigoPais || tomadorEnderecoExterior.enderecoCompletoExterior) {
+        xml += `      <EnderecoExterior>\n`;
+        xml += tomadorEnderecoExterior.codigoPais ? `        <CodigoPais>${tomadorEnderecoExterior.codigoPais}</CodigoPais>\n` : '';
+        xml += tomadorEnderecoExterior.enderecoCompletoExterior ? `        <EnderecoCompletoExterior>${tomadorEnderecoExterior.enderecoCompletoExterior}</EnderecoCompletoExterior>\n` : '';
+        xml += `      </EnderecoExterior>\n`;
+    }
+} else {
+    if (tomadorIdentificacao.cnpj || tomadorIdentificacao.cpf) {
+        xml += `      <IdentificacaoTomador>\n`;
+        xml += `        <CpfCnpj>\n`;
+        xml += tomadorIdentificacao.cnpj ? `          <Cnpj>${tomadorIdentificacao.cnpj}</Cnpj>\n` : '';
+        xml += tomadorIdentificacao.cpf ? `          <Cpf>${tomadorIdentificacao.cpf}</Cpf>\n` : '';
+        xml += `        </CpfCnpj>\n`;
+        xml += tomadorIdentificacao.inscricaoMunicipal ? `        <InscricaoMunicipal>${tomadorIdentificacao.inscricaoMunicipal}</InscricaoMunicipal>\n` : '';
+        xml += `      </IdentificacaoTomador>\n`;
+        
+        xml += tomador.razaoSocial ? `      <RazaoSocial>${tomador.razaoSocial}</RazaoSocial>\n` : '';
+        
+        if (tomadorEndereco.endereco || tomadorEndereco.numero || tomadorEndereco.complemento || 
+            tomadorEndereco.bairro || tomadorEndereco.codigoMunicipio || tomadorEndereco.uf || tomadorEndereco.cep) {
+            xml += `      <Endereco>\n`;
+            xml += tomadorEndereco.endereco ? `        <Endereco>${tomadorEndereco.endereco}</Endereco>\n` : '';
+            xml += tomadorEndereco.numero ? `        <Numero>${tomadorEndereco.numero}</Numero>\n` : '';
+            xml += tomadorEndereco.complemento ? `        <Complemento>${tomadorEndereco.complemento}</Complemento>\n` : '';
+            xml += tomadorEndereco.bairro ? `        <Bairro>${tomadorEndereco.bairro}</Bairro>\n` : '';
+            xml += tomadorEndereco.codigoMunicipio ? `        <CodigoMunicipio>${tomadorEndereco.codigoMunicipio}</CodigoMunicipio>\n` : '';
+            xml += tomadorEndereco.uf ? `        <Uf>${tomadorEndereco.uf}</Uf>\n` : '';
+            xml += tomadorEndereco.cep ? `        <Cep>${tomadorEndereco.cep}</Cep>\n` : '';
+            xml += `      </Endereco>\n`;
+        }
+    } else if (tomadorEnderecoExterior.codigoPais || tomadorEnderecoExterior.enderecoCompletoExterior) {
+        xml += `      <EnderecoExterior>\n`;
+        xml += tomadorEnderecoExterior.codigoPais ? `        <CodigoPais>${tomadorEnderecoExterior.codigoPais}</CodigoPais>\n` : '';
+        xml += tomadorEnderecoExterior.enderecoCompletoExterior ? `        <EnderecoCompletoExterior>${tomadorEnderecoExterior.enderecoCompletoExterior}</EnderecoCompletoExterior>\n` : '';
+        xml += `      </EnderecoExterior>\n`;
+    }
+}
 
-                // Contato (opcional)
-                if (tomador.contato?.telefone || tomador.contato?.email) {
-                    xml += `      <Contato>\n`;
-                    xml += tomador.contato.telefone ? `        <Telefone>${tomador.contato.telefone}</Telefone>\n` : '';
-                    xml += tomador.contato.email ? `        <Email>${tomador.contato.email}</Email>\n` : '';
-                    xml += `      </Contato>\n`;
-                }
+// Contato (opcional)
+if (tomador.contato?.telefone || tomador.contato?.email) {
+    xml += `      <Contato>\n`;
+    xml += tomador.contato.telefone ? `        <Telefone>${tomador.contato.telefone}</Telefone>\n` : '';
+    xml += tomador.contato.email ? `        <Email>${tomador.contato.email}</Email>\n` : '';
+    xml += `      </Contato>\n`;
+}
 
-                // Final do XML
-                xml += `    </TomadorServico>
+// Final do XML
+xml += `    </TomadorServico>
                 <OptanteSimplesNacional>${rps.optanteSimplesNacional || '2'}</OptanteSimplesNacional>
                 <IncentivoFiscal>${rps.incentivoFiscal || '2'}</IncentivoFiscal>
               ${rps.informacoesComplementares ? `    <InformacoesComplementares>${rps.informacoesComplementares}</InformacoesComplementares>\n` : ''}\

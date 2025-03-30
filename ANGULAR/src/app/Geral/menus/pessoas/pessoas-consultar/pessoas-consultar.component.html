@@ -26,6 +26,7 @@
               <label for="CPF_CNPJ-input">CPF / CNPJ</label>
             </span>
           </div>
+          
 
           <div class="field col-12 md:col-7">
             <span class="p-float-label">
@@ -89,7 +90,7 @@
        
               <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
                   <!-- CPF -->
-                  <div class="field col-12 md:col-4">
+                  <div class="field col-12 md:col-3">
                       <span class="p-float-label float-label-fixed">
                           <input id="resultado-CPF_CNPJ" type="text" pinputtext class="p-inputtext p-component p-element"
                               [ngClass]="{ 'p-filled': !editMode }"
@@ -98,9 +99,19 @@
                           <label for="resultado-CPF_CNPJ">CPF / CNPJ</label>
                       </span>
                   </div>
+
+                  <div class="field col-12 md:col-3">
+                      <span class="p-float-label float-label-fixed">
+                          <input id="resultado-IM" type="text" pinputtext class="p-inputtext p-component p-element"
+                              [ngClass]="{ 'p-filled': !editMode }"
+                              [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
+                              [(ngModel)]="resultado.IM" name="IM" [readonly]="!editMode">
+                          <label for="resultado-IM">INSCRIÇÃO MUNICIPAL</label>
+                      </span>
+                  </div>
   
                   <!-- Nome -->
-                  <div class="field col-12 md:col-8">
+                  <div class="field col-12 md:col-6">
                       <span class="p-float-label float-label-fixed">
                           <input id="resultado-nome" type="text" pinputtext class="p-inputtext p-component p-element"
                               [ngClass]="{ 'p-filled': !editMode }"
