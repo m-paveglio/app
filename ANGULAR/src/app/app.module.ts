@@ -35,6 +35,7 @@ import { ComandasConsultarComponent } from './Geral/menus/comandas/comandas-cons
 import { CarouselModule } from 'primeng/carousel';
 import { FileUploadModule } from 'primeng/fileupload';
 import { WebserviceConsultarComponent } from './Geral/menus/webservice/consultar/webservice-consultar.component';
+import { InputTextModule } from 'primeng/inputtext';
 
 
 
@@ -81,7 +82,8 @@ import { WebserviceConsultarComponent } from './Geral/menus/webservice/consultar
     TabViewModule,
     DialogModule,
     CarouselModule,
-    FileUploadModule
+    FileUploadModule,
+    InputTextModule
   
     
         

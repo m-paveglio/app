@@ -17,6 +17,8 @@ import { NfseModule } from './Geral/Nota-Fiscal/Nfse/nfse.module';
 import { ComandasModule } from './Geral/Comanda/comanda.module';
 import { ComandasXServicoModule } from './Geral/ComandaXservico/comandaXservico.module';
 import { RpsModule } from './Geral/Nota-Fiscal/Nfse/RpsDisponivel/Rps.module';
+import { CnaeModule } from './Geral/CNAE/cnae.module';
+import { ItemLCModule } from './Geral/ITEM_LC/itemLC.module';
 
  
 
@@ -36,7 +38,9 @@ import { RpsModule } from './Geral/Nota-Fiscal/Nfse/RpsDisponivel/Rps.module';
     NfseModule,
     ComandasModule,
     ComandasXServicoModule,
-    RpsModule
+    RpsModule,
+    CnaeModule,
+    ItemLCModule
 
     ],
   controllers: [AppController],

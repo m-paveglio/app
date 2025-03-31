@@ -25,3 +25,7 @@
   .mensagem.error {
     background-color: #dc3545; /* Vermelho para erro */
   }
+
+  textarea {
+    width: 100%;
+  }

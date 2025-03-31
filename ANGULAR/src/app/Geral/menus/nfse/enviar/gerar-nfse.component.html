@@ -350,6 +350,87 @@
         </div>
       </div>
 
+      <div class="card p-3 field col-12 md:col-12">
+      <h5 class="text-center" 
+            [ngStyle]="{
+              backgroundColor: 'var(--cyan-800)',
+              color: 'var(--primary-color-text)',
+              borderRadius: 'var(--border-radius)'
+            }">
+          DESCRIÇÃO
+        </h5>
+        <div class="grid gap-12 mt-2">
+
+        <div class="field col-12 md:col-12">
+          <span class="p-float-label">
+            <textarea
+              id="discriminacao"
+              rows="3"
+              pInputText 
+              [(ngModel)]="nfseData.servico.discriminacao"
+              name="discriminacao"
+            ></textarea>
+            <label for="discriminacao">Discriminação do Serviço</label>
+          </span>
+        </div>
+        </div>
+      </div>
+
+
+      <div class="card p-3 field col-12 md:col-12">
+        <h5 class="text-center" 
+              [ngStyle]="{
+                backgroundColor: 'var(--cyan-800)',
+                color: 'var(--primary-color-text)',
+                borderRadius: 'var(--border-radius)'
+              }">
+            CÓDIGOS
+          </h5>
+          <div class="grid gap-12  mt-2">
+
+            <!-- Código CNAE -->
+        <div class="field col-12 md:col-2">
+          <span class="p-float-label">
+            <input
+              id="codigoCnae"
+              type="text"
+              pInputText
+              [(ngModel)]="nfseData.servico.codigoCnae"
+              name="codigoCnae"
+            />
+            <label for="codigoCnae">Código CNAE</label>
+          </span>
+        </div>
+
+        <!-- Código de Tributação -->
+        <div class="field col-12 md:col-2">
+          <span class="p-float-label">
+            <input
+              id="codigoTributacao"
+              type="text"
+              pInputText
+              [(ngModel)]="nfseData.servico.codigoTributacaoMunicipio"
+              name="codigoTributacao"
+            />
+            <label for="codigoTributacao">Cód. Tributação</label>
+          </span>
+        </div>
+          </div></div>
+
+
+
+      <div class="card p-3 field col-12 md:col-12">
+        <h5 class="text-center" 
+              [ngStyle]="{
+                backgroundColor: 'var(--cyan-800)',
+                color: 'var(--primary-color-text)',
+                borderRadius: 'var(--border-radius)'
+              }">
+            VALORES
+          </h5>
+          <div class="grid gap-12  mt-2">
+
+       
 
 
         
@@ -426,75 +507,9 @@
         <!-- Campos do tomador do serviço -->
         
 
-        <!-- Código CNAE -->
-        <div class="field col-12 md:col-2">
-          <span class="p-float-label">
-            <input
-              id="codigoCnae"
-              type="text"
-              pInputText
-              [(ngModel)]="nfseData.servico.codigoCnae"
-              name="codigoCnae"
-            />
-            <label for="codigoCnae">Código CNAE</label>
-          </span>
-        </div>
-
-        <!-- Código de Tributação -->
-        <div class="field col-12 md:col-2">
-          <span class="p-float-label">
-            <input
-              id="codigoTributacao"
-              type="text"
-              pInputText
-              [(ngModel)]="nfseData.servico.codigoTributacaoMunicipio"
-              name="codigoTributacao"
-            />
-            <label for="codigoTributacao">Cód. Tributação</label>
-          </span>
-        </div>
-
+        
         <!-- Discriminação do Serviço -->
-        <div class="field col-12">
-          <span class="p-float-label">
-            <textarea
-              id="discriminacao"
-              rows="3"
-              pInputTextarea
-              [(ngModel)]="nfseData.servico.discriminacao"
-              name="discriminacao"
-            ></textarea>
-            <label for="discriminacao">Discriminação do Serviço</label>
-          </span>
-        </div>
-
-        <!-- Código do Município -->
-        <div class="field col-12 md:col-2">
-          <span class="p-float-label">
-            <input
-              id="codigoMunicipio"
-              type="text"
-              pInputText
-              [(ngModel)]="nfseData.servico.codigoMunicipio"
-              name="codigoMunicipio"
-            />
-            <label for="codigoMunicipio">Cód. Município</label>
-          </span>
-        </div>
-
-        <!-- Município de Incidência -->
-        <div class="field col-12 md:col-2">
-          <span class="p-float-label">
-            <input
-              id="municipioIncidencia"
-              type="text"
-              pInputText
-              [(ngModel)]="nfseData.servico.municipioIncidencia"
-              name="municipioIncidencia"
-            />
-            <label for="municipioIncidencia">Mun. Incidência</label>
-          </span>
-        </div>
+      
 
         <!-- IR, CSLL e Outras Retenções -->
         <div class="field col-12 md:col-2">
@@ -576,19 +591,32 @@
           </span>
         </div>
 
-        <!-- Informações Complementares -->
-        <div class="field col-12">
-          <span class="p-float-label">
-            <textarea
-              id="informacoesComplementares"
-              rows="2"
-              pInputTextarea
-              [(ngModel)]="nfseData.informacoesComplementares"
-              name="informacoesComplementares"
-            ></textarea>
-            <label for="informacoesComplementares">Informações Complementares</label>
-          </span>
-        </div>
+
+        <div class="card p-3 field col-12 md:col-12">
+          <h5 class="text-center" 
+                [ngStyle]="{
+                  backgroundColor: 'var(--cyan-800)',
+                  color: 'var(--primary-color-text)',
+                  borderRadius: 'var(--border-radius)'
+                }">
+              INFORMAÇÕES COMPLEMENTARES
+            </h5>
+            <div class="grid gap-12 mt-2">
+    
+            <div class="field col-12 md:col-12">
+              <span class="p-float-label">
+                <textarea
+                  id="informacoesComplementares"
+                  rows="1"
+                  pInputText 
+                  [(ngModel)]="nfseData.informacoesComplementares"
+                  name="informacoesComplementares"
+                ></textarea>
+                <label for="informacoesComplementares">Informações Complementares</label>
+              </span>
+            </div>
+            </div>
+          </div>
 
         <!-- Botão de envio -->
         <div class="field col-12">
