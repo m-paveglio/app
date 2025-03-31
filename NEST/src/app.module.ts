@@ -19,6 +19,7 @@ import { ComandasXServicoModule } from './Geral/ComandaXservico/comandaXservico.
 import { RpsModule } from './Geral/Nota-Fiscal/Nfse/RpsDisponivel/Rps.module';
 import { CnaeModule } from './Geral/CNAE/cnae.module';
 import { ItemLCModule } from './Geral/ITEM_LC/itemLC.module';
+import { CodigoTributacaoMunicipioModule } from './Geral/CodigoTributacaoMunicipio/CodigoTributacaoMunicipio.module';
 
  
 
@@ -40,7 +41,8 @@ import { ItemLCModule } from './Geral/ITEM_LC/itemLC.module';
     ComandasXServicoModule,
     RpsModule,
     CnaeModule,
-    ItemLCModule
+    ItemLCModule,
+    CodigoTributacaoMunicipioModule
 
     ],
   controllers: [AppController],
