@@ -17,9 +17,10 @@ import { NfseModule } from './Geral/Nota-Fiscal/Nfse/nfse.module';
 import { ComandasModule } from './Geral/Comanda/comanda.module';
 import { ComandasXServicoModule } from './Geral/ComandaXservico/comandaXservico.module';
 import { RpsModule } from './Geral/Nota-Fiscal/Nfse/RpsDisponivel/Rps.module';
-import { CnaeModule } from './Geral/CNAE/cnae.module';
-import { ItemLCModule } from './Geral/ITEM_LC/itemLC.module';
-import { CodigoTributacaoMunicipioModule } from './Geral/CodigoTributacaoMunicipio/CodigoTributacaoMunicipio.module';
+import { CnaeModule } from './Geral/Codigos/CNAE/cnae.module';
+import { ItemLCModule } from './Geral/Codigos/ITEM_LC/itemLC.module';
+import { CodigoTributacaoMunicipioModule } from './Geral/Codigos/CodigoTributacaoMunicipio/CodigoTributacaoMunicipio.module';
+import { EmpresaCnaeModule } from './Geral/Empresa_Cnae/Empresa-Cnae.module';
 
  
 
@@ -42,7 +43,8 @@ import { CodigoTributacaoMunicipioModule } from './Geral/CodigoTributacaoMunicip
     RpsModule,
     CnaeModule,
     ItemLCModule,
-    CodigoTributacaoMunicipioModule
+    CodigoTributacaoMunicipioModule,
+    EmpresaCnaeModule
 
     ],
   controllers: [AppController],
