@@ -12,13 +12,8 @@ export class EmpresaCnaeController {
     return this.EmrpesaCnaeService.getEmpresaCnaes();
   }
 
-   
-  @Get(':CNPJ/:CNPJ')
-  getEmpresaCnae(@Param('CNPJ') CNPJ: string) {
-    return this.EmrpesaCnaeService.getEmpresaCnae(CNPJ);
-  }
 
-  @Get('CNPJ/:CNPJ')
+  @Get(':CNPJ')
   getEmpresaCnaeCnpj(@Param('CNPJ') CNPJ: string) {
     return this.EmrpesaCnaeService.getEmpresaCnaeCnpj(CNPJ);
   }
@@ -36,8 +31,4 @@ export class EmpresaCnaeController {
       return this.EmrpesaCnaeService.deleteEmpresaCnae(CNPJ, CNAE);
     }
 
-  @Patch(':CNPJ')
-  updateEmpresaCnae(@Param('CNPJ') CNPJ: string, @Body() EmpresaCnae: UpdateEmpresaCnaeDto) {
-    return this.EmrpesaCnaeService.updateEmpresaCnae(CNPJ, EmpresaCnae);
-  }
 }

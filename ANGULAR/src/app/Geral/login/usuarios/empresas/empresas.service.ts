@@ -123,7 +123,76 @@ export class EmpresasService {
     return this.http.get<any[]>(`${this.apiUrl}/webservice`);  // Remove o tipo { data: any[] }
   }
 
+  buscarCnae(COD_CNAE: string): Observable<any> {
+    const url = `${this.apiUrl}/cnae/${COD_CNAE}`;
+    return this.http.get(url).pipe(
+      catchError(this.handleError)
+    );
+  }
   
+  // Buscar CNAEs vinculados a um CNPJ
+getCnaesVinculados(CNPJ: string): Observable<any[]> {
+  const url = `${this.apiUrl}/EMPRESA_CNAE/${CNPJ}`;
+  return this.http.get<any[]>(url).pipe(
+    catchError(this.handleError)
+  );
+}
+
+// Adicionar um CNAE a um CNPJ
+adicionarCnae(CNPJ: string, COD_CNAE: string): Observable<any> {
+  const url = `${this.apiUrl}/EMPRESA_CNAE`;
+  return this.http.post(url, { CNPJ, COD_CNAE }).pipe(
+    map(response => {
+      this.handleSuccess('CNAE adicionado com sucesso!');
+      return response;
+    }),
+    catchError(this.handleError)
+  );
+}
+
+// Remover um CNAE de um CNPJ
+removerCnae(CNPJ: string, COD_CNAE: string): Observable<any> {
+  const url = `${this.apiUrl}/EMPRESA_CNAE/${CNPJ}/${COD_CNAE}`;
+  return this.http.delete(url).pipe(
+    map(response => {
+      this.handleSuccess('CNAE removido com sucesso!');
+      return response;
+    }),
+    catchError(this.handleError)
+  );
+}
+
+// Buscar CNAEs de uma empresa
+getEmpresaCnaes(CNPJ: string): Observable<any> {
+  const url = `${this.apiUrl}/EMPRESA_CNAE/CNPJ/${CNPJ}`;
+  return this.http.get(url).pipe(
+    catchError(this.handleError)
+  );
+}
+
+// Adicionar CNAE a uma empresa
+adicionarCnaeEmpresa(CNPJ: string, COD_CNAE: string): Observable<any> {
+  const url = `${this.apiUrl}/EMPRESA_CNAE`;
+  return this.http.post(url, { CNPJ, COD_CNAE }).pipe(
+    map(response => {
+      this.handleSuccess('CNAE adicionado com sucesso!');
+      return response;
+    }),
+    catchError(this.handleError)
+  );
+}
+
+// Remover CNAE de uma empresa
+removerCnaeEmpresa(CNPJ: string, COD_CNAE: string): Observable<any> {
+  const url = `${this.apiUrl}/EMPRESA_CNAE/${CNPJ}/${COD_CNAE}`;
+  return this.http.delete(url).pipe(
+    map(response => {
+      this.handleSuccess('CNAE removido com sucesso!');
+      return response;
+    }),
+    catchError(this.handleError)
+  );
+}
 
   /*exportarRelatorio(): Observable<any> {
     const url = `${this.apiUrl}/empresa/export/excel`; // Corrigido

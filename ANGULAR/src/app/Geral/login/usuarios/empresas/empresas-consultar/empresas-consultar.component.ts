@@ -40,6 +40,15 @@ export class EmpresasConsultarComponent {
   dataUploadCertificado: string | null = null;
   certificadoEnviado: boolean = false;
   valoresOriginais: any = {};
+  cnaesDaEmpresa: any[] = [];
+  cnaeParaAdicionar: string = '';
+  mostrarAdicionarCnae: boolean = false;
+  cnaesDisponiveis: any[] = [];
+  cnaeFiltrado: any[] = [];
+  mostrarDialogoCnae: boolean = false;
+  cnaeSelecionado: any = null;
+  cnaesFiltrados: any[] = [];
+
 
   constructor(
     private EmpresasService: EmpresasService,
@@ -206,6 +215,7 @@ export class EmpresasConsultarComponent {
         this.dataUploadCertificado = data.data_upload || null;
         
         // Sempre azul, independente de ter certificado
+        this.carregarCnaesDaEmpresa();
         this.certificadoCarregado = true;
       },
       (error) => {
@@ -371,5 +381,107 @@ export class EmpresasConsultarComponent {
     }
   }
   
+  carregarCnaesDaEmpresa() {
+    if (this.resultado?.CNPJ) {
+      this.EmpresasService.getEmpresaCnaes(this.resultado.CNPJ).subscribe({
+        next: (data) => {
+          this.cnaesDaEmpresa = data;
+        },
+        error: (error) => {
+          console.error('Erro ao carregar CNAEs:', error);
+        }
+      });
+    }
+  }
+
+  
+  removerCnae(COD_CNAE: string) {
+    if (this.resultado?.CNPJ && COD_CNAE) {
+      this.confirmationService.confirm({
+        message: 'Tem certeza que deseja remover este CNAE?',
+        accept: () => {
+          this.EmpresasService.removerCnaeEmpresa(this.resultado.CNPJ, COD_CNAE).subscribe({
+            next: () => {
+              this.carregarCnaesDaEmpresa();
+            },
+            error: (error) => {
+              console.error('Erro ao remover CNAE:', error);
+            }
+          });
+        }
+      });
+    }
+  }
+  
+  filtrarCnae(event: any) {
+    if (event.query.length >= 3) {
+      this.EmpresasService.buscarCnae(event.query).subscribe({
+        next: (data) => {
+          this.cnaeFiltrado = data;
+        },
+        error: (error) => {
+          console.error('Erro ao buscar CNAEs:', error);
+        }
+      });
+    }
+  }
+
+abrirDialogoCnae() {
+  this.mostrarDialogoCnae = true;
+  this.cnaeSelecionado = null;
+  this.cnaesFiltrados = [];
+}
+
+fecharDialogoCnae() {
+  this.mostrarDialogoCnae = false;
+  this.cnaeSelecionado = null;
+  this.cnaesFiltrados = [];
+}
+
+buscarCnaes(event: any) {
+  const query = event.query;
+  if (query.length >= 3) {
+    this.EmpresasService.buscarCnae(query).subscribe({
+      next: (data) => {
+        this.cnaesFiltrados = data;
+      },
+      error: (error) => {
+        console.error('Erro ao buscar CNAEs:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao buscar CNAEs'
+        });
+      }
+    });
+  }
+}
+
+adicionarCnae() {
+  if (this.cnaeSelecionado && this.resultado?.CNPJ) {
+    this.EmpresasService.adicionarCnaeEmpresa(
+      this.resultado.CNPJ, 
+      this.cnaeSelecionado.COD_CNAE
+    ).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Sucesso',
+          detail: 'CNAE adicionado com sucesso!'
+        });
+        this.carregarCnaesDaEmpresa();
+        this.fecharDialogoCnae();
+      },
+      error: (error) => {
+        console.error('Erro ao adicionar CNAE:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Falha ao adicionar CNAE'
+        });
+      }
+    });
+  }
+}
 
 }

@@ -218,6 +218,103 @@
                     <label for="data-upload">DATA DO UPLOAD</label>
                     </span>
                 </div>
+
+                <!-- Substitua a seção de CNAEs existente por este código -->
+<div class="field col-12">
+    <div class="card">
+      <h3 class="text-center" [ngStyle]="{backgroundColor:'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}">
+        CNAEs DA EMPRESA
+        <p-button 
+          *ngIf="editMode"
+          icon="pi pi-plus" 
+          severity="success" 
+          styleClass="p-button-rounded p-button-text"
+          (click)="abrirDialogoCnae()"
+          [disabled]="!editMode"
+          tooltip="Adicionar CNAE"
+          tooltipPosition="top"
+        ></p-button>
+      </h3>
+      
+      <!-- Lista de CNAEs -->
+      <p-table [value]="cnaesDaEmpresa" *ngIf="cnaesDaEmpresa.length > 0" [tableStyle]="{'min-width': '50rem'}">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>CÓDIGO CNAE</th>
+            <th>DESCRIÇÃO</th>
+            <th *ngIf="editMode">AÇÕES</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-cnae>
+          <tr>
+            <td>{{cnae.COD_CNAE}}</td>
+            <td>{{cnae.DESCRICAO}}</td>
+            <td *ngIf="editMode">
+              <p-button icon="pi pi-trash" severity="danger" (click)="removerCnae(cnae.COD_CNAE)"></p-button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+  
+      <div *ngIf="cnaesDaEmpresa.length === 0" class="text-center p-4">
+        <p>Nenhum CNAE cadastrado para esta empresa.</p>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Diálogo para adicionar CNAEs -->
+  <p-dialog 
+    header="Adicionar CNAE" 
+    [(visible)]="mostrarDialogoCnae" 
+    [modal]="true" 
+    [style]="{ width: '50vw' }"
+    [draggable]="false" 
+    [resizable]="false"
+    (onHide)="fecharDialogoCnae()">
+    
+    <div class="p-fluid grid">
+      <div class="field col-12">
+        <h4>Buscar CNAE</h4>
+        <p-autoComplete 
+          [(ngModel)]="cnaeSelecionado" 
+          [suggestions]="cnaesFiltrados" 
+          (completeMethod)="buscarCnaes($event)"
+          field="DESCRICAO" 
+          [minLength]="3"
+          placeholder="Digite para buscar CNAE..."
+          [dropdown]="true">
+          <ng-template let-cnae pTemplate="item">
+            <div class="cnae-item">
+              <div><strong>{{cnae.COD_CNAE}}</strong> - {{cnae.DESCRICAO}}</div>
+            </div>
+          </ng-template>
+        </p-autoComplete>
+      </div>
+  
+      <div class="field col-12" *ngIf="cnaeSelecionado">
+        <h4>CNAE Selecionado:</h4>
+        <div class="selected-cnae">
+          <strong>{{cnaeSelecionado.COD_CNAE}}</strong> - {{cnaeSelecionado.DESCRICAO}}
+        </div>
+      </div>
+    </div>
+  
+    <ng-template pTemplate="footer">
+      <p-button 
+        label="Cancelar" 
+        icon="pi pi-times" 
+        (click)="fecharDialogoCnae()" 
+        styleClass="p-button-text">
+      </p-button>
+      <p-button 
+        label="Adicionar" 
+        icon="pi pi-check" 
+        (click)="adicionarCnae()" 
+        [disabled]="!cnaeSelecionado"
+        styleClass="p-button-success">
+      </p-button>
+    </ng-template>
+  </p-dialog>
                        
 
 

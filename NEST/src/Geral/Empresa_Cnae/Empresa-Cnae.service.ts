@@ -15,7 +15,8 @@ export class EmrpesaCnaeService {
     const EmpresaCnaeFound = await this.Empresa_CNAERepository.findOne({
       where: {
         CNPJ: EmpresaCnaeDto.CNPJ,
-      },
+        COD_CNAE: EmpresaCnaeDto.COD_CNAE
+      }
     });
 
      const newEmpresaCnae = this.Empresa_CNAERepository.create({
