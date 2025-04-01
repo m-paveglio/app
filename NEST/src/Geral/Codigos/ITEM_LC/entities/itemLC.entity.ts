@@ -1,11 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, PrimaryColumn } from 'typeorm';
 
 @Entity('ITEM_LC')
 export class ItemLC {
-  @PrimaryGeneratedColumn()
+  @PrimaryColumn()
   COD_ITEM_LC: string;
 
-  @Column({ length: 500, nullable: false })
+  @Column({ length: 2000, nullable: false })
   DESC_ITEM_LC: string;
  
 }
