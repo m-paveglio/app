@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { forkJoin, Observable, of, throwError } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { ApiConfigService } from '../../../../api-config.service';
 
 @Injectable({
@@ -123,12 +123,33 @@ export class EmpresasService {
     return this.http.get<any[]>(`${this.apiUrl}/webservice`);  // Remove o tipo { data: any[] }
   }
 
-  buscarCnae(COD_CNAE: string): Observable<any> {
-    const url = `${this.apiUrl}/cnae/${COD_CNAE}`;
-    return this.http.get(url).pipe(
-      catchError(this.handleError)
-    );
+  buscarCNAE(params: { codigo?: string; descricao?: string }): Observable<any[]> {
+    if (params.codigo) {
+      const url = `${this.apiUrl}/cnae/${params.codigo}`;
+      return this.http.get(url).pipe(
+        map(response => {
+          if (!response) {
+            // Modifique aqui: Lançar um erro simples que será tratado no catchError
+            throw new Error('CNAE não encontrado');
+          }
+          return [response];
+        }),
+        // Corrija o tratamento de erro para propagar o status correto
+        catchError(error => {
+          if (error instanceof HttpErrorResponse && error.status === 404) {
+            return throwError(() => new HttpErrorResponse({
+              status: 404,
+              statusText: 'CNAE não encontrado'
+            }));
+          }
+          return this.handleError(error);
+        })
+      );
+    }
+  
+    return of([]); // Retorna array vazio caso nenhum parâmetro seja informado
   }
+  
   
   // Buscar CNAEs vinculados a um CNPJ
 getCnaesVinculados(CNPJ: string): Observable<any[]> {
@@ -170,7 +191,25 @@ getEmpresaCnaes(CNPJ: string): Observable<any> {
   );
 }
 
-// Adicionar CNAE a uma empresa
+getCnaesDaEmpresa(CNPJ: string): Observable<any[]> {
+  const url = `${this.apiUrl}/EMPRESA_CNAE/${CNPJ}`;
+  return this.http.get<any[]>(url).pipe(
+    // Adicione uma transformação para buscar as descrições
+    switchMap(cnaesVinculados => {
+      const requests = cnaesVinculados.map(cnae => 
+        this.buscarCNAE({ codigo: cnae.COD_CNAE }).pipe(
+          map(detalhes => ({
+            COD_CNAE: cnae.COD_CNAE,
+            DESC_CNAE: detalhes[0]?.DESC_CNAE || 'Descrição não encontrada'
+          }))
+        )
+      );
+      return forkJoin(requests);
+    }),
+    catchError(this.handleError)
+  );
+}
+
 adicionarCnaeEmpresa(CNPJ: string, COD_CNAE: string): Observable<any> {
   const url = `${this.apiUrl}/EMPRESA_CNAE`;
   return this.http.post(url, { CNPJ, COD_CNAE }).pipe(
@@ -182,7 +221,6 @@ adicionarCnaeEmpresa(CNPJ: string, COD_CNAE: string): Observable<any> {
   );
 }
 
-// Remover CNAE de uma empresa
 removerCnaeEmpresa(CNPJ: string, COD_CNAE: string): Observable<any> {
   const url = `${this.apiUrl}/EMPRESA_CNAE/${CNPJ}/${COD_CNAE}`;
   return this.http.delete(url).pipe(
@@ -193,6 +231,10 @@ removerCnaeEmpresa(CNPJ: string, COD_CNAE: string): Observable<any> {
     catchError(this.handleError)
   );
 }
+
+
+
+
 
   /*exportarRelatorio(): Observable<any> {
     const url = `${this.apiUrl}/empresa/export/excel`; // Corrigido

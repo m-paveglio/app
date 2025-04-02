@@ -5,6 +5,6 @@ export class Empresa_CNAE {
   @PrimaryColumn({ type: 'text', length: 14})
   CNPJ: string;
 
-  @Column()
+  @PrimaryColumn()
   COD_CNAE: string;
 }

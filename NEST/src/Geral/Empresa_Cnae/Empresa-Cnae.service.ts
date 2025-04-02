@@ -18,11 +18,15 @@ export class EmrpesaCnaeService {
         COD_CNAE: EmpresaCnaeDto.COD_CNAE
       }
     });
-
-     const newEmpresaCnae = this.Empresa_CNAERepository.create({
+  
+    if (EmpresaCnaeFound) {
+      throw new HttpException('CNAE já vinculado a esta empresa', HttpStatus.CONFLICT);
+    }
+  
+    const newEmpresaCnae = this.Empresa_CNAERepository.create({
       ...EmpresaCnaeDto,
     });
-
+  
     return this.Empresa_CNAERepository.save(newEmpresaCnae);
   }
 
@@ -48,12 +52,13 @@ export class EmrpesaCnaeService {
         where:{
           CNPJ,
         }
-      })
-
-      if (!EmpresaCnaeFound){
-      return new HttpException('Serviço não encontrado', HttpStatus.NOT_FOUND)
+      });
+    
+      if (EmpresaCnaeFound.length === 0) { // Se array estiver vazio, retorna erro 404
+        throw new HttpException('Serviço não encontrado', HttpStatus.NOT_FOUND);
       }
-      return EmpresaCnaeFound
+      
+      return EmpresaCnaeFound;
     }
 
 

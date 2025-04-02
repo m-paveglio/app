@@ -183,7 +183,7 @@
                                 accept=".pfx,.p12"
                                 maxFileSize="1000000"
                                 mode="basic"
-                                chooseLabel="Buscar Certificado"
+                                chooseLabel="Buscar Certificad."
                                 chooseIcon="pi pi-search"
                                 styleClass="p-button p-button-info"
                                 [disabled]="!editMode">
@@ -221,110 +221,176 @@
 
                 <!-- Substitua a seção de CNAEs existente por este código -->
 <div class="field col-12">
-    <div class="card">
-      <h3 class="text-center" [ngStyle]="{backgroundColor:'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}">
-        CNAEs DA EMPRESA
-        <p-button 
+  <div class="card">
+    <h3 class="text-center" [ngStyle]="{backgroundColor:'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}">
+      CNAE
+    </h3>
+    
+    <!-- Tabela de CNAEs da empresa -->
+    <p-table 
+    [value]="cnaesDaEmpresa" 
+    [loading]="carregandoCnaesDaEmpresa"
+    [paginator]="true" 
+    [rows]="5"
+    [rowsPerPageOptions]="[5,10,20]"
+    [tableStyle]="{'min-width': '100%'}"
+    styleClass="p-datatable-sm">
+    
+    <ng-template pTemplate="header">
+      <tr>
+        <th width="120px">Código</th>
+        <th>Descrição</th>
+        <th width="100px" *ngIf="editMode">Ação</th>
+        <th><p-button 
           *ngIf="editMode"
           icon="pi pi-plus" 
           severity="success" 
-          styleClass="p-button-rounded p-button-text"
+          styleClass="p-button-rounded"
           (click)="abrirDialogoCnae()"
-          [disabled]="!editMode"
           tooltip="Adicionar CNAE"
-          tooltipPosition="top"
-        ></p-button>
-      </h3>
-      
-      <!-- Lista de CNAEs -->
-      <p-table [value]="cnaesDaEmpresa" *ngIf="cnaesDaEmpresa.length > 0" [tableStyle]="{'min-width': '50rem'}">
-        <ng-template pTemplate="header">
-          <tr>
-            <th>CÓDIGO CNAE</th>
-            <th>DESCRIÇÃO</th>
-            <th *ngIf="editMode">AÇÕES</th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-cnae>
-          <tr>
-            <td>{{cnae.COD_CNAE}}</td>
-            <td>{{cnae.DESCRICAO}}</td>
-            <td *ngIf="editMode">
-              <p-button icon="pi pi-trash" severity="danger" (click)="removerCnae(cnae.COD_CNAE)"></p-button>
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
-  
-      <div *ngIf="cnaesDaEmpresa.length === 0" class="text-center p-4">
-        <p>Nenhum CNAE cadastrado para esta empresa.</p>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Diálogo para adicionar CNAEs -->
-  <p-dialog 
-    header="Adicionar CNAE" 
-    [(visible)]="mostrarDialogoCnae" 
-    [modal]="true" 
-    [style]="{ width: '50vw' }"
-    [draggable]="false" 
-    [resizable]="false"
-    (onHide)="fecharDialogoCnae()">
-    
-    <div class="p-fluid grid">
-      <div class="field col-12">
-        <h4>Buscar CNAE</h4>
-        <p-autoComplete 
-          [(ngModel)]="cnaeSelecionado" 
-          [suggestions]="cnaesFiltrados" 
-          (completeMethod)="buscarCnaes($event)"
-          field="DESCRICAO" 
-          [minLength]="3"
-          placeholder="Digite para buscar CNAE..."
-          [dropdown]="true">
-          <ng-template let-cnae pTemplate="item">
-            <div class="cnae-item">
-              <div><strong>{{cnae.COD_CNAE}}</strong> - {{cnae.DESCRICAO}}</div>
-            </div>
-          </ng-template>
-        </p-autoComplete>
-      </div>
-  
-      <div class="field col-12" *ngIf="cnaeSelecionado">
-        <h4>CNAE Selecionado:</h4>
-        <div class="selected-cnae">
-          <strong>{{cnaeSelecionado.COD_CNAE}}</strong> - {{cnaeSelecionado.DESCRICAO}}
-        </div>
-      </div>
-    </div>
-  
-    <ng-template pTemplate="footer">
-      <p-button 
-        label="Cancelar" 
-        icon="pi pi-times" 
-        (click)="fecharDialogoCnae()" 
-        styleClass="p-button-text">
-      </p-button>
-      <p-button 
-        label="Adicionar" 
-        icon="pi pi-check" 
-        (click)="adicionarCnae()" 
-        [disabled]="!cnaeSelecionado"
-        styleClass="p-button-success">
-      </p-button>
+          tooltipPosition="top">
+        </p-button></th>
+      </tr>
     </ng-template>
-  </p-dialog>
+    
+    <ng-template pTemplate="body" let-cnae>
+      <tr>
+        <td>{{cnae.COD_CNAE}}</td>
+        <td>{{cnae.DESC_CNAE}}</td> <!-- Nova coluna -->
+        <td *ngIf="editMode" class="text-center">
+          <p-button 
+            icon="pi pi-trash" 
+            severity="danger" 
+            (click)="removerCnae(cnae.COD_CNAE)"
+            styleClass="p-button-sm"
+            tooltip="Remover CNAE"
+            tooltipPosition="top">
+          </p-button>
+        </td>
+      </tr>
+    </ng-template>
+      
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td [attr.colspan]="editMode ? 3 : 2" class="text-center p-4">
+            <i class="pi pi-info-circle mr-2"></i>
+            {{
+              carregandoCnaesDaEmpresa ? 
+              'Carregando CNAEs...' : 
+              'Nenhum CNAE vinculado a esta empresa.'
+            }}
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+  
+          <p-dialog 
+          [(visible)]="mostrarDialogoCnae" 
+          [modal]="true" 
+          [style]="{ width: '70vw', maxWidth: '800px' }"
+          [draggable]="false" 
+          [resizable]="false"
+          (onHide)="fecharDialogoCnae()">
+          
+          <div class="p-fluid grid p-3">
+            <!-- Formulário de busca melhorado -->
+            <div class="field col-12 md:col-3">
+              <span class="float-label-fixed label">
+                <input id="codCnae-input" type="text" pInputText 
+                      [(ngModel)]="codCnaeBusca" 
+                      placeholder="Código CNAE"
+                      (keydown.enter)="buscarCnaes()">
+              </span>
+            </div>
+            
+            <div class="field col-12 md:col-7">
+              <span class="float-label-fixed label">
+                <input id="descCnae-input" type="text" pInputText 
+                      [(ngModel)]="descCnaeBusca" 
+                      placeholder="Descrição CNAE"
+                      (keydown.enter)="buscarCnaes()">
+              </span>
+            </div>
+            
+            <div class="field col-12 md:col-2 flex align-content-end">
+              <p-button 
+                icon="pi pi-search" 
+                label="Buscar" 
+                (click)="buscarCnaes()"
+                styleClass="p-button-primary w-full"
+                [loading]="carregandoCnaes">
+              </p-button>
+            </div>
+            
+            <!-- Resultados da busca -->
+            <div class="col-12 mt-3" *ngIf="cnaesEncontrados.length > 0">
+              <p-table 
+                [value]="cnaesEncontrados" 
+                [loading]="carregandoCnaes"
+                [paginator]="true" 
+                [rows]="5"
+                [rowsPerPageOptions]="[5,10,20]"
+                [tableStyle]="{'min-width': '100%'}"
+                styleClass="p-datatable-sm">
+                
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th width="120px">Código</th>
+                    <th>Descrição</th>
+                    <th width="100px">Ação</th>
+                  </tr>
+                </ng-template>
+                
+                <ng-template pTemplate="body" let-cnae>
+                  <tr>
+                    <td>{{cnae.COD_CNAE}}</td>
+                    <td>{{cnae.DESC_CNAE}}</td>
+                    <td class="text-center">
+                      <p-button 
+                        icon="pi pi-plus" 
+                        severity="success" 
+                        (click)="selecionarCnaeParaAdicionar(cnae)"
+                        styleClass="p-button-sm"
+                        [disabled]="!editMode"
+                        tooltip="Adicionar este CNAE"
+                        tooltipPosition="top">
+                      </p-button>
+                    </td>
+                  </tr>
+                </ng-template>
+                
+                <ng-template pTemplate="emptymessage">
+                  <tr>
+                    <td colspan="3" class="text-center p-4">
+                      Nenhum resultado encontrado.
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div>
+          </div>
+          
+          <ng-template pTemplate="footer">
+            <p-button 
+              label="Fechar" 
+              icon="pi pi-times" 
+              (click)="fecharDialogoCnae()" 
+              styleClass="p-button-text">
+            </p-button>
+          </ng-template>
+        </p-dialog>
                        
 
 
                 <!-- Botões Editar, Salvar e Excluir -->
                 <!-- No grupo de botões, adicione: -->
-                <div class="btn-group field col-12 md:col-3 flex flex-wrap gap-3" role="group" aria-label="Edit group">
-                    <p-button *ngIf="!editMode" icon="pi pi-pencil" severity="info" (click)="editarEmpresa(resultado.CNPJ)"></p-button>
-                    <p-button *ngIf="editMode" icon="pi pi-save" severity="success" (click)="salvarEmpresa()"></p-button>
-                    <p-button *ngIf="editMode" icon="pi pi-times" severity="warning" (click)="cancelarEdicao()"></p-button>
-                    <p-button *ngIf="!editMode" icon="pi pi-trash" severity="danger" (click)="confirmarExclusao()"></p-button>
+                <div class="btn-group field col-12 md:col-3 flex flex-wrap gap-3 justify-content-center items-center" role="group" aria-label="Edit group">
+                    <p-button *ngIf="!editMode" icon="pi pi-pencil" severity="info" label="Editar" (click)="editarEmpresa(resultado.CNPJ)"></p-button>
+                    <p-button *ngIf="editMode" icon="pi pi-save" severity="success" label="Salvar" (click)="salvarEmpresa()"></p-button>
+                    <p-button *ngIf="editMode" icon="pi pi-times" severity="warning" label="Cancelar Edição" (click)="cancelarEdicao()"></p-button>
+                    <p-button *ngIf="!editMode" icon="pi pi-trash" severity="danger" label="Excluir" (click)="confirmarExclusao()"></p-button>
                 </div>
             </div>
         </div>

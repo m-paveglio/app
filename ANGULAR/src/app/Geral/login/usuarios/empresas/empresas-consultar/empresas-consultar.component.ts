@@ -5,6 +5,11 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { ChangeDetectorRef } from '@angular/core';
 import { cnpj } from 'cpf-cnpj-validator'; // Importando a biblioteca
 
+interface CnaeVinculado {
+  COD_CNAE: string;
+  DESC_CNAE: string;
+}
+
 interface Column {
   field: string;
   header: string;
@@ -18,6 +23,7 @@ interface Column {
 })
 export class EmpresasConsultarComponent {
   cols!: Column[];
+  cnaesDaEmpresa: CnaeVinculado[] = [];
   CNPJ: string = '';
   NOME: string = '';
   resultado: any = null;
@@ -40,7 +46,6 @@ export class EmpresasConsultarComponent {
   dataUploadCertificado: string | null = null;
   certificadoEnviado: boolean = false;
   valoresOriginais: any = {};
-  cnaesDaEmpresa: any[] = [];
   cnaeParaAdicionar: string = '';
   mostrarAdicionarCnae: boolean = false;
   cnaesDisponiveis: any[] = [];
@@ -48,6 +53,11 @@ export class EmpresasConsultarComponent {
   mostrarDialogoCnae: boolean = false;
   cnaeSelecionado: any = null;
   cnaesFiltrados: any[] = [];
+  codCnaeBusca: string = '';
+  descCnaeBusca: string = '';
+  cnaesEncontrados: any[] = [];
+  carregandoCnaes: boolean = false;
+  carregandoCnaesDaEmpresa: boolean = false;
 
 
   constructor(
@@ -116,16 +126,16 @@ export class EmpresasConsultarComponent {
         if (data && Object.keys(data).length > 0) {
           this.resultado = data;
           
-          // Carrega os dados do certificado na primeira consulta
+          // Carrega os dados do certificado
           this.certificadoEnviado = !!data.certificado;
           this.senhaCertificado = data.senha || '';
           this.dataUploadCertificado = data.data_upload || null;
           
-          // Converte OPTANTE_SN para exibir o nome correspondente
+          // Carrega os CNAEs da empresa
+          this.carregarCnaesDaEmpresa(data.CNPJ);
+          
           const OPTANTE_SN = this.OPTANTE_SN.find(t => t.codigo === this.resultado.OPTANTE_SN);
           this.resultado.OPTANTE_SN_nome = OPTANTE_SN ? OPTANTE_SN.nome : '';
-  
-          console.log(this.resultado);
         } else {
           this.showError('Empresa não existe no banco de dados.');
           this.resultado = null;
@@ -204,21 +214,21 @@ export class EmpresasConsultarComponent {
 
 
   selecionarEmpresa(empresa: any) {
-    this.EmpresasService.buscarPorCnpj(empresa.CNPJ).subscribe(
-      (data) => {
+    this.EmpresasService.buscarPorCnpj(empresa.CNPJ).subscribe({
+      next: (data) => {
         this.resultado = data;
         this.EmpresasEncontradas = [];
         
-        // Verifica se tem certificado
+        // Carrega dados do certificado
         this.certificadoEnviado = !!data.certificado;
         this.senhaCertificado = data.senha || '';
         this.dataUploadCertificado = data.data_upload || null;
         
-        // Sempre azul, independente de ter certificado
-        this.carregarCnaesDaEmpresa();
+        // Carrega os CNAEs da empresa
+        this.carregarCnaesDaEmpresa(data.CNPJ);
         this.certificadoCarregado = true;
       },
-      (error) => {
+      error: (error) => {
         console.error('Erro ao selecionar empresa:', error);
         if (error.error && error.error.message) {
           this.processarErro(error.error.message);
@@ -226,7 +236,7 @@ export class EmpresasConsultarComponent {
           this.showError('Erro ao selecionar empresa');
         }
       }
-    );
+    });
   }
   
   processarErro(mensagemErro: string) {
@@ -380,19 +390,6 @@ export class EmpresasConsultarComponent {
       this.editMode = false;
     }
   }
-  
-  carregarCnaesDaEmpresa() {
-    if (this.resultado?.CNPJ) {
-      this.EmpresasService.getEmpresaCnaes(this.resultado.CNPJ).subscribe({
-        next: (data) => {
-          this.cnaesDaEmpresa = data;
-        },
-        error: (error) => {
-          console.error('Erro ao carregar CNAEs:', error);
-        }
-      });
-    }
-  }
 
   
   removerCnae(COD_CNAE: string) {
@@ -402,7 +399,7 @@ export class EmpresasConsultarComponent {
         accept: () => {
           this.EmpresasService.removerCnaeEmpresa(this.resultado.CNPJ, COD_CNAE).subscribe({
             next: () => {
-              this.carregarCnaesDaEmpresa();
+              this.carregarCnaesDaEmpresa(this.CNPJ);
             },
             error: (error) => {
               console.error('Erro ao remover CNAE:', error);
@@ -415,7 +412,7 @@ export class EmpresasConsultarComponent {
   
   filtrarCnae(event: any) {
     if (event.query.length >= 3) {
-      this.EmpresasService.buscarCnae(event.query).subscribe({
+      this.EmpresasService.buscarCNAE(event.query).subscribe({
         next: (data) => {
           this.cnaeFiltrado = data;
         },
@@ -426,62 +423,148 @@ export class EmpresasConsultarComponent {
     }
   }
 
+
 abrirDialogoCnae() {
   this.mostrarDialogoCnae = true;
-  this.cnaeSelecionado = null;
-  this.cnaesFiltrados = [];
+  this.codCnaeBusca = '';
+  this.descCnaeBusca = '';
+  this.cnaesEncontrados = [];
 }
 
+// Método para fechar o diálogo
 fecharDialogoCnae() {
   this.mostrarDialogoCnae = false;
-  this.cnaeSelecionado = null;
-  this.cnaesFiltrados = [];
 }
 
-buscarCnaes(event: any) {
-  const query = event.query;
-  if (query.length >= 3) {
-    this.EmpresasService.buscarCnae(query).subscribe({
-      next: (data) => {
-        this.cnaesFiltrados = data;
-      },
-      error: (error) => {
-        console.error('Erro ao buscar CNAEs:', error);
+// Método para buscar CNAEs
+buscarCnaes() {
+  if (!this.codCnaeBusca && !this.descCnaeBusca) {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Atenção',
+      detail: 'Informe pelo menos um critério de busca'
+    });
+    return;
+  }
+
+  this.carregandoCnaes = true;
+  
+  const params = {
+    codigo: this.codCnaeBusca,
+    descricao: this.descCnaeBusca
+  };
+
+  this.EmpresasService.buscarCNAE(params).subscribe({
+    next: (cnaes) => {
+      // Normaliza a resposta para sempre trabalhar com array
+      this.cnaesEncontrados = Array.isArray(cnaes) ? cnaes : [cnaes];
+      this.carregandoCnaes = false;
+      
+      if (this.cnaesEncontrados.length === 0) {
         this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Falha ao buscar CNAEs'
+          severity: 'info',
+          summary: 'Informação',
+          detail: 'Nenhum CNAE encontrado com os critérios informados'
         });
       }
-    });
-  }
+    },
+    error: (error) => {
+      console.error('Erro ao buscar CNAEs:', error);
+      this.carregandoCnaes = false;
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Erro',
+        detail: 'Falha ao buscar CNAEs'
+      });
+    }
+  });
 }
 
-adicionarCnae() {
-  if (this.cnaeSelecionado && this.resultado?.CNPJ) {
-    this.EmpresasService.adicionarCnaeEmpresa(
-      this.resultado.CNPJ, 
-      this.cnaeSelecionado.COD_CNAE
-    ).subscribe({
-      next: () => {
+
+
+// Método para selecionar um CNAE para adicionar
+selecionarCnaeParaAdicionar(cnae: any) {
+  this.EmpresasService.adicionarCnae(this.CNPJ, cnae.COD_CNAE).subscribe(
+    () => {
+      this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'CNAE adicionado!' });
+      this.cnaesDaEmpresa.push(cnae);
+      this.fecharDialogoCnae();
+    },
+    (erro) => {
+      if (erro.status === 409) {
+        this.messageService.add({ severity: 'warn', summary: 'Aviso', detail: 'Este CNAE já está vinculado!' });
+      } else {
+        this.messageService.add({ severity: 'error', summary: 'Erro', detail: erro.error?.message || 'Erro ao adicionar CNAE!' });
+      }
+    }
+  );
+}
+
+// Método para adicionar o CNAE
+adicionarCnae(codCnae: string) {
+  if (!this.resultado?.CNPJ) return;
+
+  this.EmpresasService.adicionarCnaeEmpresa(this.resultado.CNPJ, codCnae).subscribe({
+    next: () => {
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Sucesso',
+        detail: 'CNAE adicionado com sucesso!'
+      });
+      this.carregarCnaesDaEmpresa(this.CNPJ)
+    },
+    error: (error) => {
+      console.error('Erro ao adicionar CNAE:', error);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Erro',
+        detail: 'Falha ao adicionar CNAE'
+      });
+    }
+  });
+}
+
+// Adicione este método para carregar os CNAEs
+carregarCnaesDaEmpresa(CNPJ: string) {
+  this.carregandoCnaesDaEmpresa = true;
+  this.EmpresasService.getCnaesDaEmpresa(CNPJ).subscribe({
+    next: (cnaes) => {
+      this.cnaesDaEmpresa = Array.isArray(cnaes) ? cnaes : [cnaes];
+      this.carregandoCnaesDaEmpresa = false;
+    },
+    error: (error) => {
+      console.error('Erro ao carregar CNAEs da empresa:', error);
+      this.carregandoCnaesDaEmpresa = false;
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Erro',
+        detail: 'Falha ao carregar CNAEs da empresa'
+      });
+    }
+  });
+}
+
+
+buscarCnaeEspecifico(codigo: string) {
+  this.EmpresasService.buscarCNAE({ codigo }).subscribe({
+    next: (cnaes) => {
+      if (cnaes.length === 0) {
         this.messageService.add({
-          severity: 'success',
-          summary: 'Sucesso',
-          detail: 'CNAE adicionado com sucesso!'
-        });
-        this.carregarCnaesDaEmpresa();
-        this.fecharDialogoCnae();
-      },
-      error: (error) => {
-        console.error('Erro ao adicionar CNAE:', error);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Falha ao adicionar CNAE'
+          severity: 'warn',
+          summary: 'CNAE não encontrado',
+          detail: `Nenhum CNAE encontrado com o código ${codigo}`
         });
       }
-    });
-  }
+      this.cnaesEncontrados = cnaes;
+    },
+    error: (error) => {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Erro na busca',
+        detail: error.message || 'Falha ao buscar CNAE'
+      });
+    }
+  });
 }
 
 }
