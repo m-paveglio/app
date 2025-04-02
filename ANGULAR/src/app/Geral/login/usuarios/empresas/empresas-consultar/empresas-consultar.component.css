@@ -2,3 +2,143 @@
   top: -0.75rem !important;
   font-size: 0.75rem !important;
 }
+
+/* Estilos para as tabelas e cards */
+.card {
+  margin-bottom: 1.5rem;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+/* Garante que as tabelas tenham a mesma largura */
+.p-datatable {
+  width: 100% !important;
+}
+
+/* Estilo para os cabeçalhos das tabelas */
+.p-datatable .p-datatable-thead > tr > th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+}
+
+/* Ajuste para os botões nas tabelas */
+.p-button.p-button-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+/* Espaçamento consistente para os formulários dentro dos cards */
+.card .p-fluid.p-formgrid {
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 0 0 6px 6px;
+}
+
+/* Alinhamento dos botões de ação */
+.btn-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Ajuste para os títulos dos cards */
+.card h3.text-center {
+  margin: 0;
+}
+
+.card {
+  border: 1px solid rgb(0, 0, 0); /* Temporário para debug */
+}
+
+.p-datatable-wrapper {
+  max-height: 400px; /* Ajuste conforme necessário */
+  overflow-y: auto;
+}
+
+/* Bordas arredondadas para as tabelas */
+.card-rounded {
+  border-radius: 12px !important;
+  overflow: hidden; /* Importante para que as bordas internas respeitem o arredondamento */
+}
+
+/* Ajuste para a tabela dentro do card */
+.card-rounded .p-datatable {
+  border-radius: 12px !important;
+}
+
+/* Ajuste para o cabeçalho da tabela */
+.card-rounded .p-datatable .p-datatable-thead > tr > th:first-child {
+  border-top-left-radius: 12px !important;
+}
+
+.card-rounded .p-datatable .p-datatable-thead > tr > th:last-child {
+  border-top-right-radius: 12px !important;
+}
+
+/* Ajuste para a última linha da tabela */
+.card-rounded .p-datatable .p-datatable-tbody > tr:last-child > td:first-child {
+  border-bottom-left-radius: 12px !important;
+}
+
+.card-rounded .p-datatable .p-datatable-tbody > tr:last-child > td:last-child {
+  border-bottom-right-radius: 12px !important;
+}
+
+
+/* Estilo para tabelas arredondadas */
+.rounded-table {
+  border-collapse: separate;
+  border-spacing: 0 8px;
+  margin-top: -8px; /* Compensa o espaçamento extra */
+}
+
+.rounded-table .p-datatable-thead > tr > th {
+  background-color: #f8f9fa;
+  border: none !important;
+  padding: 1rem;
+  font-weight: 600;
+}
+
+.rounded-table .p-datatable-tbody > tr > td {
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  border: none !important;
+  padding: 0.75rem 1rem;
+  vertical-align: middle;
+}
+
+/* Cantos arredondados para células */
+.rounded-table .p-datatable-tbody > tr > td:first-child {
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+
+.rounded-table .p-datatable-tbody > tr > td:last-child {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+/* Efeito hover */
+.rounded-table .p-datatable-tbody > tr:hover > td {
+  background-color: #f8fafc !important;
+}
+
+/* Ajuste para botões nas células */
+.rounded-table .p-button.p-button-sm {
+  transform: scale(0.9);
+  transition: all 0.2s;
+}
+
+.rounded-table .p-button.p-button-sm:hover {
+  transform: scale(1);
+}
+
+/* Estilo para o diálogo */
+.p-dialog .p-dialog-content {
+  padding: 1.5rem;
+}
+
+/* Espaçamento entre campos */
+.p-fluid .field {
+  margin-bottom: 1.5rem;
+}

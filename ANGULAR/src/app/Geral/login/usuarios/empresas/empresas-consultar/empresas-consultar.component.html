@@ -219,171 +219,297 @@
                     </span>
                 </div>
 
-                <!-- Substitua a seção de CNAEs existente por este código -->
-<div class="field col-12">
-  <div class="card">
-    <h3 class="text-center" [ngStyle]="{backgroundColor:'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}">
-      CNAE
-    </h3>
-    
-    <!-- Tabela de CNAEs da empresa -->
-    <p-table 
-    [value]="cnaesDaEmpresa" 
-    [loading]="carregandoCnaesDaEmpresa"
-    [paginator]="true" 
-    [rows]="5"
-    [rowsPerPageOptions]="[5,10,20]"
-    [tableStyle]="{'min-width': '100%'}"
-    styleClass="p-datatable-sm">
-    
-    <ng-template pTemplate="header">
-      <tr>
-        <th width="120px">Código</th>
-        <th>Descrição</th>
-        <th width="100px" *ngIf="editMode">Ação</th>
-        <th><p-button 
-          *ngIf="editMode"
-          icon="pi pi-plus" 
-          severity="success" 
-          styleClass="p-button-rounded"
-          (click)="abrirDialogoCnae()"
-          tooltip="Adicionar CNAE"
-          tooltipPosition="top">
-        </p-button></th>
-      </tr>
-    </ng-template>
-    
-    <ng-template pTemplate="body" let-cnae>
-      <tr>
-        <td>{{cnae.COD_CNAE}}</td>
-        <td>{{cnae.DESC_CNAE}}</td> <!-- Nova coluna -->
-        <td *ngIf="editMode" class="text-center">
-          <p-button 
-            icon="pi pi-trash" 
-            severity="danger" 
-            (click)="removerCnae(cnae.COD_CNAE)"
-            styleClass="p-button-sm"
-            tooltip="Remover CNAE"
-            tooltipPosition="top">
-          </p-button>
-        </td>
-      </tr>
-    </ng-template>
-      
-      <ng-template pTemplate="emptymessage">
-        <tr>
-          <td [attr.colspan]="editMode ? 3 : 2" class="text-center p-4">
-            <i class="pi pi-info-circle mr-2"></i>
-            {{
-              carregandoCnaesDaEmpresa ? 
-              'Carregando CNAEs...' : 
-              'Nenhum CNAE vinculado a esta empresa.'
-            }}
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
-  </div>
-</div>
+<!-- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////////////////////////////////////-->
+<!-- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////////////////////////////////////-->
+<!-- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\CNAES/////////////////////////////////////////////////////////////-->
+<!-- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////////////////////////////////////-->
+<!-- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////////////////////////////////////-->
+                
+
+                <div class="field col-12">
+                  <div class="card">
+                    <h3 class="text-center" [ngStyle]="{backgroundColor:'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}">
+                      CNAE
+                    </h3>
+                    
+                    <p-table [value]="cnaesDaEmpresa" 
+                            [loading]="carregandoCnaesDaEmpresa"
+                            styleClass="p-datatable-sm rounded-table"
+                            [tableStyle]="{'min-width': '100%'}">
+                      
+                            <ng-template pTemplate="header">
+                              <tr>
+                                <th style="width: 120px; border-top-left-radius: 12px;">Código</th>
+                                <th>Descrição</th>
+                                <th *ngIf="editMode" style="width: 100px;">Ação</th>
+                                <th style="width: 60px; border-top-right-radius: 12px;"> <!-- Ajuste importante aqui -->
+                                  <p-button *ngIf="editMode"
+                                          icon="pi pi-plus" 
+                                          severity="success" 
+                                          styleClass="p-button-rounded p-button-sm"
+                                          (click)="abrirDialogoCnae()"
+                                          tooltip="Adicionar CNAE"
+                                          tooltipPosition="top">
+                                  </p-button>
+                                </th>
+                              </tr>
+                            </ng-template>
+                      
+                      <ng-template pTemplate="body" let-cnae>
+                        <tr>
+                          <td style="background: #ffffff;">{{cnae.COD_CNAE}}</td>
+                          <td style="background: #ffffff;">{{cnae.DESC_CNAE || '-'}}</td>
+                          <td *ngIf="editMode" class="text-center" style="background: #ffffff;">
+                            <p-button icon="pi pi-trash" 
+                                    severity="danger" 
+                                    styleClass="p-button-sm"
+                                    (click)="removerCnae(cnae.COD_CNAE)"
+                                    tooltip="Remover CNAE"
+                                    tooltipPosition="top">
+                            </p-button>
+                          </td>
+                          <td style="background: #ffffff;"></td>
+                        </tr>
+                      </ng-template>
+                      
+                      <ng-template pTemplate="emptymessage">
+                        <tr>
+                          <td [attr.colspan]="editMode ? 4 : 3" class="text-center p-4" style="border-radius: 12px;">
+                            <i class="pi pi-info-circle mr-2"></i>
+                            {{ carregandoCnaesDaEmpresa ? 'Carregando CNAEs...' : 'Nenhum CNAE vinculado' }}
+                          </td>
+                        </tr>
+                      </ng-template>
+                    </p-table>
+                  </div>
+                </div>
   
-          <p-dialog 
-          [(visible)]="mostrarDialogoCnae" 
-          [modal]="true" 
-          [style]="{ width: '70vw', maxWidth: '800px' }"
-          [draggable]="false" 
-          [resizable]="false"
-          (onHide)="fecharDialogoCnae()">
-          
-          <div class="p-fluid grid p-3">
-            <!-- Formulário de busca melhorado -->
-            <div class="field col-12 md:col-3">
-              <span class="float-label-fixed label">
-                <input id="codCnae-input" type="text" pInputText 
-                      [(ngModel)]="codCnaeBusca" 
-                      placeholder="Código CNAE"
-                      (keydown.enter)="buscarCnaes()">
-              </span>
-            </div>
-            
-            <div class="field col-12 md:col-7">
-              <span class="float-label-fixed label">
-                <input id="descCnae-input" type="text" pInputText 
-                      [(ngModel)]="descCnaeBusca" 
-                      placeholder="Descrição CNAE"
-                      (keydown.enter)="buscarCnaes()">
-              </span>
-            </div>
-            
-            <div class="field col-12 md:col-2 flex align-content-end">
-              <p-button 
-                icon="pi pi-search" 
-                label="Buscar" 
-                (click)="buscarCnaes()"
-                styleClass="p-button-primary w-full"
-                [loading]="carregandoCnaes">
-              </p-button>
-            </div>
-            
-            <!-- Resultados da busca -->
-            <div class="col-12 mt-3" *ngIf="cnaesEncontrados.length > 0">
-              <p-table 
-                [value]="cnaesEncontrados" 
-                [loading]="carregandoCnaes"
-                [paginator]="true" 
-                [rows]="5"
-                [rowsPerPageOptions]="[5,10,20]"
-                [tableStyle]="{'min-width': '100%'}"
-                styleClass="p-datatable-sm">
-                
-                <ng-template pTemplate="header">
-                  <tr>
-                    <th width="120px">Código</th>
-                    <th>Descrição</th>
-                    <th width="100px">Ação</th>
-                  </tr>
-                </ng-template>
-                
-                <ng-template pTemplate="body" let-cnae>
-                  <tr>
-                    <td>{{cnae.COD_CNAE}}</td>
-                    <td>{{cnae.DESC_CNAE}}</td>
-                    <td class="text-center">
+                    <p-dialog 
+                    [(visible)]="mostrarDialogoCnae" 
+                    [modal]="true" 
+                    [style]="{ width: '70vw', maxWidth: '800px' }"
+                    [draggable]="false" 
+                    [resizable]="false"
+                    (onHide)="fecharDialogoCnae()">
+                    
+                    <div class="p-fluid grid p-3">
+                      <!-- Formulário de busca melhorado -->
+                      <div class="field col-12 md:col-3">
+                        <span class="float-label-fixed label">
+                          <input id="codCnae-input" type="text" pInputText 
+                                [(ngModel)]="codCnaeBusca" 
+                                placeholder="Código CNAE"
+                                (keydown.enter)="buscarCnaes()">
+                        </span>
+                      </div>
+                      
+                      <div class="field col-12 md:col-7">
+                        <span class="float-label-fixed label">
+                          <input id="descCnae-input" type="text" pInputText 
+                                [(ngModel)]="descCnaeBusca" 
+                                placeholder="Descrição CNAE"
+                                (keydown.enter)="buscarCnaes()">
+                        </span>
+                      </div>
+                      
+                      <div class="field col-12 md:col-2 flex align-content-end">
+                        <p-button 
+                          icon="pi pi-search" 
+                          label="Buscar" 
+                          (click)="buscarCnaes()"
+                          styleClass="p-button-primary w-full"
+                          [loading]="carregandoCnaes">
+                        </p-button>
+                      </div>
+                      
+                      <!-- Resultados da busca -->
+                      <div class="col-12 mt-3" *ngIf="cnaesEncontrados.length > 0">
+                        <p-table 
+                          [value]="cnaesEncontrados" 
+                          [loading]="carregandoCnaes"
+                          [paginator]="true" 
+                          [rows]="5"
+                          [rowsPerPageOptions]="[5,10,20]"
+                          [tableStyle]="{'min-width': '100%'}"
+                          styleClass="p-datatable-sm">
+                          
+                          <ng-template pTemplate="header">
+                            <tr>
+                              <th width="120px">Código</th>
+                              <th>Descrição</th>
+                              <th width="100px">Ação</th>
+                            </tr>
+                          </ng-template>
+                          
+                          <ng-template pTemplate="body" let-cnae>
+                            <tr>
+                              <td>{{cnae.COD_CNAE}}</td>
+                              <td>{{cnae.DESC_CNAE}}</td>
+                              <td class="text-center">
+                                <p-button 
+                                  icon="pi pi-plus" 
+                                  severity="success" 
+                                  (click)="selecionarCnaeParaAdicionar(cnae)"
+                                  styleClass="p-button-sm"
+                                  [disabled]="!editMode"
+                                  tooltip="Adicionar este CNAE"
+                                  tooltipPosition="top">
+                                </p-button>
+                              </td>
+                            </tr>
+                          </ng-template>
+                          
+                          <ng-template pTemplate="emptymessage">
+                            <tr>
+                              <td colspan="3" class="text-center p-4">
+                                Nenhum resultado encontrado.
+                              </td>
+                            </tr>
+                          </ng-template>
+                        </p-table>
+                      </div>
+                    </div>
+                    
+                    <ng-template pTemplate="footer">
                       <p-button 
-                        icon="pi pi-plus" 
-                        severity="success" 
-                        (click)="selecionarCnaeParaAdicionar(cnae)"
-                        styleClass="p-button-sm"
-                        [disabled]="!editMode"
-                        tooltip="Adicionar este CNAE"
-                        tooltipPosition="top">
+                        label="Fechar" 
+                        icon="pi pi-times" 
+                        (click)="fecharDialogoCnae()" 
+                        styleClass="p-button-text">
                       </p-button>
-                    </td>
-                  </tr>
-                </ng-template>
-                
-                <ng-template pTemplate="emptymessage">
-                  <tr>
-                    <td colspan="3" class="text-center p-4">
-                      Nenhum resultado encontrado.
-                    </td>
-                  </tr>
-                </ng-template>
-              </p-table>
-            </div>
-          </div>
-          
-          <ng-template pTemplate="footer">
-            <p-button 
-              label="Fechar" 
-              icon="pi pi-times" 
-              (click)="fecharDialogoCnae()" 
-              styleClass="p-button-text">
-            </p-button>
-          </ng-template>
-        </p-dialog>
+                    </ng-template>
+                  </p-dialog>
                        
+<!-- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////////////////////////////////////-->
+<!-- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////////////////////////////////////-->
+<!-- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ATIVIDADES///////////////////////////////////////////////////////////-->
+<!-- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////////////////////////////////////-->
+<!-- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////////////////////////////////////-->
 
+              <div class="field col-12">
+                <div class="card card-rounded">
+                  <h3 class="text-center" [ngStyle]="{backgroundColor:'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}">
+                    ATIVIDADES (Código de Tributação Municipal)
+                  </h3>
+                  
+                  <p-table [value]="codigosTributacaoDaEmpresa" 
+                  [loading]="carregandoCodigosTributacaoDaEmpresa"
+                  styleClass="p-datatable-sm rounded-table"
+                  [tableStyle]="{'min-width': '100%'}">
 
+                  <ng-template pTemplate="header">
+                    <tr>
+                      <th style="width: 120px; border-top-left-radius: 12px;">Código</th>
+                      <th>Descrição</th>
+                      <th *ngIf="editMode" style="width: 100px;">Ação</th>
+                      <th style="width: 60px; border-top-right-radius: 12px;">
+                        <p-button *ngIf="editMode"
+                                icon="pi pi-plus" 
+                                severity="success" 
+                                styleClass="p-button-rounded p-button-sm"
+                                (click)="abrirDialogoNovaAtividade()"
+                                tooltip="Cadastrar Nova Atividade"
+                                tooltipPosition="top">
+                        </p-button>
+                      </th>
+                    </tr>
+                  </ng-template>
+
+              <ng-template pTemplate="body" let-codigo>
+              <tr>
+              <td style="background: #ffffff;">{{codigo.COD_ATIVIDADE}}</td>
+              <td style="background: #ffffff;">{{codigo.DESC_ATIVIDADE || '-'}}</td>
+              <td *ngIf="editMode" class="text-center" style="background: #ffffff;">
+                <p-button icon="pi pi-trash" 
+                          severity="danger" 
+                          styleClass="p-button-sm"
+                          (click)="removerCodigoTributacao(codigo.COD_ATIVIDADE)"
+                          tooltip="Remover código"
+                          tooltipPosition="top">
+                </p-button>
+              </td>
+              </tr>
+              </ng-template>
+
+              <ng-template pTemplate="emptymessage">
+              <tr>
+              <td [attr.colspan]="editMode ? 3 : 2" class="text-center p-4" style="border-radius: 12px;">
+                <i class="pi pi-info-circle mr-2"></i>
+                {{ carregandoCodigosTributacaoDaEmpresa ? 'Carregando...' : 'Nenhum registro encontrado' }}
+              </td>
+              </tr>
+              </ng-template>
+              </p-table>
+                  
+                  <div *ngIf="mostrarAdicionarCodigoTributacao" class="p-fluid p-formgrid grid p-mt-2 p-p-3">
+                    <div class="field col-12 md:col-3">
+                      <span class="p-float-label">
+                        <input id="codAtividade" type="text" pInputText 
+                              [(ngModel)]="codigoTributacaoParaAdicionar.COD_ATIVIDADE" 
+                              name="codAtividade" required>
+                        <label for="codAtividade">Código *</label>
+                      </span>
+                    </div>
+                    
+                    <div class="field col-12 md:col-6">
+                      <span class="p-float-label">
+                        <input id="descAtividade" type="text" pInputText 
+                              [(ngModel)]="codigoTributacaoParaAdicionar.DESC_ATIVIDADE" 
+                              name="descAtividade">
+                        <label for="descAtividade">Descrição</label>
+                      </span>
+                    </div>
+                    
+                    <div class="field col-12 md:col-3 flex align-items-end gap-2">
+                      <p-button icon="pi pi-check" label="Adicionar" 
+                                severity="success" (click)="adicionarCodigoTributacao()">
+                      </p-button>
+                      <p-button icon="pi pi-times" label="Cancelar" 
+                                severity="secondary" (click)="mostrarAdicionarCodigoTributacao = false">
+                      </p-button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <p-dialog 
+                [(visible)]="mostrarDialogoNovaAtividade" 
+                [modal]="true" 
+                [style]="{ width: '50vw' }"
+                [draggable]="false" 
+                [resizable]="false"
+                header="Cadastrar Nova Atividade">
+                
+                <div class="p-fluid grid p-3">
+                  <!-- Formulário de cadastro -->
+                  <div class="field col-12 md:col-3">
+                    <span class="float-label-fixed label">
+                      <input id="codAtividade-input" type="text" pInputText 
+                            [(ngModel)]="novaAtividade.COD_ATIVIDADE" 
+                            placeholder="Código da Atividade"
+                            required>
+                    </span>
+                  </div>
+                  
+                  <div class="field col-12 md:col-7">
+                    <span class="float-label-fixed label">
+                      <input id="descAtividade-input" type="text" pInputText 
+                            [(ngModel)]="novaAtividade.DESC_ATIVIDADE" 
+                            placeholder="Descrição da Atividade">
+                    </span>
+                  </div>
+                  
+                  <div class="field col-12 md:col-2 flex align-content-end">
+                    <p-button 
+                      icon="pi pi-plus" 
+                      label="Adicionar" 
+                      (click)="adicionarNovaAtividade()"
+                      styleClass="p-button-primary w-full"
+                      [(ngModel)]="adicionarNovaAtividade">
+                    </p-button>
+                  </div>
+                </div>
+              </p-dialog>
                 <!-- Botões Editar, Salvar e Excluir -->
                 <!-- No grupo de botões, adicione: -->
                 <div class="btn-group field col-12 md:col-3 flex flex-wrap gap-3 justify-content-center items-center" role="group" aria-label="Edit group">

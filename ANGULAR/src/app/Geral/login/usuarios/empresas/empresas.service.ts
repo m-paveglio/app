@@ -233,8 +233,51 @@ removerCnaeEmpresa(CNPJ: string, COD_CNAE: string): Observable<any> {
 }
 
 
+// //////////////////////////////////////////////
 
 
+getCodigoTributacaoMunicipioVinculados(CNPJ: string): Observable<any[]> {
+const url = `${this.apiUrl}/CodigoTributacaoMunicipio/${CNPJ}`;
+return this.http.get<any[]>(url).pipe(
+  catchError(this.handleError)
+);
+}
+
+
+adicionarCodigoTributacaoMunicipio(dados: { CNPJ: string, COD_ATIVIDADE: string, DESC_ATIVIDADE?: string }): Observable<any> {
+  const url = `${this.apiUrl}/CodigoTributacaoMunicipio`;
+  return this.http.post(url, dados).pipe(
+    map(response => {
+      this.handleSuccess('Código de tributação adicionado com sucesso!');
+      return response;
+    }),
+    catchError(this.handleError)
+  );
+}
+
+
+removerCodigoTributacaoMunicipio(CNPJ: string, COD_ATIVIDADE: string): Observable<any> {
+const url = `${this.apiUrl}/CodigoTributacaoMunicipio/${CNPJ}/${COD_ATIVIDADE}`;
+return this.http.delete(url).pipe(
+  map(response => {
+    this.handleSuccess('atividade removida com sucesso!');
+    return response;
+  }),
+  catchError(this.handleError)
+);
+}
+
+EditarCodigoTributacaoMunicipio(CNPJ: string, COD_ATIVIDADE: string): Observable<any> {
+  const url = `${this.apiUrl}/CodigoTributacaoMunicipio/${CNPJ}/${COD_ATIVIDADE}`;
+  // Adicione um objeto vazio como corpo da requisição ou os dados que você quer enviar
+  return this.http.patch(url, {}).pipe(
+    map(response => {
+      this.handleSuccess('CNAE removido com sucesso!');
+      return response;
+    }),
+    catchError(this.handleError)
+  );
+}
 
   /*exportarRelatorio(): Observable<any> {
     const url = `${this.apiUrl}/empresa/export/excel`; // Corrigido

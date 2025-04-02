@@ -14,14 +14,19 @@ export class CodigoTributacaoMunicipioService {
   async createCodigoTributacaoMunicipio(CodigoTributacaoMunicipioDto: CreateCodigoTributacaoMunicipioDto) {
     const CodigoTributacaoMunicipioFound = await this.CodigoTributacaoMunicipioRepository.findOne({
       where: {
-        COD_ATIVIDADE: CodigoTributacaoMunicipioDto.COD_ATIVIDADE,
-      },
+        CNPJ: CodigoTributacaoMunicipioDto.CNPJ,
+        COD_ATIVIDADE: CodigoTributacaoMunicipioDto.COD_ATIVIDADE
+      }
     });
-
-     const newCodigoTributacaoMunicipio = this.CodigoTributacaoMunicipioRepository.create({
+  
+    if (CodigoTributacaoMunicipioFound) {
+      throw new HttpException('Codigo Tributacao Municipio já vinculado a esta empresa', HttpStatus.CONFLICT);
+    }
+  
+    const newCodigoTributacaoMunicipio = this.CodigoTributacaoMunicipioRepository.create({
       ...CodigoTributacaoMunicipioDto,
     });
-
+  
     return this.CodigoTributacaoMunicipioRepository.save(newCodigoTributacaoMunicipio);
   }
 
@@ -29,42 +34,58 @@ export class CodigoTributacaoMunicipioService {
       return this.CodigoTributacaoMunicipioRepository.find()
     }
 
-    async getCodigoTributacaoMunicipio (COD_ATIVIDADE: string){
+    async getCodigoTributacaoMunicipio (CNPJ: string){
       const CodigoTributacaoMunicipioFound = await this.CodigoTributacaoMunicipioRepository.findOne({
         where:{
-          COD_ATIVIDADE,
+          CNPJ,
         }
       })
 
       if (!CodigoTributacaoMunicipioFound){
-      return new HttpException('Serviço não encontrado', HttpStatus.NOT_FOUND)
+      return new HttpException('Codigo Tributacao Municipio não encontrado', HttpStatus.NOT_FOUND)
       }
       return CodigoTributacaoMunicipioFound
     }
 
-    async deleteCodigoTributacaoMunicipio (COD_ATIVIDADE: string){
+    async getCodigoTributacaoMunicipioCnpj (CNPJ: string){
+      const CodigoTributacaoMunicipioFound = await this.CodigoTributacaoMunicipioRepository.find({
+        where:{
+          CNPJ,
+        }
+      });
+    
+      if (CodigoTributacaoMunicipioFound.length === 0) { // Se array estiver vazio, retorna erro 404
+        throw new HttpException('Codigo Tributacao Municipio não encontrado', HttpStatus.NOT_FOUND);
+      }
+      
+      return CodigoTributacaoMunicipioFound;
+    }
+
+
+    async deletCodigoTributacaoMunicipio(CNPJ: string, COD_ATIVIDADE: string) {
       const CodigoTributacaoMunicipioFound = await this.CodigoTributacaoMunicipioRepository.findOne({
         where: {
+          CNPJ,
           COD_ATIVIDADE
         }
       });
-
-      if (!CodigoTributacaoMunicipioFound){
-        return new HttpException('Serviço não encontrado', HttpStatus.NOT_FOUND)
+    
+      if (!CodigoTributacaoMunicipioFound) {
+        return new HttpException('Codigo Tributacao Municipio não encontrado', HttpStatus.NOT_FOUND);
       }
-
-      return this.CodigoTributacaoMunicipioRepository.delete({COD_ATIVIDADE})
+    
+      return this.CodigoTributacaoMunicipioRepository.delete({ CNPJ, COD_ATIVIDADE });
     }
 
-    async updateCodigoTributacaoMunicipio(COD_ATIVIDADE: string, CodigoTributacaoMunicipioDto: UpdateCodigoTributacaoMunicipioDto) {
+    async updateCodigoTributacaoMunicipio(CNPJ: string, CodigoTributacaoMunicipioDto: UpdateCodigoTributacaoMunicipioDto) {
       const CodigoTributacaoMunicipioFound = await this.CodigoTributacaoMunicipioRepository.findOne({
         where: {
-          COD_ATIVIDADE,
+          CNPJ,
         },
       });
   
       if (!CodigoTributacaoMunicipioFound) {
-        throw new HttpException('Serviço não encontrado', HttpStatus.NOT_FOUND);
+        throw new HttpException('Codigo Tributacao Municipio não encontrado', HttpStatus.NOT_FOUND);
       }
   
   
@@ -72,13 +93,4 @@ export class CodigoTributacaoMunicipioService {
       return this.CodigoTributacaoMunicipioRepository.save(updateCodigoTributacaoMunicipio);
     }
   
-
-    async searchCodigoTributacaoMunicipioByName(DESC_ATIVIDADE: string): Promise<CodigoTributacaoMunicipio[]> {
-      return this.CodigoTributacaoMunicipioRepository.find({
-        where: {
-          DESC_ATIVIDADE: Like(`%${DESC_ATIVIDADE}%`),
-        },
-      });
-    }
-
   }

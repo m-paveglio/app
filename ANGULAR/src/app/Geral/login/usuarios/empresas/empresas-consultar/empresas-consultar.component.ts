@@ -10,6 +10,11 @@ interface CnaeVinculado {
   DESC_CNAE: string;
 }
 
+interface CodigoTricodigoTributacaoParaAdicionar {
+  COD_ATIVIDADE: string;
+  DESC_ATIVIDADE?: string; // Adicione se tiver descrição
+}
+
 interface Column {
   field: string;
   header: string;
@@ -58,7 +63,23 @@ export class EmpresasConsultarComponent {
   cnaesEncontrados: any[] = [];
   carregandoCnaes: boolean = false;
   carregandoCnaesDaEmpresa: boolean = false;
-
+  mostrarAdicionarCodigoTributacao: boolean = false;
+  codigosTributacaoDaEmpresa: any[] = [];
+  carregandoCodigosTributacaoDaEmpresa: boolean = false;
+  codigoTributacaoParaAdicionar = {
+    COD_ATIVIDADE: '',
+    DESC_ATIVIDADE: ''
+  };
+  mostrarDialogoAtividade: boolean = false;
+  codAtividadeBusca: string = '';
+  descAtividadeBusca: string = '';
+  atividadesEncontradas: any[] = [];
+  carregandoAtividades: boolean = false;
+  mostrarDialogoNovaAtividade: boolean = false;
+  novaAtividade = {
+    COD_ATIVIDADE: '',
+    DESC_ATIVIDADE: ''
+  };
 
   constructor(
     private EmpresasService: EmpresasService,
@@ -133,6 +154,7 @@ export class EmpresasConsultarComponent {
           
           // Carrega os CNAEs da empresa
           this.carregarCnaesDaEmpresa(data.CNPJ);
+          this.carregarCodigosTributacaoDaEmpresa(data.CNPJ);
           
           const OPTANTE_SN = this.OPTANTE_SN.find(t => t.codigo === this.resultado.OPTANTE_SN);
           this.resultado.OPTANTE_SN_nome = OPTANTE_SN ? OPTANTE_SN.nome : '';
@@ -227,6 +249,7 @@ export class EmpresasConsultarComponent {
         // Carrega os CNAEs da empresa
         this.carregarCnaesDaEmpresa(data.CNPJ);
         this.certificadoCarregado = true;
+        this.carregarCodigosTributacaoDaEmpresa(data.CNPJ);
       },
       error: (error) => {
         console.error('Erro ao selecionar empresa:', error);
@@ -567,4 +590,152 @@ buscarCnaeEspecifico(codigo: string) {
   });
 }
 
+// Método para habilitar os inputs de adição
+habilitarAdicaoCodigoTributacao() {
+  this.codigoTributacaoParaAdicionar = { COD_ATIVIDADE: '', DESC_ATIVIDADE: '' };
+  this.mostrarAdicionarCodigoTributacao = true;
+}
+
+// Método para adicionar código de tributação
+adicionarCodigoTributacao() {
+  if (!this.codigoTributacaoParaAdicionar.COD_ATIVIDADE) {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Atenção',
+      detail: 'Informe o código da atividade'
+    });
+    return;
+  }
+
+  if (!this.resultado?.CNPJ) {
+    this.showError('CNPJ não disponível');
+    return;
+  }
+
+  const payload = {
+    CNPJ: this.resultado.CNPJ,
+    COD_ATIVIDADE: this.codigoTributacaoParaAdicionar.COD_ATIVIDADE,
+    DESC_ATIVIDADE: this.codigoTributacaoParaAdicionar.DESC_ATIVIDADE || undefined // Alterado de null para undefined
+  };
+
+  this.EmpresasService.adicionarCodigoTributacaoMunicipio(payload).subscribe({
+    next: () => {
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Sucesso',
+        detail: 'Código de tributação adicionado com sucesso!'
+      });
+      this.mostrarAdicionarCodigoTributacao = false;
+      this.carregarCodigosTributacaoDaEmpresa(this.resultado.CNPJ);
+    },
+    error: (error) => {
+      console.error('Erro ao adicionar código de tributação:', error);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Erro',
+        detail: error.error?.message || 'Falha ao adicionar código de tributação'
+      });
+    }
+  });
+}
+
+// Método para remover código de tributação
+removerCodigoTributacao(COD_ATIVIDADE: string) {
+  this.confirmationService.confirm({
+    message: 'Tem certeza que deseja remover este código de tributação?',
+    header: 'Confirmação',
+    icon: 'pi pi-exclamation-triangle',
+    accept: () => {
+      this.EmpresasService.removerCodigoTributacaoMunicipio(this.resultado.CNPJ, COD_ATIVIDADE).subscribe({
+        next: () => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Sucesso',
+            detail: 'Código de tributação removido com sucesso!'
+          });
+          this.carregarCodigosTributacaoDaEmpresa(this.resultado.CNPJ);
+        },
+        error: (error) => {
+          console.error('Erro ao remover código de tributação:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erro',
+            detail: 'Falha ao remover código de tributação'
+          });
+        }
+      });
+    }
+  });
+}
+
+// Método para carregar os códigos de tributação da empresa (mantém o mesmo)
+carregarCodigosTributacaoDaEmpresa(CNPJ: string) {
+  this.carregandoCodigosTributacaoDaEmpresa = true;
+  this.EmpresasService.getCodigoTributacaoMunicipioVinculados(CNPJ).subscribe({
+    next: (codigos) => {
+      // Se não houver códigos, retorna array vazio
+      this.codigosTributacaoDaEmpresa = Array.isArray(codigos) ? codigos : [];
+      this.carregandoCodigosTributacaoDaEmpresa = false;
+    },
+    error: (error) => {
+      // Se for erro 404 (não encontrado), considera como array vazio
+      if (error.status === 404) {
+        this.codigosTributacaoDaEmpresa = [];
+      } 
+      this.carregandoCodigosTributacaoDaEmpresa = false;
+    }
+  });
+}
+
+// Método para abrir o diálogo
+abrirDialogoNovaAtividade() {
+  this.mostrarDialogoNovaAtividade = true;
+  this.novaAtividade = { COD_ATIVIDADE: '', DESC_ATIVIDADE: '' };
+}
+
+// Método para fechar o diálogo
+fecharDialogoNovaAtividade() {
+  this.mostrarDialogoNovaAtividade = false;
+}
+
+// Método para adicionar nova atividade
+adicionarNovaAtividade() {
+  if (!this.novaAtividade.COD_ATIVIDADE) {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Atenção',
+      detail: 'Informe o código da atividade'
+    });
+    return;
+  }
+
+  if (!this.resultado?.CNPJ) {
+    this.showError('CNPJ não disponível');
+    return;
+  }
+
+  this.EmpresasService.adicionarCodigoTributacaoMunicipio({
+    CNPJ: this.resultado.CNPJ,
+    COD_ATIVIDADE: this.novaAtividade.COD_ATIVIDADE,
+    DESC_ATIVIDADE: this.novaAtividade.DESC_ATIVIDADE || undefined
+  }).subscribe({
+    next: () => {
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Sucesso',
+        detail: 'Atividade adicionada com sucesso!'
+      });
+      this.fecharDialogoNovaAtividade();
+      this.carregarCodigosTributacaoDaEmpresa(this.resultado.CNPJ);
+    },
+    error: (error) => {
+      console.error('Erro ao adicionar atividade:', error);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Erro',
+        detail: error.error?.message || 'Falha ao adicionar atividade'
+      });
+    }
+  });
+}
 }

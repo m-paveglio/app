@@ -1,8 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, PrimaryColumn } from 'typeorm';
 
 @Entity('CodigoTributacaoMunicipio')
 export class CodigoTributacaoMunicipio {
-  @PrimaryGeneratedColumn()
+  @PrimaryColumn({ type: 'text', length: 14})
+  CNPJ: string;
+  
+  @PrimaryColumn()
   COD_ATIVIDADE: string;
 
   @Column({ length: 255, nullable: false })

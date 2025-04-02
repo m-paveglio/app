@@ -3,7 +3,6 @@ import { CodigoTributacaoMunicipioService } from './CodigoTributacaoMunicipio.se
 import { CodigoTributacaoMunicipio } from './entities/CodigoTributacaoMunicipio.entity';
 import { CreateCodigoTributacaoMunicipioDto } from './dto/create-CodigoTributacaoMunicipio.dto';
 import { UpdateCodigoTributacaoMunicipioDto } from './dto/update-CodigoTributacaoMunicipio.dto';
-
 @Controller('CodigoTributacaoMunicipio')
 export class CodigoTributacaoMunicipioController {
   constructor(private readonly CodigoTributacaoMunicipioService: CodigoTributacaoMunicipioService) {}
@@ -13,15 +12,10 @@ export class CodigoTributacaoMunicipioController {
     return this.CodigoTributacaoMunicipioService.getCodigoTributacaoMunicipios();
   }
 
-   
-  @Get(':COD_ATIVIDADE')
-  getCodigoTributacaoMunicipio(@Param('COD_ATIVIDADE') COD_ATIVIDADE: string) {
-    return this.CodigoTributacaoMunicipioService.getCodigoTributacaoMunicipio(COD_ATIVIDADE);
-  }
 
-  @Get('desc/:DESC_ATIVIDADE')
-  searchCodigoTributacaoMunicipioByName(@Param('DESC_ATIVIDADE') DESC_ATIVIDADE: string) {
-    return this.CodigoTributacaoMunicipioService.searchCodigoTributacaoMunicipioByName(DESC_ATIVIDADE);
+  @Get(':CNPJ')
+  getCodigoTributacaoMunicipioCnpj(@Param('CNPJ') CNPJ: string) {
+    return this.CodigoTributacaoMunicipioService.getCodigoTributacaoMunicipioCnpj(CNPJ);
   }
 
   @Post()
@@ -29,13 +23,20 @@ export class CodigoTributacaoMunicipioController {
     return this.CodigoTributacaoMunicipioService.createCodigoTributacaoMunicipio(newCodigoTributacaoMunicipio);
   }
 
-  @Delete(':COD_ATIVIDADE')
-  deleteCodigoTributacaoMunicipio(@Param('COD_ATIVIDADE') COD_ATIVIDADE: string) {
-    return this.CodigoTributacaoMunicipioService.deleteCodigoTributacaoMunicipio(COD_ATIVIDADE);
-  }
+  @Delete(':CNPJ/:COD_ATIVIDADE')
+    deleteEmpresaCnae(
+      @Param('CNPJ') CNPJ: string,
+      @Param('COD_ATIVIDADE') COD_ATIVIDADE: string
+    ) {
+      return this.CodigoTributacaoMunicipioService.deletCodigoTributacaoMunicipio(CNPJ, COD_ATIVIDADE);
+    }
 
-  @Patch(':COD_ATIVIDADE')
+
+
+  @Patch(':CNPJ/:COD_ATIVIDADE')
   updateCodigoTributacaoMunicipio(@Param('COD_ATIVIDADE') COD_ATIVIDADE: string, @Body() CodigoTributacaoMunicipio: UpdateCodigoTributacaoMunicipioDto) {
     return this.CodigoTributacaoMunicipioService.updateCodigoTributacaoMunicipio(COD_ATIVIDADE, CodigoTributacaoMunicipio);
   }
+
+  
 }
