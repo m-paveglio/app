@@ -16,6 +16,18 @@ interface CnaeVinculado {
   DESC_CNAE: string;
 }
 
+export const currencyMaskConfig = {
+  align: "left",
+  allowNegative: false,
+  allowZero: true,
+  decimal: ",",
+  precision: 2,
+  prefix: "R$ ",
+  suffix: "",
+  thousands: ".",
+  nullable: false
+};
+
 interface Pessoa {
   CPF: string;
   CPF_CNPJ: string; // Adicionado
@@ -95,8 +107,10 @@ export class GerarNfseComponent implements OnInit {
       codigoMunicipio: '',
       exigibilidadeISS: '',
       municipioIncidencia: '',
+      issRetido: '',
+      responsavelRetencao: '',
       valores: {
-        valorServicos: '0.00',
+        valorServicos: '',
         valorDeducoes: '',
         valorPis: '',
         valorCofins: '',
@@ -108,7 +122,7 @@ export class GerarNfseComponent implements OnInit {
         aliquota: '',
         descontoIncondicionado: '',
         descontoCondicionado: '',
-        issRetido: '2'
+
       }
     },
     tomador: {
@@ -186,6 +200,23 @@ carregandoITEMLCs: boolean = false;
 carregandoITEMLCsDaEmpresa: boolean = false;
 ITEMLCsDaEmpresa: ITEMLCVinculado[] = [];
 
+currencyOptions = {
+  prefix: 'R$ ',
+  thousands: '.',
+  decimal: ',',
+  align: 'left',
+  allowNegative: false,
+  precision: 2
+};
+
+percentMaskOptions = {
+  prefix: '% ',
+  thousands: '',       // Não usar separador de milhares
+  decimal: ',',        // Vírgula para casas decimais
+  align: 'left',
+  allowNegative: false,
+  precision: 2,        // 2 casas decimais
+};
 
   constructor(
     private nfseService: NfseService,
@@ -532,19 +563,20 @@ ITEMLCsDaEmpresa: ITEMLCVinculado[] = [];
         servico: {
           valores: {
             valorServicos: parseFloat(this.nfseData.servico.valores.valorServicos) || 0,
-            valorDeducoes: 0,
-            valorPis: 0,
-            valorCofins: 0,
-            valorInss: 0,
-            valorIr: 0,
-            valorCsll: 0,
-            outrasRetencoes: 0,
-            valorIss: 0,
-            aliquota: 0,
-            descontoIncondicionado: 0,
-            descontoCondicionado: 0
+            valorDeducoes: parseFloat(this.nfseData.servico.valores.valorDeducoes) || 0,
+            valorPis: parseFloat(this.nfseData.servico.valores.valorPis) || 0,
+            valorCofins: parseFloat(this.nfseData.servico.valores.valorCofins) || 0,
+            valorInss: parseFloat(this.nfseData.servico.valores.valorInss) || 0,
+            valorIr: parseFloat(this.nfseData.servico.valores.valorIr) || 0,
+            valorCsll: parseFloat(this.nfseData.servico.valores.valorCsll) || 0,
+            outrasRetencoes: parseFloat(this.nfseData.servico.valores.outrasRetencoes) || 0,
+            valorIss: parseFloat(this.nfseData.servico.valores.valorIss) || 0,
+            aliquota: parseFloat(this.nfseData.servico.valores.aliquota) || 0,
+            descontoIncondicionado: parseFloat(this.nfseData.servico.valores.descontoIncondicionado) || 0,
+            descontoCondicionado: parseFloat(this.nfseData.servico.valores.descontoCondicionado) || 0
           },
-          issRetido: parseInt(this.nfseData.servico.valores.issRetido),
+          issRetido: parseInt(this.nfseData.servico.issRetido),
+          responsavelRetencao: parseInt(this.nfseData.servico.responsavelRetencao),
           itemListaServico: this.nfseData.servico.itemListaServico || '',
           codigoCnae: this.nfseData.servico.codigoCnae || '',
           codigoTributacaoMunicipio: this.nfseData.servico.codigoTributacaoMunicipio || '',

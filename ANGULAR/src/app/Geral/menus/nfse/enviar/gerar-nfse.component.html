@@ -487,7 +487,7 @@
               id="valorServicos"
               type="text"
               pInputText
-              class="p-inputtext p-component p-element p-filled"
+              currencyMask [options]="currencyOptions"
               [(ngModel)]="nfseData.servico.valores.valorServicos"
               name="valorServicos"
             />
@@ -503,6 +503,7 @@
               id="valorDeducoes"
               type="text"
               pInputText
+              currencyMask [options]="currencyOptions"
               class="p-inputtext p-component p-element p-filled"
               [(ngModel)]="nfseData.servico.valores.valorDeducoes"
               name="valorDeducoes"
@@ -516,6 +517,7 @@
               id="valorPis"
               type="text"
               pInputText
+              currencyMask [options]="currencyOptions"
               class="p-inputtext p-component p-element p-filled"
               [(ngModel)]="nfseData.servico.valores.valorPis"
               name="valorPis"
@@ -529,6 +531,7 @@
               id="valorCofins"
               type="text"
               pInputText
+              currencyMask [options]="currencyOptions"
               class="p-inputtext p-component p-element p-filled"
               [(ngModel)]="nfseData.servico.valores.valorCofins"
               name="valorCofins"
@@ -542,6 +545,7 @@
               id="valorInss"
               type="text"
               pInputText
+              currencyMask [options]="currencyOptions"
               class="p-inputtext p-component p-element p-filled"
               [(ngModel)]="nfseData.servico.valores.valorInss"
               name="valorInss"
@@ -549,12 +553,6 @@
             <label for="valorInss">Valor INSS</label>
           </span>
         </div>
-
-        <!-- Campos do tomador do serviço -->
-        
-
-        
-        <!-- Discriminação do Serviço -->
       
 
         <!-- IR, CSLL e Outras Retenções -->
@@ -564,6 +562,7 @@
               id="valorIr"
               type="text"
               pInputText
+              currencyMask [options]="currencyOptions"
               [(ngModel)]="nfseData.servico.valores.valorIr"
               name="valorIr"
             />
@@ -577,6 +576,7 @@
               id="valorCsll"
               type="text"
               pInputText
+              currencyMask [options]="currencyOptions"
               [(ngModel)]="nfseData.servico.valores.valorCsll"
               name="valorCsll"
             />
@@ -590,6 +590,7 @@
               id="outrasRetencoes"
               type="text"
               pInputText
+              currencyMask [options]="currencyOptions"
               [(ngModel)]="nfseData.servico.valores.outrasRetencoes"
               name="outrasRetencoes"
             />
@@ -604,6 +605,7 @@
               id="aliquota"
               type="text"
               pInputText
+              currencyMask [options]="percentMaskOptions"
               [(ngModel)]="nfseData.servico.valores.aliquota"
               name="aliquota"
             />
@@ -617,6 +619,7 @@
               id="descontoIncondicionado"
               type="text"
               pInputText
+              currencyMask [options]="currencyOptions"
               [(ngModel)]="nfseData.servico.valores.descontoIncondicionado"
               name="descontoIncondicionado"
             />
@@ -630,6 +633,7 @@
               id="descontoCondicionado"
               type="text"
               pInputText
+              currencyMask [options]="currencyOptions"
               [(ngModel)]="nfseData.servico.valores.descontoCondicionado"
               name="descontoCondicionado"
             />
