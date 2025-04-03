@@ -351,7 +351,7 @@
       </div>
 
       <div class="card p-3 field col-12 md:col-12">
-      <h5 class="text-center" 
+      <h5 class="text-center mb-5" 
             [ngStyle]="{
               backgroundColor: 'var(--cyan-800)',
               color: 'var(--primary-color-text)',
@@ -377,8 +377,8 @@
       </div>
 
 
-      <div class="card p-3 field col-12 md:col-12 mb-5 mt-5">
-        <h5 class="text-center" 
+      <div class="card p-3 field col-12 md:col-12">
+        <h5 class="text-center mb-5" 
             [ngStyle]="{
               backgroundColor: 'var(--cyan-800)',
               color: 'var(--primary-color-text)',
@@ -386,15 +386,17 @@
             }">
           CÓDIGOS
         </h5>
-        <div class="grid gap-12 mt-2">
-      
-          <!-- Código CNAE -->
+        
+        <!-- Seção de Dados Pessoais -->
+        <div class="grid gap-12">
+<!-- Código CNAE -->
           <div class="field col-12 md:col-4">
             <span class="p-float-label">
               <p-dropdown id="codigoCnae"
                           [options]="cnaesDaEmpresa || []" 
                           [(ngModel)]="nfseData.servico.codigoCnae"
                           optionLabel="COD_CNAE"
+                          optionValue="COD_CNAE"
                           [showClear]="true"
                           styleClass="w-full">
                 <ng-template pTemplate="item" let-cnae>
@@ -410,16 +412,41 @@
               <label for="codigoCnae">Código CNAE</label>
             </span>
           </div>
-      
+
+          <!-- ITEM LC -->
+          <div class="field col-12 md:col-4">
+            <span class="p-float-label">
+              <p-dropdown id="itemListaServico"
+                          [options]="ITEMLCsDaEmpresa || []" 
+                          [(ngModel)]="nfseData.servico.itemListaServico"
+                          optionLabel="COD_ITEM_LC"
+                          optionValue="COD_ITEM_LC"
+                          [showClear]="true"
+                          styleClass="w-full">
+                <ng-template pTemplate="item" let-item>
+                  <div class="flex align-items-center" style="max-width: 600px;">
+                    <span class="font-bold">{{item.COD_ITEM_LC}}</span>
+                    <span class="ml-2">- {{item.DESC_ITEM_LC}}</span>
+                  </div>
+                </ng-template>
+                <ng-template pTemplate="selectedItem" let-item>
+                  <span *ngIf="item">{{item.COD_ITEM_LC}} - {{item.DESC_ITEM_LC}}</span>
+                </ng-template>
+              </p-dropdown>
+              <label for="itemListaServico">ITEM LC</label>
+            </span>
+          </div>
+
           <!-- Código de Tributação -->
           <div class="field col-12 md:col-4">
             <span class="p-float-label">
               <p-dropdown id="codigoTributacao"
-                        [options]="codigosTributacaoDaEmpresa || []" 
-                        [(ngModel)]="nfseData.servico.codigoTributacaoMunicipio"
-                        optionLabel="COD_ATIVIDADE"
-                        [showClear]="true"
-                        styleClass="w-full">
+                          [options]="codigosTributacaoDaEmpresa || []" 
+                          [(ngModel)]="nfseData.servico.codigoTributacaoMunicipio"
+                          optionLabel="COD_ATIVIDADE"
+                          optionValue="COD_ATIVIDADE"
+                          [showClear]="true"
+                          styleClass="w-full">
                 <ng-template pTemplate="item" let-item>
                   <div class="flex align-items-center">
                     <span class="font-bold">{{item.COD_ATIVIDADE}}</span>
@@ -433,36 +460,13 @@
               <label for="codigoTributacao">Cód. Tributação</label>
             </span>
           </div>
-      
-          <!-- ITEM LC -->
-          <div class="field col-12 md:col-4">
-            <span class="p-float-label">
-              <p-dropdown id="itemListaServico"
-                        [options]="ITEMLCsDaEmpresa || []" 
-                        [(ngModel)]="nfseData.servico.itemListaServico"
-                        optionLabel="COD_ITEM_LC"
-                        [showClear]="true"
-                        styleClass="w-full">
-                <ng-template pTemplate="item" let-item>
-                  <div class="flex align-items-center">
-                    <span class="font-bold">{{item.COD_ITEM_LC}}</span>
-                    <span class="ml-2">- {{item.DESC_ITEM_LC}}</span>
-                  </div>
-                </ng-template>
-                <ng-template pTemplate="selectedItem" let-item>
-                  <span *ngIf="item">{{item.DESC_ITEM_LC}}</span>
-                </ng-template>
-              </p-dropdown>
-              <label for="itemListaServico">ITEM LC</label>
-            </span>
-          </div>
-      
+
         </div>
       </div>
 
 
       <div class="card p-3 field col-12 md:col-12">
-        <h5 class="text-center" 
+        <h5 class="text-center mb-5" 
               [ngStyle]="{
                 backgroundColor: 'var(--cyan-800)',
                 color: 'var(--primary-color-text)',
