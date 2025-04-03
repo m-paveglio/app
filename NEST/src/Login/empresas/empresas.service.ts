@@ -33,6 +33,7 @@ export class EmpresasService {
       IM: empresaDto.IM,
       NOME: empresaDto.NOME,
       OPTANTE_SN: empresaDto.OPTANTE_SN,
+      OPTANTE_MEI: empresaDto.OPTANTE_MEI,
       AMBIENTE_INTEGRACAO_ID: empresaDto.AMBIENTE_INTEGRACAO_ID // Mapeado corretamente
     });
   

@@ -140,6 +140,35 @@
                 </div>
 
                 <div class="field col-12 md:col-2">
+                  <span class="p-float-label float-label-fixed">
+                      <!-- Campo de entrada que aparece somente quando editMode é falso -->
+                      <input
+                          *ngIf="!editMode"
+                          id="resultado-OPTANTE_MEI"
+                          type="text"
+                          pinputtext
+                          class="p-inputtext p-component p-element"
+                          [ngClass]="{ 'p-filled': true }"
+                          [style.backgroundColor]="'lightgray'"
+                          [value]="getOptanteSN(resultado.OPTANTE_MEI)"
+                          readonly>  <!-- Campo somente leitura -->
+                      <label for="resultado-OPTANTE_MEI">Optante Super Simples</label>
+                  </span>
+              
+                  <!-- Dropdown que aparece somente quando editMode é verdadeiro -->
+                  <p-dropdown
+                      *ngIf="editMode"
+                      id="OPTANTE_MEI-dropdown"
+                      [options]="OPTANTE_MEI"
+                      [(ngModel)]="resultado.OPTANTE_MEI"
+                      optionLabel="nome"
+                      optionValue="codigo"
+                      placeholder="Selecione"
+                      (onChange)="OPTANTE_MEI_nome = getOptanteSN(resultado.OPTANTE_MEI)">
+                  </p-dropdown>
+              </div>
+
+                <div class="field col-12 md:col-2">
                     <span class="p-float-label float-label-fixed">
                         <!-- Modo visualização -->
                         <input
@@ -233,7 +262,6 @@
                     </h3>
                     
                     <p-table [value]="cnaesDaEmpresa" 
-                            [loading]="carregandoCnaesDaEmpresa"
                             styleClass="p-datatable-sm rounded-table"
                             [tableStyle]="{'min-width': '100%'}">
                       
@@ -276,7 +304,7 @@
                         <tr>
                           <td [attr.colspan]="editMode ? 4 : 3" class="text-center p-4" style="border-radius: 12px;">
                             <i class="pi pi-info-circle mr-2"></i>
-                            {{ carregandoCnaesDaEmpresa ? 'Carregando CNAEs...' : 'Nenhum CNAE vinculado' }}
+                            {{'Nenhum CNAE vinculado' }}
                           </td>
                         </tr>
                       </ng-template>

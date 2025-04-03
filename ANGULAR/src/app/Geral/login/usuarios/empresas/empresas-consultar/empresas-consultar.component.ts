@@ -35,11 +35,17 @@ export class EmpresasConsultarComponent {
   novaEmpresa: any = {};
   editMode = false;
   OPTANTE_SN = [
-    { nome: 'OPTANTE', codigo: '1' },
-    { nome: 'NÃO OPTANTE', codigo: '2' }
+    { nome: 'OPTANTE SN', codigo: '1' },
+    { nome: 'NÃO OPTANTE SN', codigo: '2' }
   ];
-  EmpresasEncontradas: any[] = [];
   OPTANTE_SN_nome: string = '';
+
+  OPTANTE_MEI = [
+    { nome: 'OPTANTE MEI', codigo: '1' },
+    { nome: 'NÃO OPTANTE MEI', codigo: '2' }
+  ];
+  OPTANTE_MEI_nome: string = '';
+  EmpresasEncontradas: any[] = [];
   AMBIENTE_INTEGRACAO_NOME: string = '';
   selectedFile: File | null = null;
   certificadoSelecionado: File | null = null;
@@ -158,6 +164,9 @@ export class EmpresasConsultarComponent {
           
           const OPTANTE_SN = this.OPTANTE_SN.find(t => t.codigo === this.resultado.OPTANTE_SN);
           this.resultado.OPTANTE_SN_nome = OPTANTE_SN ? OPTANTE_SN.nome : '';
+
+          const OPTANTE_MEI = this.OPTANTE_MEI.find(t => t.codigo === this.resultado.OPTANTE_MEI);
+          this.resultado.OPTANTE_MEI_nome = OPTANTE_MEI ? OPTANTE_MEI.nome : '';
         } else {
           this.showError('Empresa não existe no banco de dados.');
           this.resultado = null;
@@ -179,7 +188,8 @@ export class EmpresasConsultarComponent {
             // Para busca por nome, não carregamos certificado até selecionar um CNPJ
             this.EmpresasEncontradas = data.map(empresa => ({
               ...empresa,
-              OPTANTE_SN_nome: this.getOptanteSN(empresa.OPTANTE_SN)
+              OPTANTE_SN_nome: this.getOptanteSN(empresa.OPTANTE_SN),
+              OPTANTE_MEI_nome: this.getOptanteSN(empresa.OPTANTE_MEI)
             }));
           } else if (!Array.isArray(data)) {
             this.resultado = data;
@@ -210,6 +220,7 @@ export class EmpresasConsultarComponent {
       NOME: this.resultado.NOME,
       IM: this.resultado.IM,
       OPTANTE_SN: this.resultado.OPTANTE_SN,
+      OPTANTE_MEI: this.resultado.OPTANTE_MEI,
       AMBIENTE_INTEGRACAO_ID: this.resultado.AMBIENTE_INTEGRACAO_ID
     };
     
@@ -283,6 +294,11 @@ export class EmpresasConsultarComponent {
   getOptanteSN(codigo: string) {
     let OPTANTE_SN = this.OPTANTE_SN.find(u => u.codigo === codigo);
     return OPTANTE_SN ? OPTANTE_SN.nome : '';
+  }
+
+  getOptanteMEI(codigo: string) {
+    let OPTANTE_MEI = this.OPTANTE_MEI.find(u => u.codigo === codigo);
+    return OPTANTE_MEI ? OPTANTE_MEI.nome : '';
   }
 
   getINTEGRACAO(codigo: string) {
@@ -552,20 +568,12 @@ carregarCnaesDaEmpresa(CNPJ: string) {
   this.carregandoCnaesDaEmpresa = true;
   this.EmpresasService.getCnaesDaEmpresa(CNPJ).subscribe({
     next: (cnaes) => {
-      this.cnaesDaEmpresa = Array.isArray(cnaes) ? cnaes : [cnaes];
+      this.cnaesDaEmpresa = Array.isArray(cnaes) ? cnaes : [];
       this.carregandoCnaesDaEmpresa = false;
     },
-    error: (error) => {
-      console.error('Erro ao carregar CNAEs da empresa:', error);
-      this.carregandoCnaesDaEmpresa = false;
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Erro',
-        detail: 'Falha ao carregar CNAEs da empresa'
-      });
-    }
   });
 }
+
 
 
 buscarCnaeEspecifico(codigo: string) {

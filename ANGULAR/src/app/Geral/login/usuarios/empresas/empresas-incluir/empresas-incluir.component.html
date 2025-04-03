@@ -33,7 +33,14 @@
             </span>
           </div>
 
-          <div class="field col-12 md:col-4">
+          <div class="field col-12 md:col-2">
+            <span class="p-float-label float-label-fixed">
+              <p-dropdown id="float-input" [ngStyle]="{'padding': '0px'}" [(ngModel)]="novaEmpresa.OPTANTE_MEI" name="OPTANTE_MEI" [options]="OPTANTE_MEI" optionLabel="nome" optionValue="codigo"></p-dropdown>
+              <label for="float-input">MEI</label>
+            </span>
+          </div>
+
+          <div class="field col-12 md:col-3">
             <span class="p-float-label float-label-fixed">
               <p-dropdown 
                 id="float-input" 
@@ -65,7 +72,7 @@
                            accept=".pfx,.p12"
                            maxFileSize="1000000"
                            mode="basic"
-                           chooseLabel="Buscar Certificado"
+                           chooseLabel="Buscar Certificad."
                            chooseIcon="pi pi-search"
                            styleClass="p-button p-button-info">
               </p-fileUpload>

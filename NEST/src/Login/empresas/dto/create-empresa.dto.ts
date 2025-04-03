@@ -17,6 +17,10 @@ export class CreateEmpresaDto {
   @Length(2, 2)
   OPTANTE_SN: string;
 
+  @IsString()
+  @Length(2, 2)
+  OPTANTE_MEI: string;
+
   @IsNumber()
   AMBIENTE_INTEGRACAO_ID: number; // Corrigido para number e nome correto
 }

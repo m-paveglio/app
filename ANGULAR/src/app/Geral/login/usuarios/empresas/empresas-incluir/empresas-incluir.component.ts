@@ -21,8 +21,13 @@ export class EmpresasIncluirComponent {
   AMBIENTE_INTEGRACAO_ID: any[] = [];
 
   OPTANTE_SN = [
-    { nome: 'OPTANTE', codigo: '1' },
-    { nome: 'NÃO OPTANTE', codigo: '2' }
+    { nome: 'OPTANTE SN', codigo: '1' },
+    { nome: 'NÃO OPTANTE SN', codigo: '2' }
+  ];
+
+  OPTANTE_MEI = [
+    { nome: 'OPTANTE MEI', codigo: '1' },
+    { nome: 'NÃO OPTANTE MEI', codigo: '2' }
   ];
 
   constructor(

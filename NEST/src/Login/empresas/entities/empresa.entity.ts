@@ -15,6 +15,9 @@ export class empresa {
   @Column({ type: 'text', length: 2 })
   OPTANTE_SN: string;
 
+  @Column({ type: 'text', length: 2, nullable: true  })
+  OPTANTE_MEI: string;
+
   @Column({ nullable: true })
   AMBIENTE_INTEGRACAO_ID: number;  // Armazena o ID do webservice
 
