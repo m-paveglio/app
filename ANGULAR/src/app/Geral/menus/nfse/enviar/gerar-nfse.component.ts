@@ -1,10 +1,20 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { NfseService } from '../nfse.service';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { LoginService } from '../../../login/login.service';
 import { EmpresasService } from '../../../login/usuarios/empresas/empresas.service';
 import { WebserviceService } from '../../webservice/webservice.service';
 import { PessoasService } from '../../pessoas/pessoas.service';
+
+interface ITEMLCVinculado {
+  COD_ITEM_LC: string;
+  DESC_ITEM_LC: string;
+}
+
+interface CnaeVinculado {
+  COD_CNAE: string;
+  DESC_CNAE: string;
+}
 
 interface Pessoa {
   CPF: string;
@@ -137,6 +147,44 @@ export class GerarNfseComponent implements OnInit {
   defaultUf = 'RS';
   defaultCidade = 'Santa Maria';
 
+/////////////////////////////////////// CNAES
+cnaeParaAdicionar: string = '';
+mostrarAdicionarCnae: boolean = false;
+cnaesDisponiveis: any[] = [];
+cnaeFiltrado: any[] = [];
+mostrarDialogoCnae: boolean = false;
+cnaeSelecionado: any = null;
+cnaesFiltrados: any[] = [];
+codCnaeBusca: string = '';
+descCnaeBusca: string = '';
+cnaesEncontrados: any[] = [];
+carregandoCnaes: boolean = false;
+carregandoCnaesDaEmpresa: boolean = false;
+cnaesDaEmpresa: CnaeVinculado[] = [];
+
+//////////////////////ATIVIDADES MUNICIPAIS
+mostrarAdicionarCodigoTributacao: boolean = false;
+codigosTributacaoDaEmpresa: any[] = [];
+carregandoCodigosTributacaoDaEmpresa: boolean = false;
+codigoTributacaoParaAdicionar = {
+  COD_ATIVIDADE: '',
+  DESC_ATIVIDADE: ''
+};
+
+/////////////////////////ITEM LC
+ITEMLCParaAdicionar: string = '';
+mostrarAdicionarITEMLC: boolean = false;
+ITEMLCsDisponiveis: any[] = [];
+ITEMLCFiltrado: any[] = [];
+mostrarDialogoITEMLC: boolean = false;
+ITEMLCSelecionado: any = null;
+ITEMLCsFiltrados: any[] = [];
+codITEMLCBusca: string = '';
+descITEMLCBusca: string = '';
+ITEMLCsEncontrados: any[] = [];
+carregandoITEMLCs: boolean = false;
+carregandoITEMLCsDaEmpresa: boolean = false;
+ITEMLCsDaEmpresa: ITEMLCVinculado[] = [];
 
 
   constructor(
@@ -159,7 +207,14 @@ export class GerarNfseComponent implements OnInit {
     // Filtrar cidades para RS
     this.filtrarCidadesPrestacao(this.defaultUf);
     this.filtrarCidadesIncidencia(this.defaultUf);
-  
+    
+    // Corrigido: usar this.cnpj em vez de data.CNPJ
+    if (this.cnpj) {
+      this.carregarCnaesDaEmpresa(this.cnpj);
+      this.carregarCodigosTributacaoDaEmpresa(this.cnpj)
+      this.carregarITEMLCsDaEmpresa(this.cnpj);
+    }
+    
     // Selecionar Santa Maria após carregar cidades
     this.carregarCidades();
     
@@ -170,7 +225,7 @@ export class GerarNfseComponent implements OnInit {
         this.selectedCidadeIncidencia = santaMaria;
       }
     }, 500); 
-
+  
     // Verificar se o CNPJ está disponível antes de tentar carregar os dados
     if (this.cnpj) {
       this.carregarDadosEmpresa();
@@ -668,5 +723,218 @@ export class GerarNfseComponent implements OnInit {
         this.nfseData.tomador.endereco.codigoMunicipio = '';
       }
     }
+
+
+   //////////////////////////////////////////////////////////// CNAE
+//////////////////////////////////////////////////////////// CNAE
+//////////////////////////////////////////////////////////// CNAE
+//////////////////////////////////////////////////////////// CNAE
+//////////////////////////////////////////////////////////// CNAE
+  
+  filtrarCnae(event: any) {
+    if (event.query.length >= 3) {
+      this.nfseService.buscarCNAE(event.query).subscribe({
+        next: (data) => {
+          this.cnaeFiltrado = data;
+        },
+        error: (error) => {
+          console.error('Erro ao buscar CNAEs:', error);
+        }
+      });
+    }
+  }
+
+// Método para buscar CNAEs
+buscarCnaes() {
+  if (!this.codCnaeBusca && !this.descCnaeBusca) {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Atenção',
+      detail: 'Informe pelo menos um critério de busca'
+    });
+    return;
+  }
+
+  this.carregandoCnaes = true;
+  
+  const params = {
+    codigo: this.codCnaeBusca,
+    descricao: this.descCnaeBusca
+  };
+
+  this.nfseService.buscarCNAE(params).subscribe({
+    next: (cnaes) => {
+      // Normaliza a resposta para sempre trabalhar com array
+      this.cnaesEncontrados = Array.isArray(cnaes) ? cnaes : [cnaes];
+      this.carregandoCnaes = false;
+      
+      if (this.cnaesEncontrados.length === 0) {
+        this.messageService.add({
+          severity: 'info',
+          summary: 'Informação',
+          detail: 'Nenhum CNAE encontrado com os critérios informados'
+        });
+      }
+    },
+    error: (error) => {
+      console.error('Erro ao buscar CNAEs:', error);
+      this.carregandoCnaes = false;
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Erro',
+        detail: 'Falha ao buscar CNAEs'
+      });
+    }
+  });
+}
+
+
+// Adicione este método para carregar os CNAEs
+carregarCnaesDaEmpresa(CNPJ: string) {
+  this.carregandoCnaesDaEmpresa = true;
+  this.nfseService.getCnaesDaEmpresa(CNPJ).subscribe({
+    next: (cnaes) => {
+      this.cnaesDaEmpresa = Array.isArray(cnaes) ? cnaes : [];
+      this.carregandoCnaesDaEmpresa = false;
+    },
+  });
+}
+
+
+
+buscarCnaeEspecifico(codigo: string) {
+  this.nfseService.buscarCNAE({ codigo }).subscribe({
+    next: (cnaes) => {
+      if (cnaes.length === 0) {
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'CNAE não encontrado',
+          detail: `Nenhum CNAE encontrado com o código ${codigo}`
+        });
+      }
+      this.cnaesEncontrados = cnaes;
+    },
+    error: (error) => {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Erro na busca',
+        detail: error.message || 'Falha ao buscar CNAE'
+      });
+    }
+  });
+}
+
+
+
+carregarCodigosTributacaoDaEmpresa(CNPJ: string) {
+  this.carregandoCodigosTributacaoDaEmpresa = true;
+  this.nfseService.getCodigoTributacaoMunicipioVinculados(CNPJ).subscribe({
+    next: (codigos) => {
+      // Se não houver códigos, retorna array vazio
+      this.codigosTributacaoDaEmpresa = Array.isArray(codigos) ? codigos : [];
+      this.carregandoCodigosTributacaoDaEmpresa = false;
+    },
+    error: (error) => {
+      // Se for erro 404 (não encontrado), considera como array vazio
+      if (error.status === 404) {
+        this.codigosTributacaoDaEmpresa = [];
+      } 
+      this.carregandoCodigosTributacaoDaEmpresa = false;
+    }
+  });
+}
+
+
+filtrarITEMLC(event: any) {
+  if (event.query.length >= 3) {
+    this.nfseService.buscarITEMLC(event.query).subscribe({
+      next: (data) => {
+        this.ITEMLCFiltrado = data;
+      },
+      error: (error) => {
+        console.error('Erro ao buscar ITEM LC:', error);
+      }
+    });
+  }
+}
+
+buscarITEMLCs() {
+if (!this.codITEMLCBusca && !this.descITEMLCBusca) {
+  this.messageService.add({
+    severity: 'warn',
+    summary: 'Atenção',
+    detail: 'Informe pelo menos um critério de busca'
+  });
+  return;
+}
+
+this.carregandoITEMLCs = true;
+
+const params = {
+  codigo: this.codITEMLCBusca,
+  descricao: this.descITEMLCBusca
+};
+
+this.nfseService.buscarITEMLC(params).subscribe({
+  next: (ITEMLCs) => {
+    // Normaliza a resposta para sempre trabalhar com array
+    this.ITEMLCsEncontrados = Array.isArray(ITEMLCs) ? ITEMLCs : [ITEMLCs];
+    this.carregandoITEMLCs = false;
+    
+    if (this.ITEMLCsEncontrados.length === 0) {
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Informação',
+        detail: 'Nenhum ITEMLC encontrado com os critérios informados'
+      });
+    }
+  },
+  error: (error) => {
+    console.error('Erro ao buscar ITEMLC:', error);
+    this.carregandoITEMLCs = false;
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Erro',
+      detail: 'Falha ao buscar ITEMLC'
+    });
+  }
+});
+}
+
+
+// Adicione este método para carregar os ITEMLC
+carregarITEMLCsDaEmpresa(CNPJ: string) {
+this.carregandoITEMLCsDaEmpresa = true;
+this.nfseService.getITEMLCDaEmpresa(CNPJ).subscribe({
+  next: (ITEMLC) => {
+    this.ITEMLCsDaEmpresa = Array.isArray(ITEMLC) ? ITEMLC : [];
+    this.carregandoITEMLCsDaEmpresa = false;
+  },
+});
+}
+
+
+
+buscarITEMLCEspecifico(codigo: string) {
+this.nfseService.buscarITEMLC({ codigo }).subscribe({
+  next: (ITEMLC) => {
+    if (ITEMLC.length === 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'ITEMLC não encontrado',
+        detail: `Nenhum ITEMLC encontrado com o código ${codigo}`
+      });
+    }
+    this.ITEMLCsEncontrados = ITEMLC;
+  },
+  error: (error) => {
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Erro na busca',
+      detail: error.message || 'Falha ao buscar ITEMLC'
+    });
+  }
+});
+}
 
 }

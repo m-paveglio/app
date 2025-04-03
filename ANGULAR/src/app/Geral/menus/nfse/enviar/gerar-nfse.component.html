@@ -235,7 +235,7 @@
           ENDEREÇO
         </h5>
         
-        <div class="grid gap-12">
+        <div class="grid gap-12 mb-5 mt-5">
           <!-- CEP -->
           <div class="field col-12 md:col-2">
             <span class="p-float-label">
@@ -377,46 +377,88 @@
       </div>
 
 
-      <div class="card p-3 field col-12 md:col-12">
+      <div class="card p-3 field col-12 md:col-12 mb-5 mt-5">
         <h5 class="text-center" 
-              [ngStyle]="{
-                backgroundColor: 'var(--cyan-800)',
-                color: 'var(--primary-color-text)',
-                borderRadius: 'var(--border-radius)'
-              }">
-            CÓDIGOS
-          </h5>
-          <div class="grid gap-12  mt-2">
-
-            <!-- Código CNAE -->
-        <div class="field col-12 md:col-2">
-          <span class="p-float-label">
-            <input
-              id="codigoCnae"
-              type="text"
-              pInputText
-              [(ngModel)]="nfseData.servico.codigoCnae"
-              name="codigoCnae"
-            />
-            <label for="codigoCnae">Código CNAE</label>
-          </span>
+            [ngStyle]="{
+              backgroundColor: 'var(--cyan-800)',
+              color: 'var(--primary-color-text)',
+              borderRadius: 'var(--border-radius)'
+            }">
+          CÓDIGOS
+        </h5>
+        <div class="grid gap-12 mt-2">
+      
+          <!-- Código CNAE -->
+          <div class="field col-12 md:col-4">
+            <span class="p-float-label">
+              <p-dropdown id="codigoCnae"
+                          [options]="cnaesDaEmpresa || []" 
+                          [(ngModel)]="nfseData.servico.codigoCnae"
+                          optionLabel="COD_CNAE"
+                          [showClear]="true"
+                          styleClass="w-full">
+                <ng-template pTemplate="item" let-cnae>
+                  <div class="flex align-items-center">
+                    <span class="font-bold">{{cnae.COD_CNAE}}</span>
+                    <span class="ml-2">- {{cnae.DESC_CNAE}}</span>
+                  </div>
+                </ng-template>
+                <ng-template pTemplate="selectedItem" let-cnae>
+                  <span *ngIf="cnae">{{cnae.COD_CNAE}} - {{cnae.DESC_CNAE}}</span>
+                </ng-template>
+              </p-dropdown>
+              <label for="codigoCnae">Código CNAE</label>
+            </span>
+          </div>
+      
+          <!-- Código de Tributação -->
+          <div class="field col-12 md:col-4">
+            <span class="p-float-label">
+              <p-dropdown id="codigoTributacao"
+                        [options]="codigosTributacaoDaEmpresa || []" 
+                        [(ngModel)]="nfseData.servico.codigoTributacaoMunicipio"
+                        optionLabel="COD_ATIVIDADE"
+                        [showClear]="true"
+                        styleClass="w-full">
+                <ng-template pTemplate="item" let-item>
+                  <div class="flex align-items-center">
+                    <span class="font-bold">{{item.COD_ATIVIDADE}}</span>
+                    <span class="ml-2">- {{item.DESC_ATIVIDADE}}</span>
+                  </div>
+                </ng-template>
+                <ng-template pTemplate="selectedItem" let-item>
+                  <span *ngIf="item">{{item.COD_ATIVIDADE}} - {{item.DESC_ATIVIDADE}}</span>
+                </ng-template>
+              </p-dropdown>
+              <label for="codigoTributacao">Cód. Tributação</label>
+            </span>
+          </div>
+      
+          <!-- ITEM LC -->
+          <div class="field col-12 md:col-4">
+            <span class="p-float-label">
+              <p-dropdown id="itemListaServico"
+                        [options]="ITEMLCsDaEmpresa || []" 
+                        [(ngModel)]="nfseData.servico.itemListaServico"
+                        optionLabel="COD_ITEM_LC"
+                        [showClear]="true"
+                        styleClass="w-full">
+                <ng-template pTemplate="item" let-item>
+                  <div class="flex align-items-center">
+                    <span class="font-bold">{{item.COD_ITEM_LC}}</span>
+                    <span class="ml-2">- {{item.DESC_ITEM_LC}}</span>
+                  </div>
+                </ng-template>
+                <ng-template pTemplate="selectedItem" let-item>
+                  <span *ngIf="item">{{item.DESC_ITEM_LC}}</span>
+                </ng-template>
+              </p-dropdown>
+              <label for="itemListaServico">ITEM LC</label>
+            </span>
+          </div>
+      
         </div>
-
-        <!-- Código de Tributação -->
-        <div class="field col-12 md:col-2">
-          <span class="p-float-label">
-            <input
-              id="codigoTributacao"
-              type="text"
-              pInputText
-              [(ngModel)]="nfseData.servico.codigoTributacaoMunicipio"
-              name="codigoTributacao"
-            />
-            <label for="codigoTributacao">Cód. Tributação</label>
-          </span>
-        </div>
-          </div></div>
-
+      </div>
 
 
       <div class="card p-3 field col-12 md:col-12">
