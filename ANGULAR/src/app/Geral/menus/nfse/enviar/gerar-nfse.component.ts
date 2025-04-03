@@ -90,6 +90,9 @@ export class GerarNfseComponent implements OnInit {
   CPF_CNPJ: string = ''; // Adicionada a propriedade CPF_CNPJ
   nome: string = ''; // Adicionada a propriedade nome
 
+  isOptanteSimplesNacional: boolean = false;
+  isMunicipioSantaMaria: boolean = true; // Assume Santa Maria como padrão
+
   nfseData = {
     identificacao: {
       numero: '',
@@ -105,7 +108,7 @@ export class GerarNfseComponent implements OnInit {
       codigoTributacaoMunicipio: '',
       discriminacao: '',
       codigoMunicipio: '',
-      exigibilidadeISS: '',
+      exigibilidadeISS: '1',
       municipioIncidencia: '',
       issRetido: '',
       responsavelRetencao: '',
@@ -492,18 +495,39 @@ percentMaskOptions = {
     this.empresaService.buscarPorCnpj(this.cnpj).subscribe({
       next: (empresa) => {
         this.empresaSelecionada = empresa;
-        console.log('Dados da empresa:', empresa); // Log completo
+        console.log('Dados da empresa:', empresa);
+        
+        // Definir se é optante pelo Simples Nacional
+        this.isOptanteSimplesNacional = empresa.OPTANTE_SN === "1";
         
         if (empresa.AMBIENTE_INTEGRACAO_ID) {
           this.carregarSerieRPS(empresa.AMBIENTE_INTEGRACAO_ID);
         }
         this.loading = false;
+        
+        // Atualizar estado dos campos
+        this.atualizarEstadoCamposISS();
       },
       error: (err) => {
         console.error('Erro ao carregar empresa:', err);
         this.loading = false;
       }
     });
+  }
+
+
+  atualizarEstadoCamposISS(): void {
+    // Verificar se o município de incidência é Santa Maria
+    this.isMunicipioSantaMaria = this.selectedCidadeIncidencia?.NOME_CIDADE === 'SANTA MARIA';
+    
+    // Se for optante pelo Simples Nacional OU município Santa Maria, desabilita os campos
+    const desabilitarCampos = this.isOptanteSimplesNacional || this.isMunicipioSantaMaria;
+    
+    // Atualizar o formulário conforme necessário
+    if (desabilitarCampos) {
+      this.nfseData.servico.valores.aliquota = '';
+      this.nfseData.servico.valores.valorIss = '';
+    }
   }
 
   carregarSerieRPS(ambienteIntegracaoId: number): void {
@@ -539,10 +563,21 @@ percentMaskOptions = {
         summary: 'Erro',
         detail: 'Nenhuma empresa selecionada para emissão da NFSe'
       });
+
+      
       return;
     }
   
     this.loading = true;
+     // Criar cópia dos dados para envio
+  const dadosParaEnvio = JSON.parse(JSON.stringify(this.nfseData));
+
+  // Remover campos de ISS se necessário
+  if (this.isOptanteSimplesNacional || this.isMunicipioSantaMaria) {
+    delete dadosParaEnvio.servico.valores.aliquota;
+    delete dadosParaEnvio.servico.valores.valorIss;
+  }
+
     
     // Formatar os dados no padrão que funciona (com tomador dentro de rpsList)
     const dadosEnvio = {
@@ -629,6 +664,12 @@ percentMaskOptions = {
         this.loading = false;
       }
     });
+  }
+
+  onCidadeIncidenciaChange(event: any): void {
+    this.selectedCidadeIncidencia = event.value;
+    this.isMunicipioSantaMaria = this.selectedCidadeIncidencia?.NOME_CIDADE === 'SANTA MARIA';
+    this.atualizarEstadoCamposISS();
   }
 
   private removerCamposVazios(obj: any): any {
