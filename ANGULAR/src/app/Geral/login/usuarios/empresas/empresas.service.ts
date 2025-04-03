@@ -123,33 +123,30 @@ export class EmpresasService {
     return this.http.get<any[]>(`${this.apiUrl}/webservice`);  // Remove o tipo { data: any[] }
   }
 
+
+  //////////////////////////////////////////////////////////////////////////CNAE
+  //////////////////////////////////////////////////////////////////////////CNAE
+  //////////////////////////////////////////////////////////////////////////CNAE
+  //////////////////////////////////////////////////////////////////////////CNAE
+
   buscarCNAE(params: { codigo?: string; descricao?: string }): Observable<any[]> {
     if (params.codigo) {
+      // Busca por código
       const url = `${this.apiUrl}/cnae/${params.codigo}`;
       return this.http.get(url).pipe(
-        map(response => {
-          if (!response) {
-            // Modifique aqui: Lançar um erro simples que será tratado no catchError
-            throw new Error('CNAE não encontrado');
-          }
-          return [response];
-        }),
-        // Corrija o tratamento de erro para propagar o status correto
-        catchError(error => {
-          if (error instanceof HttpErrorResponse && error.status === 404) {
-            return throwError(() => new HttpErrorResponse({
-              status: 404,
-              statusText: 'CNAE não encontrado'
-            }));
-          }
-          return this.handleError(error);
-        })
+        map(response => [response]),
+        catchError(this.handleError)
+      );
+    } 
+    else if (params.descricao) {
+      // Busca por descrição
+      const url = `${this.apiUrl}/cnae/desc/${encodeURIComponent(params.descricao)}`;
+      return this.http.get<any[]>(url).pipe(
+        catchError(this.handleError)
       );
     }
-  
-    return of([]); // Retorna array vazio caso nenhum parâmetro seja informado
-  }
-  
+    return of([]); // Retorna vazio se nenhum parâmetro
+}
   
   // Buscar CNAEs vinculados a um CNPJ
 getCnaesVinculados(CNPJ: string): Observable<any[]> {
@@ -165,18 +162,6 @@ adicionarCnae(CNPJ: string, COD_CNAE: string): Observable<any> {
   return this.http.post(url, { CNPJ, COD_CNAE }).pipe(
     map(response => {
       this.handleSuccess('CNAE adicionado com sucesso!');
-      return response;
-    }),
-    catchError(this.handleError)
-  );
-}
-
-// Remover um CNAE de um CNPJ
-removerCnae(CNPJ: string, COD_CNAE: string): Observable<any> {
-  const url = `${this.apiUrl}/EMPRESA_CNAE/${CNPJ}/${COD_CNAE}`;
-  return this.http.delete(url).pipe(
-    map(response => {
-      this.handleSuccess('CNAE removido com sucesso!');
       return response;
     }),
     catchError(this.handleError)
@@ -233,7 +218,10 @@ removerCnaeEmpresa(CNPJ: string, COD_CNAE: string): Observable<any> {
 }
 
 
-// //////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////// ATIVIDADE MUNICIPAL
+  ////////////////////////////////////////////////////////////////////////// ATIVIDADE MUNICIPAL
+  ////////////////////////////////////////////////////////////////////////// ATIVIDADE MUNICIPAL
+  ////////////////////////////////////////////////////////////////////////// ATIVIDADE MUNICIPAL
 
 
 getCodigoTributacaoMunicipioVinculados(CNPJ: string): Observable<any[]> {
@@ -278,6 +266,101 @@ EditarCodigoTributacaoMunicipio(CNPJ: string, COD_ATIVIDADE: string): Observable
     catchError(this.handleError)
   );
 }
+
+
+  //////////////////////////////////////////////////////////////////////////ITEM LC
+  //////////////////////////////////////////////////////////////////////////ITEM LC
+  //////////////////////////////////////////////////////////////////////////ITEM LC
+  //////////////////////////////////////////////////////////////////////////ITEM LC
+
+  buscarITEMLC(params: { codigo?: string; descricao?: string }): Observable<any[]> {
+    if (params.codigo) {
+      const url = `${this.apiUrl}/ITEMLC/${params.codigo}`;
+      return this.http.get(url).pipe(
+        map(response => [response]),
+        catchError(this.handleError)
+      );
+    }
+    else if (params.descricao) {
+      const url = `${this.apiUrl}/ITEMLC/desc/${encodeURIComponent(params.descricao)}`;
+      return this.http.get<any[]>(url).pipe(
+        catchError(this.handleError)
+      );
+    }
+    return of([]);
+}
+  
+  
+  // Buscar ITEMLC vinculados a um CNPJ
+getITEMLCVinculados(CNPJ: string): Observable<any[]> {
+  const url = `${this.apiUrl}/EMPRESA_ITEMLC/${CNPJ}`;
+  return this.http.get<any[]>(url).pipe(
+    catchError(this.handleError)
+  );
+}
+
+// Adicionar um ITEMLC a um CNPJ
+adicionarITEMLC(CNPJ: string, COD_ITEM_LC: string): Observable<any> {
+  const url = `${this.apiUrl}/EMPRESA_ITEMLC`;
+  return this.http.post(url, { CNPJ, COD_ITEM_LC }).pipe(
+    map(response => {
+      this.handleSuccess('ITEM LC adicionado com sucesso!');
+      return response;
+    }),
+    catchError(this.handleError)
+  );
+}
+
+// Buscar ITEMLC de uma empresa
+getEmpresaITEMLCs(CNPJ: string): Observable<any> {
+  const url = `${this.apiUrl}/EMPRESA_ITEMLC/CNPJ/${CNPJ}`;
+  return this.http.get(url).pipe(
+    catchError(this.handleError)
+  );
+}
+
+getITEMLCDaEmpresa(CNPJ: string): Observable<any[]> {
+  const url = `${this.apiUrl}/EMPRESA_ITEMLC/${CNPJ}`;
+  return this.http.get<any[]>(url).pipe(
+    // Adicione uma transformação para buscar as descrições
+    switchMap(ITEMLCVinculados => {
+      const requests = ITEMLCVinculados.map(ITEMLC => 
+        this.buscarITEMLC({ codigo: ITEMLC.COD_ITEM_LC }).pipe(
+          map(detalhes => ({
+            COD_ITEM_LC: ITEMLC.COD_ITEM_LC,
+            DESC_ITEM_LC: detalhes[0]?.DESC_ITEM_LC || 'Descrição não encontrada'
+          }))
+        )
+      );
+      return forkJoin(requests);
+    }),
+    catchError(this.handleError)
+  );
+}
+
+adicionarITEMLCEmpresa(CNPJ: string, COD_ITEM_LC: string): Observable<any> {
+  const url = `${this.apiUrl}/EMPRESA_CNAE`;
+  return this.http.post(url, { CNPJ, COD_ITEM_LC }).pipe(
+    map(response => {
+      this.handleSuccess('ITEM LC adicionado com sucesso!');
+      return response;
+    }),
+    catchError(this.handleError)
+  );
+}
+
+removerITEMLCEmpresa(CNPJ: string, COD_ITEM_LC: string): Observable<any> {
+  const url = `${this.apiUrl}/EMPRESA_CNAE/${CNPJ}/${COD_ITEM_LC}`;
+  return this.http.delete(url).pipe(
+    map(response => {
+      this.handleSuccess('ITEM LC removido com sucesso!');
+      return response;
+    }),
+    catchError(this.handleError)
+  );
+}
+
+
 
   /*exportarRelatorio(): Observable<any> {
     const url = `${this.apiUrl}/empresa/export/excel`; // Corrigido

@@ -20,7 +20,8 @@ import { RpsModule } from './Geral/Nota-Fiscal/Nfse/RpsDisponivel/Rps.module';
 import { CnaeModule } from './Geral/Codigos/CNAE/cnae.module';
 import { ItemLCModule } from './Geral/Codigos/ITEM_LC/itemLC.module';
 import { CodigoTributacaoMunicipioModule } from './Geral/Codigos/CodigoTributacaoMunicipio/CodigoTributacaoMunicipio.module';
-import { EmpresaCnaeModule } from './Geral/Empresa_Cnae/Empresa-Cnae.module';
+import { EmpresaCnaeModule } from './Geral/Codigos/Empresa_Cnae/Empresa-Cnae.module';
+import { EmpresaITEMLCModule } from './Geral/Codigos/Empresa_ITEMLC/Empresa-ITEMLC.module';
 
  
 
@@ -44,7 +45,8 @@ import { EmpresaCnaeModule } from './Geral/Empresa_Cnae/Empresa-Cnae.module';
     CnaeModule,
     ItemLCModule,
     CodigoTributacaoMunicipioModule,
-    EmpresaCnaeModule
+    EmpresaCnaeModule,
+    EmpresaITEMLCModule
 
     ],
   controllers: [AppController],

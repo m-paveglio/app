@@ -10,6 +10,12 @@ interface CnaeVinculado {
   DESC_CNAE: string;
 }
 
+interface ITEMLCVinculado {
+  COD_ITEM_LC: string;
+  DESC_ITEM_LC: string;
+}
+
+
 interface CodigoTricodigoTributacaoParaAdicionar {
   COD_ATIVIDADE: string;
   DESC_ATIVIDADE?: string; // Adicione se tiver descrição
@@ -28,7 +34,6 @@ interface Column {
 })
 export class EmpresasConsultarComponent {
   cols!: Column[];
-  cnaesDaEmpresa: CnaeVinculado[] = [];
   CNPJ: string = '';
   NOME: string = '';
   resultado: any = null;
@@ -57,6 +62,9 @@ export class EmpresasConsultarComponent {
   dataUploadCertificado: string | null = null;
   certificadoEnviado: boolean = false;
   valoresOriginais: any = {};
+
+
+  /////////////////////////////////////// CNAES
   cnaeParaAdicionar: string = '';
   mostrarAdicionarCnae: boolean = false;
   cnaesDisponiveis: any[] = [];
@@ -69,6 +77,9 @@ export class EmpresasConsultarComponent {
   cnaesEncontrados: any[] = [];
   carregandoCnaes: boolean = false;
   carregandoCnaesDaEmpresa: boolean = false;
+  cnaesDaEmpresa: CnaeVinculado[] = [];
+
+  //////////////////////ATIVIDADES MUNICIPAIS
   mostrarAdicionarCodigoTributacao: boolean = false;
   codigosTributacaoDaEmpresa: any[] = [];
   carregandoCodigosTributacaoDaEmpresa: boolean = false;
@@ -86,6 +97,22 @@ export class EmpresasConsultarComponent {
     COD_ATIVIDADE: '',
     DESC_ATIVIDADE: ''
   };
+
+
+/////////////////////////ITEM LC
+  ITEMLCParaAdicionar: string = '';
+  mostrarAdicionarITEMLC: boolean = false;
+  ITEMLCsDisponiveis: any[] = [];
+  ITEMLCFiltrado: any[] = [];
+  mostrarDialogoITEMLC: boolean = false;
+  ITEMLCSelecionado: any = null;
+  ITEMLCsFiltrados: any[] = [];
+  codITEMLCBusca: string = '';
+  descITEMLCBusca: string = '';
+  ITEMLCsEncontrados: any[] = [];
+  carregandoITEMLCs: boolean = false;
+  carregandoITEMLCsDaEmpresa: boolean = false;
+  ITEMLCsDaEmpresa: ITEMLCVinculado[] = [];
 
   constructor(
     private EmpresasService: EmpresasService,
@@ -160,6 +187,7 @@ export class EmpresasConsultarComponent {
           
           // Carrega os CNAEs da empresa
           this.carregarCnaesDaEmpresa(data.CNPJ);
+          this.carregarITEMLCsDaEmpresa(data.CNPJ);
           this.carregarCodigosTributacaoDaEmpresa(data.CNPJ);
           
           const OPTANTE_SN = this.OPTANTE_SN.find(t => t.codigo === this.resultado.OPTANTE_SN);
@@ -258,6 +286,7 @@ export class EmpresasConsultarComponent {
         this.dataUploadCertificado = data.data_upload || null;
         
         // Carrega os CNAEs da empresa
+        this.carregarITEMLCsDaEmpresa(data.CNPJ);
         this.carregarCnaesDaEmpresa(data.CNPJ);
         this.certificadoCarregado = true;
         this.carregarCodigosTributacaoDaEmpresa(data.CNPJ);
@@ -431,6 +460,13 @@ export class EmpresasConsultarComponent {
   }
 
   
+//////////////////////////////////////////////////////////// CNAE
+//////////////////////////////////////////////////////////// CNAE
+//////////////////////////////////////////////////////////// CNAE
+//////////////////////////////////////////////////////////// CNAE
+//////////////////////////////////////////////////////////// CNAE
+
+  
   removerCnae(COD_CNAE: string) {
     if (this.resultado?.CNPJ && COD_CNAE) {
       this.confirmationService.confirm({
@@ -598,6 +634,13 @@ buscarCnaeEspecifico(codigo: string) {
   });
 }
 
+
+//////////////////////////////////////////////////////////// ATIVIDADES MUNICIPAIS
+//////////////////////////////////////////////////////////// ATIVIDADES MUNICIPAIS
+//////////////////////////////////////////////////////////// ATIVIDADES MUNICIPAIS
+//////////////////////////////////////////////////////////// ATIVIDADES MUNICIPAIS
+//////////////////////////////////////////////////////////// ATIVIDADES MUNICIPAIS
+
 // Método para habilitar os inputs de adição
 habilitarAdicaoCodigoTributacao() {
   this.codigoTributacaoParaAdicionar = { COD_ATIVIDADE: '', DESC_ATIVIDADE: '' };
@@ -746,4 +789,178 @@ adicionarNovaAtividade() {
     }
   });
 }
+
+
+//////////////////////////////////////////////////////////// ITEM LC
+//////////////////////////////////////////////////////////// ITEM LC
+//////////////////////////////////////////////////////////// ITEM LC
+//////////////////////////////////////////////////////////// ITEM LC
+
+  
+removerITEMLC(COD_ITEM_LC: string) {
+  if (this.resultado?.CNPJ && COD_ITEM_LC) {
+    this.confirmationService.confirm({
+      message: 'Tem certeza que deseja remover este ITEM LC?',
+      accept: () => {
+        this.EmpresasService.removerITEMLCEmpresa(this.resultado.CNPJ, COD_ITEM_LC).subscribe({
+          next: () => {
+            this.carregarITEMLCsDaEmpresa(this.CNPJ);
+          },
+          error: (error) => {
+            console.error('Erro ao remover ITEM LC:', error);
+          }
+        });
+      }
+    });
+  }
+}
+
+filtrarITEMLC(event: any) {
+  if (event.query.length >= 3) {
+    this.EmpresasService.buscarITEMLC(event.query).subscribe({
+      next: (data) => {
+        this.ITEMLCFiltrado = data;
+      },
+      error: (error) => {
+        console.error('Erro ao buscar ITEM LC:', error);
+      }
+    });
+  }
+}
+
+
+abrirDialogoITEMLC() {
+this.mostrarDialogoITEMLC = true;
+this.codITEMLCBusca = '';
+this.descITEMLCBusca = '';
+this.ITEMLCsEncontrados = [];
+}
+
+fecharDialogoITEMLC() {
+this.mostrarDialogoITEMLC = false;
+}
+
+
+buscarITEMLCs() {
+if (!this.codITEMLCBusca && !this.descITEMLCBusca) {
+  this.messageService.add({
+    severity: 'warn',
+    summary: 'Atenção',
+    detail: 'Informe pelo menos um critério de busca'
+  });
+  return;
+}
+
+this.carregandoITEMLCs = true;
+
+const params = {
+  codigo: this.codITEMLCBusca,
+  descricao: this.descITEMLCBusca
+};
+
+this.EmpresasService.buscarITEMLC(params).subscribe({
+  next: (ITEMLCs) => {
+    // Normaliza a resposta para sempre trabalhar com array
+    this.ITEMLCsEncontrados = Array.isArray(ITEMLCs) ? ITEMLCs : [ITEMLCs];
+    this.carregandoITEMLCs = false;
+    
+    if (this.ITEMLCsEncontrados.length === 0) {
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Informação',
+        detail: 'Nenhum ITEMLC encontrado com os critérios informados'
+      });
+    }
+  },
+  error: (error) => {
+    console.error('Erro ao buscar ITEMLC:', error);
+    this.carregandoITEMLCs = false;
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Erro',
+      detail: 'Falha ao buscar ITEMLC'
+    });
+  }
+});
+}
+
+
+
+// Método para selecionar um ITEMLC para adicionar
+selecionarITEMLCParaAdicionar(ITEMLC: any) {
+this.EmpresasService.adicionarITEMLC(this.CNPJ, ITEMLC.COD_ITEM_LC).subscribe(
+  () => {
+    this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'ITEMLC adicionado!' });
+    this.ITEMLCsDaEmpresa.push(ITEMLC);
+    this.fecharDialogoITEMLC();
+  },
+  (erro) => {
+    if (erro.status === 409) {
+      this.messageService.add({ severity: 'warn', summary: 'Aviso', detail: 'Este ITEMLC já está vinculado!' });
+    } else {
+      this.messageService.add({ severity: 'error', summary: 'Erro', detail: erro.error?.message || 'Erro ao adicionar ITEMLC!' });
+    }
+  }
+);
+}
+
+// Método para adicionar o ITEMLC
+adicionarITEMLC(ITEMLC: string) {
+if (!this.resultado?.CNPJ) return;
+
+this.EmpresasService.adicionarITEMLCEmpresa(this.resultado.CNPJ, ITEMLC).subscribe({
+  next: () => {
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Sucesso',
+      detail: 'ITEMLC adicionado com sucesso!'
+    });
+    this.carregarITEMLCsDaEmpresa(this.CNPJ)
+  },
+  error: (error) => {
+    console.error('Erro ao adicionar ITEMLC:', error);
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Erro',
+      detail: 'Falha ao adicionar ITEMLC'
+    });
+  }
+});
+}
+
+// Adicione este método para carregar os ITEMLC
+carregarITEMLCsDaEmpresa(CNPJ: string) {
+this.carregandoITEMLCsDaEmpresa = true;
+this.EmpresasService.getITEMLCDaEmpresa(CNPJ).subscribe({
+  next: (ITEMLC) => {
+    this.ITEMLCsDaEmpresa = Array.isArray(ITEMLC) ? ITEMLC : [];
+    this.carregandoITEMLCsDaEmpresa = false;
+  },
+});
+}
+
+
+
+buscarITEMLCEspecifico(codigo: string) {
+this.EmpresasService.buscarITEMLC({ codigo }).subscribe({
+  next: (ITEMLC) => {
+    if (ITEMLC.length === 0) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'ITEMLC não encontrado',
+        detail: `Nenhum ITEMLC encontrado com o código ${codigo}`
+      });
+    }
+    this.ITEMLCsEncontrados = ITEMLC;
+  },
+  error: (error) => {
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Erro na busca',
+      detail: error.message || 'Falha ao buscar ITEMLC'
+    });
+  }
+});
+}
+
 }

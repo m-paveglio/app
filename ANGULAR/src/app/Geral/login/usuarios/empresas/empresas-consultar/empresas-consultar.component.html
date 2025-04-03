@@ -318,7 +318,7 @@
                     [style]="{ width: '70vw', maxWidth: '800px' }"
                     [draggable]="false" 
                     [resizable]="false"
-                    (onHide)="fecharDialogoCnae()">
+                    header="Adicionar CNAE">
                     
                     <div class="p-fluid grid p-3">
                       <!-- Formulário de busca melhorado -->
@@ -397,17 +397,160 @@
                         </p-table>
                       </div>
                     </div>
-                    
-                    <ng-template pTemplate="footer">
-                      <p-button 
-                        label="Fechar" 
-                        icon="pi pi-times" 
-                        (click)="fecharDialogoCnae()" 
-                        styleClass="p-button-text">
-                      </p-button>
-                    </ng-template>
                   </p-dialog>
                        
+<!-- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////////////////////////////////////-->
+<!-- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////////////////////////////////////-->
+<!-- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ITEM LC/////////////////////////////////////////////////////////////-->
+<!-- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////////////////////////////////////-->
+<!-- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////////////////////////////////////-->
+                
+
+        <div class="field col-12">
+          <div class="card">
+            <h3 class="text-center" [ngStyle]="{backgroundColor:'var(--cyan-800)', color: 'var(--primary-color-text)', borderRadius: 'var(--border-radius)'}">
+              ITEM LC
+            </h3>
+            
+            <p-table [value]="ITEMLCsDaEmpresa" 
+                    styleClass="p-datatable-sm rounded-table"
+                    [tableStyle]="{'min-width': '100%'}">
+              
+                    <ng-template pTemplate="header">
+                      <tr>
+                        <th style="width: 120px; border-top-left-radius: 12px;">Código</th>
+                        <th>Descrição</th>
+                        <th *ngIf="editMode" style="width: 100px;">Ação</th>
+                        <th style="width: 60px; border-top-right-radius: 12px;"> <!-- Ajuste importante aqui -->
+                          <p-button *ngIf="editMode"
+                                  icon="pi pi-plus" 
+                                  severity="success" 
+                                  styleClass="p-button-rounded p-button-sm"
+                                  (click)="abrirDialogoITEMLC()"
+                                  tooltip="Adicionar ITEM LC"
+                                  tooltipPosition="top">
+                          </p-button>
+                        </th>
+                      </tr>
+                    </ng-template>
+              
+              <ng-template pTemplate="body" let-ITEMLC>
+                <tr>
+                  <td style="background: #ffffff;">{{ITEMLC.COD_ITEM_LC}}</td>
+                  <td style="background: #ffffff;">{{ITEMLC.DESC_ITEM_LC || '-'}}</td>
+                  <td *ngIf="editMode" class="text-center" style="background: #ffffff;">
+                    <p-button icon="pi pi-trash" 
+                            severity="danger" 
+                            styleClass="p-button-sm"
+                            (click)="removerITEMLC(ITEMLC.COD_ITEM_LC)"
+                            tooltip="Remover ITEM LC"
+                            tooltipPosition="top">
+                    </p-button>
+                  </td>
+                  <td style="background: #ffffff;"></td>
+                </tr>
+              </ng-template>
+              
+              <ng-template pTemplate="emptymessage">
+                <tr>
+                  <td [attr.colspan]="editMode ? 4 : 3" class="text-center p-4" style="border-radius: 12px;">
+                    <i class="pi pi-info-circle mr-2"></i>
+                    {{'Nenhum ITEM LC vinculado' }}
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+        </div>
+
+            <p-dialog 
+            [(visible)]="mostrarDialogoITEMLC" 
+            [modal]="true" 
+            [style]="{ width: '70vw', maxWidth: '800px' }"
+            [draggable]="false" 
+            [resizable]="false"
+            header="Adicionar ITEM LC">
+            
+            <div class="p-fluid grid p-3">
+              <!-- Formulário de busca melhorado -->
+              <div class="field col-12 md:col-3">
+                <span class="float-label-fixed label">
+                  <input id="codITEMLC-input" type="text" pInputText 
+                        [(ngModel)]="codITEMLCBusca" 
+                        placeholder="Código ITEM LC"
+                        (keydown.enter)="buscarITEMLCs()">
+                </span>
+              </div>
+              
+              <div class="field col-12 md:col-7">
+                <span class="float-label-fixed label">
+                  <input id="descITEMLC-input" type="text" pInputText 
+                        [(ngModel)]="descITEMLCBusca" 
+                        placeholder="Descrição ITEMLC"
+                        (keydown.enter)="buscarITEMLCs()">
+                </span>
+              </div>
+              
+              <div class="field col-12 md:col-2 flex align-content-end">
+                <p-button 
+                  icon="pi pi-search" 
+                  label="Buscar" 
+                  (click)="buscarITEMLCs()"
+                  styleClass="p-button-primary w-full"
+                  [loading]="carregandoITEMLCs">
+                </p-button>
+              </div>
+              
+              <!-- Resultados da busca -->
+              <div class="col-12 mt-3" *ngIf="ITEMLCsEncontrados.length > 0">
+                <p-table 
+                  [value]="ITEMLCsEncontrados" 
+                  [loading]="carregandoITEMLCs"
+                  [paginator]="true" 
+                  [rows]="5"
+                  [rowsPerPageOptions]="[5,10,20]"
+                  [tableStyle]="{'min-width': '100%'}"
+                  styleClass="p-datatable-sm">
+                  
+                  <ng-template pTemplate="header">
+                    <tr>
+                      <th width="120px">Código</th>
+                      <th>Descrição</th>
+                      <th width="100px">Ação</th>
+                    </tr>
+                  </ng-template>
+                  
+                  <ng-template pTemplate="body" let-ITEMLC>
+                    <tr>
+                      <td>{{ITEMLC.COD_ITEM_LC}}</td>
+                      <td>{{ITEMLC.DESC_ITEM_LC}}</td>
+                      <td class="text-center">
+                        <p-button 
+                          icon="pi pi-plus" 
+                          severity="success" 
+                          (click)="selecionarITEMLCParaAdicionar(ITEMLC)"
+                          styleClass="p-button-sm"
+                          [disabled]="!editMode"
+                          tooltip="Adicionar este ITEM LC"
+                          tooltipPosition="top">
+                        </p-button>
+                      </td>
+                    </tr>
+                  </ng-template>
+                  
+                  <ng-template pTemplate="emptymessage">
+                    <tr>
+                      <td colspan="3" class="text-center p-4">
+                        Nenhum resultado encontrado.
+                      </td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+              </div>
+            </div>
+          </p-dialog>
+
+
 <!-- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////////////////////////////////////-->
 <!-- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\////////////////////////////////////////////////////////////////-->
 <!-- \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ATIVIDADES///////////////////////////////////////////////////////////-->
@@ -538,6 +681,10 @@
                   </div>
                 </div>
               </p-dialog>
+
+
+
+
                 <!-- Botões Editar, Salvar e Excluir -->
                 <!-- No grupo de botões, adicione: -->
                 <div class="btn-group field col-12 md:col-3 flex flex-wrap gap-3 justify-content-center items-center" role="group" aria-label="Edit group">
