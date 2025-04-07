@@ -517,6 +517,24 @@
           </h5>
           <div class="grid gap-12  mt-2">
 
+
+                  <!-- EXIGIBILIDADE ISSQN -->
+      <div class="field col-12 md:col-4">
+        <span class="p-float-label float-label-fixed">
+          <p-dropdown
+            inputId="exigibilidadeISS"
+            [options]="EXIGIBILIDADE_ISS"
+            optionLabel="nome"
+            optionValue="codigo"
+            [(ngModel)]="nfseData.servico.exigibilidadeISS"
+            name="exigibilidadeISS"
+            placeholder="Selecione"
+            required
+          ></p-dropdown>
+          <label for="exigibilidadeISS">EXIGIBILIDADE ISSQN</label>
+        </span>
+      </div>
+
                   
             <div class="field col-12 md:col-2">
               <span class="p-float-label">
@@ -527,6 +545,7 @@
                   currencyMask [options]="currencyOptions"
                   [(ngModel)]="nfseData.servico.valores.valorServicos"
                   (ngModelChange)="calcularISS()"
+                  (ngModelChange)="calcularValorLiquido()"
                   name="valorServicos"
                 />
                 <label for="valorServicos">Valor dos Serviços</label>
@@ -577,6 +596,7 @@
                 [disabled]="true"
                 currencyMask [options]="currencyOptions"
                 [ngModel]="nfseData.servico.valores.valorIss"
+                (ngModelChange)="calcularValorLiquido()"
                 name="valorIss"
                 readonly
               />
@@ -612,6 +632,7 @@
               pInputText
               currencyMask [options]="currencyOptions"
               [(ngModel)]="nfseData.servico.valores.descontoIncondicionado"
+              (ngModelChange)="calcularValorLiquido()"
               (ngModelChange)="calcularISS()"
               name="descontoIncondicionado"
             />
@@ -627,6 +648,7 @@
               pInputText
               currencyMask [options]="currencyOptions"
               [(ngModel)]="nfseData.servico.valores.descontoCondicionado"
+              (ngModelChange)="calcularValorLiquido()"
               name="descontoCondicionado"
             />
             <label for="descontoCondicionado">Desc. Condic.</label>
@@ -637,16 +659,16 @@
       <div class="field col-12 md:col-2">
         <span class="p-float-label float-label-fixed">
           <p-dropdown
-            inputId="issRetido"
-            [options]="ISSQN_RETIDO"
-            optionLabel="nome"
-            optionValue="codigo"
-            [(ngModel)]="nfseData.servico.issRetido"
-            (ngModelChange)="onIssRetidoChange($event)"
-            name="issRetido"
-            placeholder="Selecione"
-            required
-          ></p-dropdown>
+          inputId="issRetido"
+          [options]="ISSQN_RETIDO"
+          optionLabel="nome"
+          optionValue="codigo"
+          [(ngModel)]="nfseData.servico.issRetido"
+          (onChange)="onIssRetidoChange($event.value)"
+          name="issRetido"
+          placeholder="Selecione"
+          required
+        ></p-dropdown>
           <label for="issRetido">ISSQN RETIDO</label>
         </span>
       </div>
@@ -677,12 +699,9 @@
             id="ValorLiquido"
             type="text"
             pInputText
-            [value]="'R$ ' + nfseData.servico.valores.valorLiquido"
-            readonly="true"
-            label="Valor Líquido"
-          
+            disabled
             currencyMask [options]="currencyOptions"
-            class="p-inputtext p-component p-element p-filled"
+            [(ngModel)]="nfseData.servico.valores.valorLiquido"
             name="ValorLiquido"
           />
           <label for="ValorLiquido">Valor Líquido</label>
@@ -696,9 +715,19 @@
     </p-inputText>
 
 
+    <div class="field col-12 md:col-12"> 
+      <h5 class="text-center" 
+              [ngStyle]="{
+                backgroundColor: 'var(--cyan-800)',
+                color: 'var(--primary-color-text)',
+                borderRadius: 'var(--border-radius)'
+              }">
+            RETENÇÕES
+          </h5>
+    </div>
         
 
-        <h6 class="col-12 mt-4">Retenções</h6>
+        
         <div class="field col-12 md:col-2">
           <span class="p-float-label">
             <input
@@ -708,6 +737,7 @@
               currencyMask [options]="currencyOptions"
               class="p-inputtext p-component p-element p-filled"
               [(ngModel)]="nfseData.servico.valores.valorPis"
+              (ngModelChange)="calcularValorLiquido()"
               name="valorPis"
             />
             <label for="valorPis">Valor PIS</label>
@@ -722,6 +752,7 @@
               currencyMask [options]="currencyOptions"
               class="p-inputtext p-component p-element p-filled"
               [(ngModel)]="nfseData.servico.valores.valorCofins"
+              (ngModelChange)="calcularValorLiquido()"
               name="valorCofins"
             />
             <label for="valorCofins">Valor COFINS</label>
@@ -736,6 +767,7 @@
               currencyMask [options]="currencyOptions"
               class="p-inputtext p-component p-element p-filled"
               [(ngModel)]="nfseData.servico.valores.valorInss"
+              (ngModelChange)="calcularValorLiquido()"
               name="valorInss"
             />
             <label for="valorInss">Valor INSS</label>
@@ -752,6 +784,7 @@
               pInputText
               currencyMask [options]="currencyOptions"
               [(ngModel)]="nfseData.servico.valores.valorIr"
+              (ngModelChange)="calcularValorLiquido()"
               name="valorIr"
             />
             <label for="valorIr">Valor IR</label>
@@ -766,6 +799,7 @@
               pInputText
               currencyMask [options]="currencyOptions"
               [(ngModel)]="nfseData.servico.valores.valorCsll"
+              (ngModelChange)="calcularValorLiquido()"
               name="valorCsll"
             />
             <label for="valorCsll">Valor CSLL</label>
@@ -780,17 +814,15 @@
               pInputText
               currencyMask [options]="currencyOptions"
               [(ngModel)]="nfseData.servico.valores.outrasRetencoes"
+              (ngModelChange)="calcularValorLiquido()"
               name="outrasRetencoes"
             />
             <label for="outrasRetencoes">Outras Retenções</label>
           </span>
         </div>
-
-
-        
-
-        
-
+      </div>
+    </div>
+  
 
         <div class="card p-3 field col-12 md:col-12">
           <h5 class="text-center mb-3" 
@@ -819,9 +851,10 @@
           </div>
 
         <!-- Botão de envio -->
-        <div class="field col-12">
+        <div class="field col-12 md:col-2">
           <p-button
             icon="pi pi-check"
+            severity="success" 
             label="Emitir NFSe"
             (click)="onSubmit()"
             [loading]="loading"

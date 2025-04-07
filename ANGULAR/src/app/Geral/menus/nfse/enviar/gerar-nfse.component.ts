@@ -166,53 +166,53 @@ export class GerarNfseComponent implements OnInit {
   defaultUf = 'RS';
   defaultCidade = 'Santa Maria';
 
-/////////////////////////////////////// CNAES
-cnaeParaAdicionar: string = '';
-mostrarAdicionarCnae: boolean = false;
-cnaesDisponiveis: any[] = [];
-cnaeFiltrado: any[] = [];
-mostrarDialogoCnae: boolean = false;
-cnaeSelecionado: any = null;
-cnaesFiltrados: any[] = [];
-codCnaeBusca: string = '';
-descCnaeBusca: string = '';
-cnaesEncontrados: any[] = [];
-carregandoCnaes: boolean = false;
-carregandoCnaesDaEmpresa: boolean = false;
-cnaesDaEmpresa: CnaeVinculado[] = [];
+  /////////////////////////////////////// CNAES
+  cnaeParaAdicionar: string = '';
+  mostrarAdicionarCnae: boolean = false;
+  cnaesDisponiveis: any[] = [];
+  cnaeFiltrado: any[] = [];
+  mostrarDialogoCnae: boolean = false;
+  cnaeSelecionado: any = null;
+  cnaesFiltrados: any[] = [];
+  codCnaeBusca: string = '';
+  descCnaeBusca: string = '';
+  cnaesEncontrados: any[] = [];
+  carregandoCnaes: boolean = false;
+  carregandoCnaesDaEmpresa: boolean = false;
+  cnaesDaEmpresa: CnaeVinculado[] = [];
 
-//////////////////////ATIVIDADES MUNICIPAIS
-mostrarAdicionarCodigoTributacao: boolean = false;
-codigosTributacaoDaEmpresa: any[] = [];
-carregandoCodigosTributacaoDaEmpresa: boolean = false;
-codigoTributacaoParaAdicionar = {
-  COD_ATIVIDADE: '',
-  DESC_ATIVIDADE: ''
-};
+  //////////////////////ATIVIDADES MUNICIPAIS
+  mostrarAdicionarCodigoTributacao: boolean = false;
+  codigosTributacaoDaEmpresa: any[] = [];
+  carregandoCodigosTributacaoDaEmpresa: boolean = false;
+  codigoTributacaoParaAdicionar = {
+    COD_ATIVIDADE: '',
+    DESC_ATIVIDADE: ''
+  };
 
-/////////////////////////ITEM LC
-ITEMLCParaAdicionar: string = '';
-mostrarAdicionarITEMLC: boolean = false;
-ITEMLCsDisponiveis: any[] = [];
-ITEMLCFiltrado: any[] = [];
-mostrarDialogoITEMLC: boolean = false;
-ITEMLCSelecionado: any = null;
-ITEMLCsFiltrados: any[] = [];
-codITEMLCBusca: string = '';
-descITEMLCBusca: string = '';
-ITEMLCsEncontrados: any[] = [];
-carregandoITEMLCs: boolean = false;
-carregandoITEMLCsDaEmpresa: boolean = false;
-ITEMLCsDaEmpresa: ITEMLCVinculado[] = [];
+  /////////////////////////ITEM LC
+  ITEMLCParaAdicionar: string = '';
+  mostrarAdicionarITEMLC: boolean = false;
+  ITEMLCsDisponiveis: any[] = [];
+  ITEMLCFiltrado: any[] = [];
+  mostrarDialogoITEMLC: boolean = false;
+  ITEMLCSelecionado: any = null;
+  ITEMLCsFiltrados: any[] = [];
+  codITEMLCBusca: string = '';
+  descITEMLCBusca: string = '';
+  ITEMLCsEncontrados: any[] = [];
+  carregandoITEMLCs: boolean = false;
+  carregandoITEMLCsDaEmpresa: boolean = false;
+  ITEMLCsDaEmpresa: ITEMLCVinculado[] = [];
 
-currencyOptions = {
-  prefix: 'R$ ',
-  thousands: '.',
-  decimal: ',',
-  align: 'left',
-  allowNegative: false,
-  precision: 2
-};
+  currencyOptions = {
+    prefix: 'R$ ',
+    thousands: '.',
+    decimal: ',',
+    align: 'left',
+    allowNegative: false,
+    precision: 2
+  };
 
 percentMaskOptions = {
   prefix: '',          // Sem prefixo tipo %
@@ -231,6 +231,17 @@ ISSQN_RETIDO = [
 RESPONSAVEL_RETENCAO = [
   { nome: 'TOMADOR', codigo: '1' },
   { nome: 'INTERMEDIÁRIO', codigo: '2' }
+];
+
+EXIGIBILIDADE_ISS = [
+  { nome: 'Exigível', codigo: '1' },
+  { nome: 'Não incidência', codigo: '2' },
+  { nome: 'Isenção', codigo: '3' },
+  { nome: 'Exportação', codigo: '4' },
+  { nome: 'Imunidade', codigo: '5' },
+  { nome: 'Exigibilidade Suspensa por Decisão Judicial', codigo: '6' },
+  { nome: 'Exigibilidade Suspensa por Processo Administrativo', codigo: '7' },
+
 ];
 
 
@@ -261,6 +272,7 @@ RESPONSAVEL_RETENCAO = [
       this.carregarCodigosTributacaoDaEmpresa(this.cnpj)
       this.carregarITEMLCsDaEmpresa(this.cnpj);
     }
+    this.calcularValorLiquido();
   
     
     // Selecionar Santa Maria após carregar cidades
@@ -283,12 +295,6 @@ RESPONSAVEL_RETENCAO = [
         summary: 'Atenção',
         detail: 'Nenhuma empresa selecionada para emissão de NFSe'
       });
-    }
-  }
-
-  onIssRetidoChange(valor: string) {
-    if (valor !== '1') {
-      this.nfseData.servico.responsavelRetencao = '';
     }
   }
 
@@ -328,6 +334,69 @@ RESPONSAVEL_RETENCAO = [
     this.nfseData.servico.valores.valorIss = valorIss.toFixed(2);
   }
 
+  // Modifique o método onIssRetidoChange
+  onIssRetidoChange(valor: string) {
+    this.nfseData.servico.issRetido = valor;
+    // Limpa o responsável pela retenção se não for retido
+    if (valor !== '1') {
+      this.nfseData.servico.responsavelRetencao = '';
+    }
+    this.calcularISS();
+    this.calcularValorLiquido();
+  }
+
+// Atualize o calcularValorLiquido
+calcularValorLiquido() {
+  const parseValor = (valor: any): number => {
+    if (valor === null || valor === undefined || valor === '') return 0;
+    if (typeof valor === 'number') return valor;
+  
+    const valorStr = valor.toString()
+      .replace(/[^\d,.-]/g, '')  // Permite também o ponto negativo
+      .replace(/\.(?=\d{3,})/g, '')  // Remove separador de milhar
+      .replace(',', '.');
+  
+    const parsed = parseFloat(valorStr);
+    return isNaN(parsed) ? 0 : parsed;  // <-- Isso garante que nunca volte NaN
+  };
+
+  const valores = this.nfseData.servico.valores;
+
+  // Parseia todos os valores
+  const valorServicos = parseValor(valores.valorServicos);
+  const valorPis = parseValor(valores.valorPis);
+  const valorCofins = parseValor(valores.valorCofins);
+  const valorInss = parseValor(valores.valorInss);
+  const valorIr = parseValor(valores.valorIr);
+  const valorCsll = parseValor(valores.valorCsll);
+  const outrasRetencoes = parseValor(valores.outrasRetencoes);
+  const descontoIncondicionado = parseValor(valores.descontoIncondicionado);
+  const descontoCondicionado = parseValor(valores.descontoCondicionado);
+  const valorIss = parseValor(valores.valorIss);
+
+  // Calcula o valor líquido base
+  let valorLiquido = valorServicos - descontoIncondicionado - descontoCondicionado;
+
+  // Calcula o total de outras retenções (exceto ISS)
+  const totalOutrasRetencoes = valorPis + valorCofins + valorInss + valorIr + valorCsll + outrasRetencoes;
+
+  // Aplica as outras retenções
+  valorLiquido -= totalOutrasRetencoes;
+
+  // Se ISS for retido, subtrai do valor líquido
+  if (this.nfseData.servico.issRetido === '1') {
+    valorLiquido -= valorIss;
+  }
+
+  // Garante que o valor não seja negativo
+  valorLiquido = Math.max(0, this.arredondarABNT(valorLiquido));
+
+  // Atualiza o valor líquido
+  this.nfseData.servico.valores.valorLiquido = valorLiquido.toFixed(2);
+
+  // Força a atualização da view
+  this.cdRef.detectChanges();
+}
 
 
 
