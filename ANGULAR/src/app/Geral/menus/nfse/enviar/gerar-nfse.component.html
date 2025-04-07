@@ -517,53 +517,72 @@
           </h5>
           <div class="grid gap-12  mt-2">
 
-           
-        <!-- Valor dos Serviços -->
-        <div class="field col-12 md:col-2">
-          <span class="p-float-label">
-            <input
-              id="valorServicos"
-              type="text"
-              pInputText
-              currencyMask [options]="currencyOptions"
-              [(ngModel)]="nfseData.servico.valores.valorServicos"
-              name="valorServicos"
-            />
-            <label for="valorServicos">Valor dos Serviços</label>
-          </span>
-        </div>
+                  
+            <div class="field col-12 md:col-2">
+              <span class="p-float-label">
+                <input
+                  id="valorServicos"
+                  type="text"
+                  pInputText
+                  currencyMask [options]="currencyOptions"
+                  [(ngModel)]="nfseData.servico.valores.valorServicos"
+                  (ngModelChange)="calcularISS()"
+                  name="valorServicos"
+                />
+                <label for="valorServicos">Valor dos Serviços</label>
+              </span>
+            </div>
 
+            <div class="field col-12 md:col-2">
+              <span class="p-float-label">
+                <input
+                  id="baseCalculo"
+                  type="text"
+                  pInputText
+                    [disabled]="true"
+                  currencyMask [options]="currencyOptions"
+                  [(ngModel)]="nfseData.servico.valores.baseCalculo"
+                  (ngModelChange)="calcularISS()"
+                  name="baseCalculo"
+                />
+                <label for="baseCalculo">Base de Cálculo</label>
+              </span>
+            </div>
 
-        <div class="field col-12 md:col-2">
-          <span class="p-float-label">
-            <input
-              id="aliquota"
-              type="text"
-              pInputText
-              [disabled]="isOptanteSimplesNacional || isMunicipioSantaMaria"
-              currencyMask [options]="percentMaskOptions"
-              [(ngModel)]="nfseData.servico.valores.aliquota"
-              name="aliquota"
-            />
-            <label for="aliquota">Alíquota (%)</label>
-          </span>
-        </div>
-
-
-        <div class="field col-12 md:col-2">
-          <span class="p-float-label">
-            <input
-              id="valorIss"
-              type="text"
-              pInputText
-              [disabled]="isOptanteSimplesNacional || isMunicipioSantaMaria"
-              currencyMask [options]="currencyOptions"
-              [(ngModel)]="nfseData.servico.valores.valorIss"
-              name="valorIss"
-            />
-            <label for="valorIss">Valor dos ISSQN</label>
-          </span>
-        </div>
+            
+            <div class="field col-12 md:col-2">
+              <span class="p-float-label float-label-fixed">
+                <input
+                type="text"
+                pInputText
+                name="aliquota"
+                mask="separator.2"
+                [thousandSeparator]="''"
+                [prefix]="'% '"
+                [suffix]="''"
+                [(ngModel)]="nfseData.servico.valores.aliquota"
+                (ngModelChange)="calcularISS()"
+              />
+              
+                <label for="aliquota">Alíquota (%)</label>
+              </span>
+            </div>
+            
+            <div class="field col-12 md:col-2">
+              <span class="p-float-label">
+                <input
+                id="valorIss"
+                type="text"
+                pInputText
+                [disabled]="true"
+                currencyMask [options]="currencyOptions"
+                [ngModel]="nfseData.servico.valores.valorIss"
+                name="valorIss"
+                readonly
+              />
+                <label for="valorIss">Valor do ISSQN</label>
+              </span>
+            </div>
 
 
 
@@ -578,6 +597,7 @@
               currencyMask [options]="currencyOptions"
               class="p-inputtext p-component p-element p-filled"
               [(ngModel)]="nfseData.servico.valores.valorDeducoes"
+              (ngModelChange)="calcularISS()"
               name="valorDeducoes"
             />
             <label for="valorDeducoes">Dedução Base de Cálculo</label>
@@ -592,6 +612,7 @@
               pInputText
               currencyMask [options]="currencyOptions"
               [(ngModel)]="nfseData.servico.valores.descontoIncondicionado"
+              (ngModelChange)="calcularISS()"
               name="descontoIncondicionado"
             />
             <label for="descontoIncondicionado">Desc. Incond.</label>
@@ -611,6 +632,69 @@
             <label for="descontoCondicionado">Desc. Condic.</label>
           </span>
         </div>
+
+      <!-- ISSQN RETIDO -->
+      <div class="field col-12 md:col-2">
+        <span class="p-float-label float-label-fixed">
+          <p-dropdown
+            inputId="issRetido"
+            [options]="ISSQN_RETIDO"
+            optionLabel="nome"
+            optionValue="codigo"
+            [(ngModel)]="nfseData.servico.issRetido"
+            (ngModelChange)="onIssRetidoChange($event)"
+            name="issRetido"
+            placeholder="Selecione"
+            required
+          ></p-dropdown>
+          <label for="issRetido">ISSQN RETIDO</label>
+        </span>
+      </div>
+
+      <!-- RESPONSÁVEL RETENÇÃO (required if issRetido == '1') -->
+      <div class="field col-12 md:col-2">
+        <span class="p-float-label float-label-fixed">
+          <p-dropdown
+            inputId="responsavelRetencao"
+            [options]="RESPONSAVEL_RETENCAO"
+            optionLabel="nome"
+            optionValue="codigo"
+            [(ngModel)]="nfseData.servico.responsavelRetencao"
+            [disabled]="nfseData.servico.issRetido !== '1'"
+            [required]="nfseData.servico.issRetido === '1'"
+            [ngClass]="{ 'dropdown-disabled': nfseData.servico.issRetido !== '1' }"
+            name="responsavelRetencao"
+            placeholder="Selecione"
+          ></p-dropdown>
+          <label for="responsavelRetencao">RESPONSÁVEL RETENÇÃO</label>
+        </span>
+      </div>
+
+
+      <div class="field col-12 md:col-2">
+        <span class="p-float-label">
+          <input
+            id="ValorLiquido"
+            type="text"
+            pInputText
+            [value]="'R$ ' + nfseData.servico.valores.valorLiquido"
+            readonly="true"
+            label="Valor Líquido"
+          
+            currencyMask [options]="currencyOptions"
+            class="p-inputtext p-component p-element p-filled"
+            name="ValorLiquido"
+          />
+          <label for="ValorLiquido">Valor Líquido</label>
+        </span>
+      </div>
+
+      <p-inputText
+      [value]="'R$ ' + nfseData.servico.valores.valorLiquido"
+      readonly="true"
+      label="Valor Líquido">
+    </p-inputText>
+
 
         
 

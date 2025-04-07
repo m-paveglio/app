@@ -410,7 +410,7 @@ private gerarXmlRps(rps: any, prestadorLote: any): string {
               ${valores.descontoCondicionado ? `        <DescontoCondicionado>${valores.descontoCondicionado}</DescontoCondicionado>\n` : ''}\
                   </Valores>
                   <IssRetido>${servico.issRetido || '2'}</IssRetido>
-              ${valores.responsavelRetencao ? `      <ResponsavelRetencao>${valores.responsavelRetencao}</ResponsavelRetencao>\n` : ''}\
+                  ${servico.responsavelRetencao ? `<ResponsavelRetencao>${servico.responsavelRetencao}</ResponsavelRetencao>\n` : ''}
                   <ItemListaServico>${servico.itemListaServico || ''}</ItemListaServico>
                   <CodigoCnae>${servico.codigoCnae || ''}</CodigoCnae>
                   <CodigoTributacaoMunicipio>${servico.codigoTributacaoMunicipio || ''}</CodigoTributacaoMunicipio>

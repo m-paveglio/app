@@ -186,3 +186,9 @@
 .p-fluid .field {
   margin-bottom: 1.5rem;
 }
+
+.dropdown-disabled .p-dropdown {
+  background-color: #f0f0f0;
+  pointer-events: none;
+  opacity: 0.8;
+}

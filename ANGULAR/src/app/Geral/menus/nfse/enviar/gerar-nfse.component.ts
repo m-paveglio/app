@@ -5,6 +5,7 @@ import { LoginService } from '../../../login/login.service';
 import { EmpresasService } from '../../../login/usuarios/empresas/empresas.service';
 import { WebserviceService } from '../../webservice/webservice.service';
 import { PessoasService } from '../../pessoas/pessoas.service';
+import { arredondarABNT } from '../arredondamentoAbnt/arredondamento';
 
 interface ITEMLCVinculado {
   COD_ITEM_LC: string;
@@ -110,7 +111,7 @@ export class GerarNfseComponent implements OnInit {
       codigoMunicipio: '',
       exigibilidadeISS: '1',
       municipioIncidencia: '',
-      issRetido: '',
+      issRetido: '2',
       responsavelRetencao: '',
       valores: {
         valorServicos: '',
@@ -125,7 +126,8 @@ export class GerarNfseComponent implements OnInit {
         aliquota: '',
         descontoIncondicionado: '',
         descontoCondicionado: '',
-
+        valorLiquido: '',
+        baseCalculo: ''
       }
     },
     tomador: {
@@ -213,13 +215,24 @@ currencyOptions = {
 };
 
 percentMaskOptions = {
-  prefix: '% ',
-  thousands: '',       // Não usar separador de milhares
-  decimal: ',',        // Vírgula para casas decimais
+  prefix: '',          // Sem prefixo tipo %
+  thousands: '',       // Sem separador de milhar
+  decimal: ',',        // Usa vírgula como decimal
   align: 'left',
   allowNegative: false,
-  precision: 2,        // 2 casas decimais
+  precision: 2         // 2 casas decimais
 };
+
+ISSQN_RETIDO = [
+  { nome: 'SIM', codigo: '1' },
+  { nome: 'NÃO', codigo: '2' }
+];
+
+RESPONSAVEL_RETENCAO = [
+  { nome: 'TOMADOR', codigo: '1' },
+  { nome: 'INTERMEDIÁRIO', codigo: '2' }
+];
+
 
   constructor(
     private nfseService: NfseService,
@@ -248,6 +261,7 @@ percentMaskOptions = {
       this.carregarCodigosTributacaoDaEmpresa(this.cnpj)
       this.carregarITEMLCsDaEmpresa(this.cnpj);
     }
+  
     
     // Selecionar Santa Maria após carregar cidades
     this.carregarCidades();
@@ -271,7 +285,53 @@ percentMaskOptions = {
       });
     }
   }
+
+  onIssRetidoChange(valor: string) {
+    if (valor !== '1') {
+      this.nfseData.servico.responsavelRetencao = '';
+    }
+  }
+
+  arredondarABNT(valor: number): number {
+    const factor = 100;
+    const temp = valor * factor;
+    const intPart = Math.trunc(temp);
+    const nextDigit = Math.trunc((temp - intPart) * 10);
+    const isOdd = intPart % 2 !== 0;
   
+    if (nextDigit < 5) {
+      return intPart / factor;
+    }
+  
+    if (nextDigit > 5 || (nextDigit === 5 && ((temp * 10) % 10 !== 0))) {
+      return (intPart + 1) / factor;
+    }
+  
+    return (isOdd ? intPart + 1 : intPart) / factor;
+  }
+
+  calcularISS() {
+    const valorServicos = parseFloat((this.nfseData.servico.valores.valorServicos || '0').toString().replace(/\./g, '').replace(',', '.'));
+    const valorDeducoes = parseFloat((this.nfseData.servico.valores.valorDeducoes || '0').toString().replace(/\./g, '').replace(',', '.'));
+    const descontoIncondicionado = parseFloat((this.nfseData.servico.valores.descontoIncondicionado || '0').toString().replace(/\./g, '').replace(',', '.'));
+    
+    // CORRIGIDO: não remove ponto, só troca vírgula por ponto
+    const aliquota = parseFloat((this.nfseData.servico.valores.aliquota || '0').toString().replace(',', '.'));
+  
+    const baseCalculo = valorServicos - descontoIncondicionado - valorDeducoes;
+    const baseCalculoPositivo = Math.max(0, baseCalculo);
+  
+    let valorIss = (baseCalculoPositivo * aliquota) / 100;
+    valorIss = this.arredondarABNT(valorIss);
+  
+    this.nfseData.servico.valores.baseCalculo = baseCalculoPositivo.toFixed(2);
+    this.nfseData.servico.valores.valorIss = valorIss.toFixed(2);
+  }
+
+
+
+
+
 
   isCpfValido(CPF_CNPJ: string): boolean {
     if (!CPF_CNPJ || CPF_CNPJ.length !== 11) return false;
