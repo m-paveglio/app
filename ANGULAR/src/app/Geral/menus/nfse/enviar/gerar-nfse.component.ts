@@ -362,13 +362,24 @@ EXIGIBILIDADE_ISS = [
     return (isOdd ? intPart + 1 : intPart) / factor;
   }
 
+  parseValor(valor: any): number {
+    if (valor === null || valor === undefined || valor === '') return 0;
+    if (typeof valor === 'number') return valor;
+  
+    const valorStr = valor.toString()
+      .replace(/[^\d,.-]/g, '')  // Permite também o ponto negativo
+      .replace(/\.(?=\d{3,})/g, '')  // Remove separador de milhar
+      .replace(',', '.');
+  
+    const parsed = parseFloat(valorStr);
+    return isNaN(parsed) ? 0 : parsed;
+  }
+
   calcularISS() {
-    const valorServicos = parseFloat((this.nfseData.servico.valores.valorServicos || '0').toString().replace(/\./g, '').replace(',', '.'));
-    const valorDeducoes = parseFloat((this.nfseData.servico.valores.valorDeducoes || '0').toString().replace(/\./g, '').replace(',', '.'));
-    const descontoIncondicionado = parseFloat((this.nfseData.servico.valores.descontoIncondicionado || '0').toString().replace(/\./g, '').replace(',', '.'));
-    
-    // CORRIGIDO: não remove ponto, só troca vírgula por ponto
-    const aliquota = parseFloat((this.nfseData.servico.valores.aliquota || '0').toString().replace(',', '.'));
+    const valorServicos = this.parseValor(this.nfseData.servico.valores.valorServicos);
+    const valorDeducoes = this.parseValor(this.nfseData.servico.valores.valorDeducoes);
+    const descontoIncondicionado = this.parseValor(this.nfseData.servico.valores.descontoIncondicionado);
+    const aliquota = this.parseValor(this.nfseData.servico.valores.aliquota);
   
     const baseCalculo = valorServicos - descontoIncondicionado - valorDeducoes;
     const baseCalculoPositivo = Math.max(0, baseCalculo);
