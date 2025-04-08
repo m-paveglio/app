@@ -1,4 +1,4 @@
-import { HttpException, Inject, Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import * as fs from 'fs';
 import * as https from 'https';
@@ -1038,5 +1038,18 @@ async obterXmlResposta(protocolo: string): Promise<string | null> {
   });
   
   return nfse?.XmlResposta || null;
+}
+
+async getNFSECnpj (CnpjPrestador: string){
+  const ServicoFound = await this.nfseRepository.find({
+    where:{
+      CnpjPrestador,
+    }
+  })
+
+  if (!ServicoFound){
+  return new HttpException('NFSE não encontrada', HttpStatus.NOT_FOUND)
+  }
+  return ServicoFound
 }
 }

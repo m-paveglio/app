@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param } from '@nestjs/common';
 import { NfseService } from './nfse.service';
 
 @Controller('nfse')
@@ -14,4 +14,12 @@ export class NfseController {
   async consultarSituacao(@Body() dados: { protocolo: string; prestador: any }) {
     return this.nfseService.consultarSituacaoLote(dados.protocolo, dados.prestador);
   }
+
+
+    @Get('CNPJ/:CNPJ')
+    getNFSECnpj(@Param('CNPJ') CNPJ: string) {
+      return this.nfseService.getNFSECnpj(CNPJ);
+    }
+  
+  
 }
