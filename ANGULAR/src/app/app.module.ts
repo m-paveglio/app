@@ -37,6 +37,8 @@ import { FileUploadModule } from 'primeng/fileupload';
 import { WebserviceConsultarComponent } from './Geral/menus/webservice/consultar/webservice-consultar.component';
 import { InputTextModule } from 'primeng/inputtext';
 import { CurrencyMaskModule } from 'ng2-currency-mask';
+import { CheckboxModule } from 'primeng/checkbox';
+
 
 
 
@@ -85,7 +87,8 @@ import { CurrencyMaskModule } from 'ng2-currency-mask';
     CarouselModule,
     FileUploadModule,
     InputTextModule,
-    CurrencyMaskModule
+    CurrencyMaskModule,
+    CheckboxModule,
   
     
         

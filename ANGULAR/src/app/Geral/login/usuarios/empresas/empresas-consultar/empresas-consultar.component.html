@@ -225,16 +225,31 @@
                 </div>
                 
                 <!-- Senha do Certificado -->
-                <div class="field col-12 md:col-2">
-                    <span class="p-float-label float-label-fixed">
-                    <input id="senha-certificado" type="text" pinputtext="" 
-                            class="p-inputtext p-component p-element"
-                            [value]="senhaCertificado ? '••••••••' : ''"
-                            readonly
-                            [style.backgroundColor]="'lightgray'">
-                    <label for="senha-certificado">SENHA DO CERTIFICADO</label>
-                    </span>
-                </div>
+<!-- Senha do Certificado -->
+<div class="field col-12 md:col-2">
+  <span class="p-float-label float-label-fixed">
+      <!-- Modo visualização -->
+      <input *ngIf="!editMode"
+             id="senha-certificado" 
+             type="text" 
+             pinputtext="" 
+             class="p-inputtext p-component p-element"
+             [value]="senhaCertificado ? '••••••••' : ''"
+             readonly
+             [style.backgroundColor]="'lightgray'">
+             
+      <!-- Modo edição -->
+      <input *ngIf="editMode"
+             id="senha-certificado-edit" 
+             type="password" 
+             pinputtext="" 
+             class="p-inputtext p-component p-element"
+             [(ngModel)]="senhaCertificado"
+             [style.backgroundColor]="'white'">
+             
+      <label for="senha-certificado">SENHA DO CERTIFICADO</label>
+  </span>
+</div>
                 
                 <!-- Data de Upload -->
                 <div class="field col-12 md:col-2" *ngIf="dataUploadCertificado">

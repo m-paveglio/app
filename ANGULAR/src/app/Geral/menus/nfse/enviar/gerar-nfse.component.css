@@ -192,3 +192,17 @@
   pointer-events: none;
   opacity: 0.8;
 }
+
+
+.custom-gap-12 .p-grid {
+  margin: -0.5rem;
+}
+
+.custom-gap-12 .p-grid > div {
+  padding: 0.5rem;
+}
+
+/* Ou para grids mais recentes */
+.custom-gap-12 .grid {
+  gap: 12px;
+}

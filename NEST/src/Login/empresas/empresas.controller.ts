@@ -131,4 +131,21 @@ export class EmpresasController {
       throw new HttpException(`Erro ao ler certificado: ${err.message}`, HttpStatus.BAD_REQUEST);
     }
   }
+
+  @Delete(':CNPJ/certificado')
+async removerCertificado(@Param('CNPJ') CNPJ: string) {
+  try {
+    const result = await this.EmpresasService.removerCertificado(CNPJ);
+    return { 
+      success: true,
+      message: 'Certificado removido com sucesso',
+      data: result 
+    };
+  } catch (error) {
+    throw new HttpException(
+      error.message || 'Erro ao remover certificado',
+      error.status || HttpStatus.INTERNAL_SERVER_ERROR
+    );
+  }
+}
 }

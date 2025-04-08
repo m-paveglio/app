@@ -743,93 +743,113 @@ async consultarSituacaoLote(protocolo: string, prestador: any): Promise<any> {
 }
 
 async consultarLoteRps(cnpjPrestador: string, inscricaoMunicipal: string, protocolo: string): Promise<any> {
-    this.logger.debug(`[CONSULTA PROTOCOLO] Iniciando consulta para protocolo: ${protocolo}`);
-    
-    try {
-        // 1. Validar dados de entrada
-        if (!cnpjPrestador || !inscricaoMunicipal || !protocolo) {
-            throw new Error('CNPJ, Inscrição Municipal e Protocolo são obrigatórios');
-        }
+  this.logger.debug(`[CONSULTA PROTOCOLO] Iniciando consulta para protocolo: ${protocolo}`);
+  
+  try {
+      // 1. Validar dados de entrada
+      if (!cnpjPrestador || !inscricaoMunicipal || !protocolo) {
+          throw new Error('CNPJ, Inscrição Municipal e Protocolo são obrigatórios');
+      }
 
-        // 2. Gerar XML de consulta
-        this.logger.debug('[CONSULTA PROTOCOLO] Gerando XML de consulta...');
-        const xmlConsulta = this.gerarXmlConsultaLote(cnpjPrestador, inscricaoMunicipal, protocolo);
-        this.logger.verbose('[CONSULTA PROTOCOLO] XML gerado:', xmlConsulta);
+      // 2. Adicionar delay inicial de 5 segundos
+      this.logger.debug('[CONSULTA PROTOCOLO] Aguardando 5 segundos antes da primeira consulta...');
+      await new Promise(resolve => setTimeout(resolve, 5000));
 
-        // 3. Configurar agente HTTPS
-        this.logger.debug('Configurando agente HTTPS...');
-        const { pfx, passphrase } = await this.empresasService.buscarCertificadoPorCnpj(cnpjPrestador);
-        const httpsAgent = new https.Agent({
-            pfx,
-            passphrase,
-            rejectUnauthorized: false,
-            secureOptions: crypto.constants.SSL_OP_NO_SSLv3 | crypto.constants.SSL_OP_NO_TLSv1,
-        });
+      let tentativas = 0;
+      const maxTentativas = 30; // Máximo de tentativas (30 * 5s = 2.5 minutos)
+      let resultado;
 
-        // 4. Obter endpoint do webservice
-        this.logger.debug('Obtendo endpoint do webservice...');
-        const empresa = await this.empresasService.getEmpresa(cnpjPrestador);
-        if (empresa instanceof HttpException || !empresa?.AMBIENTE_INTEGRACAO_ID) {
-            throw new Error('Empresa não encontrada ou ambiente de integração não configurado');
-        }
+      do {
+          tentativas++;
+          this.logger.debug(`[CONSULTA PROTOCOLO] Tentativa ${tentativas} de ${maxTentativas}`);
 
-        const webservice = await this.webserviceService.getWebservice(empresa.AMBIENTE_INTEGRACAO_ID);
-        if (!webservice?.LINK) {
-            throw new Error('Webservice de consulta não encontrado ou link não configurado');
-        }
-        this.logger.debug(`Endpoint obtido: ${webservice.LINK}`);
+          // 3. Gerar XML de consulta
+          this.logger.debug('[CONSULTA PROTOCOLO] Gerando XML de consulta...');
+          const xmlConsulta = this.gerarXmlConsultaLote(cnpjPrestador, inscricaoMunicipal, protocolo);
+          this.logger.verbose('[CONSULTA PROTOCOLO] XML gerado:', xmlConsulta);
 
-        // 5. Enviar consulta
-        this.logger.debug('[CONSULTA PROTOCOLO] Enviando consulta para o webservice...');
-        const response = await this.httpService.post(
-            webservice.LINK,
-            xmlConsulta,
-            {
-                headers: {
-                    'Content-Type': 'text/xml;charset=utf-8',
-                    'SOAPAction': 'http://nfse.abrasf.org.br/ConsultarLoteRps',
-                },
-                httpsAgent,
-                timeout: 30000,
-            }
-        ).toPromise();
-        
-        this.logger.debug('[CONSULTA PROTOCOLO] Resposta do webservice recebida');
-        this.logger.verbose('[CONSULTA PROTOCOLO] Resposta completa:', response.data);
+          // 4. Configurar agente HTTPS
+          this.logger.debug('Configurando agente HTTPS...');
+          const { pfx, passphrase } = await this.empresasService.buscarCertificadoPorCnpj(cnpjPrestador);
+          const httpsAgent = new https.Agent({
+              pfx,
+              passphrase,
+              rejectUnauthorized: false,
+              secureOptions: crypto.constants.SSL_OP_NO_SSLv3 | crypto.constants.SSL_OP_NO_TLSv1,
+          });
 
-        // 6. Processar resposta
-        this.logger.debug('[CONSULTA PROTOCOLO] Processando resposta...');
-        const resultado = await this.processarRespostaConsulta(response.data);
+          // 5. Obter endpoint do webservice
+          this.logger.debug('Obtendo endpoint do webservice...');
+          const empresa = await this.empresasService.getEmpresa(cnpjPrestador);
+          if (empresa instanceof HttpException || !empresa?.AMBIENTE_INTEGRACAO_ID) {
+              throw new Error('Empresa não encontrada ou ambiente de integração não configurado');
+          }
 
-        // 7. Salvar XML de resposta no banco de dados
-        await this.salvarRespostaConsulta(protocolo, response.data, resultado);
+          const webservice = await this.webserviceService.getWebservice(empresa.AMBIENTE_INTEGRACAO_ID);
+          if (!webservice?.LINK) {
+              throw new Error('Webservice de consulta não encontrado ou link não configurado');
+          }
+          this.logger.debug(`Endpoint obtido: ${webservice.LINK}`);
 
-        // 8. Retornar resultado formatado
-        return this.formatarResultadoConsulta(protocolo, resultado);
+          // 6. Enviar consulta
+          this.logger.debug('[CONSULTA PROTOCOLO] Enviando consulta para o webservice...');
+          const response = await this.httpService.post(
+              webservice.LINK,
+              xmlConsulta,
+              {
+                  headers: {
+                      'Content-Type': 'text/xml;charset=utf-8',
+                      'SOAPAction': 'http://nfse.abrasf.org.br/ConsultarLoteRps',
+                  },
+                  httpsAgent,
+                  timeout: 30000,
+              }
+          ).toPromise();
+          
+          this.logger.debug('[CONSULTA PROTOCOLO] Resposta do webservice recebida');
+          this.logger.verbose('[CONSULTA PROTOCOLO] Resposta completa:', response.data);
 
-    } catch (error) {
-        this.logger.error('[CONSULTA PROTOCOLO] Erro na consulta do lote RPS:', {
-            message: error.message,
-            stack: error.stack,
-            response: error.response?.data,
-        });
+          // 7. Processar resposta
+          this.logger.debug('[CONSULTA PROTOCOLO] Processando resposta...');
+          resultado = await this.processarRespostaConsulta(response.data);
 
-        // Salvar resposta de erro se existir
-        if (error.response?.data) {
-            await this.salvarRespostaConsulta(
-                protocolo, 
-                error.response.data, 
-                { success: false, status: 'ERRO' }
-            );
-        }
+          // 8. Verificar se a situação é 2 (em processamento)
+          if (resultado.status === '2') {
+              this.logger.debug('[CONSULTA PROTOCOLO] Nota ainda em processamento (Situação 2). Aguardando 5 segundos para nova tentativa...');
+              await new Promise(resolve => setTimeout(resolve, 5000));
+          }
 
-        throw {
-            success: false,
-            error: 'Falha na consulta do lote RPS',
-            message: error.message,
-            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
-        };
-    }
+      } while (resultado.status === '2' && tentativas < maxTentativas);
+
+      // 9. Salvar XML de resposta no banco de dados
+      await this.salvarRespostaConsulta(protocolo, resultado.xmlResposta, resultado);
+
+      // 10. Retornar resultado formatado
+      return this.formatarResultadoConsulta(protocolo, resultado);
+
+  } catch (error) {
+      this.logger.error('[CONSULTA PROTOCOLO] Erro na consulta do lote RPS:', {
+          message: error.message,
+          stack: error.stack,
+          response: error.response?.data,
+      });
+
+      // Salvar resposta de erro se existir
+      if (error.response?.data) {
+          await this.salvarRespostaConsulta(
+              protocolo, 
+              error.response.data, 
+              { success: false, status: 'ERRO' }
+          );
+      }
+
+      throw {
+          success: false,
+          error: 'Falha na consulta do lote RPS',
+          message: error.message,
+          stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+      };
+  }
 }
        
 private gerarXmlConsultaLote(cnpjPrestador: string, inscricaoMunicipal: string, protocolo: string): string {
@@ -878,6 +898,12 @@ private async processarRespostaConsulta(xmlResposta: string): Promise<any> {
           throw new Error('Estrutura da resposta inválida');
       }
 
+      // Extrair situação (pode vir em diferentes formatos dependendo da resposta)
+      let situacao = resposta.Situacao;
+      if (!situacao && resposta.CompNfse?.Nfse?.InfNfse?.Situacao) {
+          situacao = resposta.CompNfse.Nfse.InfNfse.Situacao;
+      }
+
       // Verificar se há mensagens de erro
       if (resposta.ListaMensagemRetorno?.MensagemRetorno) {
           const mensagens = Array.isArray(resposta.ListaMensagemRetorno.MensagemRetorno) 
@@ -886,7 +912,8 @@ private async processarRespostaConsulta(xmlResposta: string): Promise<any> {
           
           return {
               success: false,
-              status: resposta.Situacao || 'ERRO',
+              status: situacao || 'ERRO',
+              xmlResposta: xmlResposta,
               mensagens: mensagens.map(msg => ({
                   codigo: msg.Codigo,
                   mensagem: msg.Mensagem,
@@ -900,7 +927,8 @@ private async processarRespostaConsulta(xmlResposta: string): Promise<any> {
       
       return {
           success: true,
-          status: resposta.Situacao || 'PROCESSADO',
+          status: situacao || 'PROCESSADO',
+          xmlResposta: xmlResposta,
           numeroNfse: nfse.Numero,
           codigoVerificacao: nfse.CodigoVerificacao,
           dataEmissao: nfse.DataEmissao,

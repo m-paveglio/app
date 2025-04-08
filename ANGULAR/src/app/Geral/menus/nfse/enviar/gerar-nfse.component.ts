@@ -54,6 +54,14 @@ interface Cidade {
   COD_UF: string;
 }
 
+interface Tomador {
+  nifTomador?: string;
+  enderecoExterior?: {
+    codigoPais: string;
+    enderecoCompletoExterior: string;
+  };
+}
+
 @Component({
   selector: 'app-gerar-nfse',
   templateUrl: './gerar-nfse.component.html',
@@ -86,6 +94,7 @@ export class GerarNfseComponent implements OnInit {
   pessoasEncontrados: Pessoa[] = []; // Lista de pessoas encontradas
   displayDialogUsuarios: boolean = false;
   displayDialogNovaPessoa: boolean = false; // Controla o diálogo de nova pessoa
+  tomadorExterior: boolean = false;
 
   // Propriedades faltantes
   CPF_CNPJ: string = ''; // Adicionada a propriedade CPF_CNPJ
@@ -149,6 +158,10 @@ export class GerarNfseComponent implements OnInit {
       contato: {
         telefone: '',
         email: ''
+      },
+      enderecoExterior: {
+        enderecoCompletoExterior: '',
+        codigoPais: ''
       },
       nifTomador: ''
     },
@@ -298,6 +311,39 @@ EXIGIBILIDADE_ISS = [
     }
   }
 
+  toggleTomadorExterior() {
+    if (this.tomadorExterior) {
+      // Limpar campos do tomador brasileiro
+      this.nfseData.tomador.identificacao.cpf = '';
+      this.nfseData.tomador.identificacao.cnpj = '';
+      this.nfseData.tomador.identificacao.inscricaoMunicipal = '';
+      this.nfseData.tomador.endereco = {
+        cep: '',
+        endereco: '',
+        numero: '',
+        bairro: '',
+        complemento: '',
+        codigoMunicipio: '',
+        uf: ''
+      };
+      
+      // Inicializar campos do tomador exterior se não existirem
+      if (!this.nfseData.tomador.enderecoExterior) {
+        this.nfseData.tomador.enderecoExterior = {
+          codigoPais: '',
+          enderecoCompletoExterior: ''
+        };
+      }
+    } else {
+      // Limpar campos do tomador exterior
+      this.nfseData.tomador.nifTomador = '';
+      if (this.nfseData.tomador.enderecoExterior) {
+        this.nfseData.tomador.enderecoExterior.codigoPais = '';
+        this.nfseData.tomador.enderecoExterior.enderecoCompletoExterior = '';
+      }
+    }
+  }
+
   arredondarABNT(valor: number): number {
     const factor = 100;
     const temp = valor * factor;
@@ -397,10 +443,6 @@ calcularValorLiquido() {
   // Força a atualização da view
   this.cdRef.detectChanges();
 }
-
-
-
-
 
   isCpfValido(CPF_CNPJ: string): boolean {
     if (!CPF_CNPJ || CPF_CNPJ.length !== 11) return false;
@@ -516,14 +558,20 @@ calcularValorLiquido() {
   }
 
   private preencherDadosTomador(pessoa: any) {
+    // Se for tomador do exterior, preencha apenas os campos necessários
+    if (this.tomadorExterior) {
+      this.nfseData.tomador.razaoSocial = pessoa.NOME;
+      this.nfseData.tomador.contato.email = pessoa.EMAIL;
+      this.nfseData.tomador.contato.telefone = pessoa.TELEFONE_CELULAR;
+      return;
+    }
+  
     // Dados básicos
     this.nfseData.tomador.razaoSocial = pessoa.NOME;
     this.nfseData.tomador.contato.email = pessoa.EMAIL;
     this.nfseData.tomador.contato.telefone = pessoa.TELEFONE_CELULAR;
-
-      // Inscrição Municipal - adicione esta linha
     this.nfseData.tomador.identificacao.inscricaoMunicipal = pessoa.IM || '';
-  
+    
     // Endereço
     this.nfseData.tomador.endereco = {
       endereco: pessoa.RUA_LOGRADOURO,
@@ -749,14 +797,15 @@ calcularValorLiquido() {
           exigibilidadeISS: this.nfseData.servico.exigibilidadeISS || '',
           municipioIncidencia: this.selectedCidadeIncidencia?.COD_IBGE.toString() || ''
         },
-        tomador: {  // Agora o tomador está dentro do objeto do RPS
+        tomador: {
           identificacao: {
-            cpf: this.nfseData.tomador.identificacao.cpf || null,
-            cnpj: this.nfseData.tomador.identificacao.cnpj || null,
-            inscricaoMunicipal: this.nfseData.tomador.identificacao.inscricaoMunicipal || null,
+            cpf: !this.tomadorExterior ? this.nfseData.tomador.identificacao.cpf || null : null,
+            cnpj: !this.tomadorExterior ? this.nfseData.tomador.identificacao.cnpj || null : null,
+            inscricaoMunicipal: !this.tomadorExterior ? this.nfseData.tomador.identificacao.inscricaoMunicipal || null : null,
+            nifTomador: this.tomadorExterior ? this.nfseData.tomador.nifTomador || null : null
           },
           razaoSocial: this.nfseData.tomador.razaoSocial,
-          endereco: {
+          endereco: !this.tomadorExterior ? {
             endereco: this.nfseData.tomador.endereco.endereco,
             numero: this.nfseData.tomador.endereco.numero,
             complemento: this.nfseData.tomador.endereco.complemento,
@@ -764,7 +813,11 @@ calcularValorLiquido() {
             codigoMunicipio: this.nfseData.tomador.endereco.codigoMunicipio,
             uf: this.nfseData.tomador.endereco.uf,
             cep: this.nfseData.tomador.endereco.cep
-          },
+          } : null,
+          enderecoExterior: this.tomadorExterior ? {
+            codigoPais: this.nfseData.tomador.enderecoExterior.codigoPais,
+            enderecoCompletoExterior: this.nfseData.tomador.enderecoExterior.enderecoCompletoExterior
+          } : null,
           contato: {
             telefone: this.nfseData.tomador.contato.telefone,
             email: this.nfseData.tomador.contato.email
@@ -990,7 +1043,6 @@ buscarCnaes() {
   });
 }
 
-
 // Adicione este método para carregar os CNAEs
 carregarCnaesDaEmpresa(CNPJ: string) {
   this.carregandoCnaesDaEmpresa = true;
@@ -1001,8 +1053,6 @@ carregarCnaesDaEmpresa(CNPJ: string) {
     },
   });
 }
-
-
 
 buscarCnaeEspecifico(codigo: string) {
   this.nfseService.buscarCNAE({ codigo }).subscribe({
@@ -1025,8 +1075,6 @@ buscarCnaeEspecifico(codigo: string) {
     }
   });
 }
-
-
 
 carregarCodigosTributacaoDaEmpresa(CNPJ: string) {
   this.carregandoCodigosTributacaoDaEmpresa = true;
