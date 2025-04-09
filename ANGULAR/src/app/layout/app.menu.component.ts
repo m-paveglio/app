@@ -123,7 +123,7 @@ export class AppMenuComponent implements OnInit {
                         {
                             label: 'Consultar',
                             icon: 'pi pi-fw pi-search',
-                            routerLink: ['user/consultar']
+                            routerLink: ['nfse/consultar']
                         },
                         ],
                      },  

@@ -153,6 +153,26 @@ getITEMLCDaEmpresa(CNPJ: string): Observable<any[]> {
 }
 
 
+consultarNfse(CNPJ: string): Observable<any[]> {
+  const url = `${this.apiUrl}/nfse/CNPJ/${CNPJ}`;
+  return this.http.get<any[]>(url).pipe(
+    catchError(this.handleError)
+  );
+}
+
+cancelarNfse(idNfse: string): Observable<any> {
+  return this.http.post(`${this.apiUrl}/nfse/cancelar`, { id: idNfse }).pipe(
+    catchError(this.handleError)
+  );
+}
+
+exportarParaExcel(nfses: any[]): Observable<Blob> {
+  return this.http.post(`${this.apiUrl}/nfse/exportar-excel`, { nfses }, {
+    responseType: 'blob'
+  }).pipe(
+    catchError(this.handleError)
+  );
+}
 
 
 

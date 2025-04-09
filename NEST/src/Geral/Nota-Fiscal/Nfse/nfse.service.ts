@@ -30,48 +30,62 @@ export class NfseService {
 ) {}
  
 async enviarNfse(cnpj: string, xml: string): Promise<any> {
-      try {
-        // 1. Busca a empresa pelo CNPJ
-        const empresa = await this.empresasService.getEmpresa(cnpj);
-        
-        if (empresa instanceof HttpException || !empresa?.AMBIENTE_INTEGRACAO_ID) {
+  let nfseRecord;
+  
+  try {
+      // 1. Busca a empresa pelo CNPJ
+      const empresa = await this.empresasService.getEmpresa(cnpj);
+      
+      if (empresa instanceof HttpException || !empresa?.AMBIENTE_INTEGRACAO_ID) {
           throw new Error('Empresa não encontrada ou ambiente de integração não configurado');
-        }
-  
-        // 2. Busca o webservice pelo ID
-        const webservice = await this.webserviceService.getWebservice(empresa.AMBIENTE_INTEGRACAO_ID);
-        
-        if (!webservice?.LINK) {
+      }
+
+      // 2. Busca o webservice pelo ID
+      const webservice = await this.webserviceService.getWebservice(empresa.AMBIENTE_INTEGRACAO_ID);
+      
+      if (!webservice?.LINK) {
           throw new Error('Webservice não encontrado ou link não configurado');
-        }
-  
-        // 3. Envia a NFSe
-        const response = await this.httpService.post(webservice.LINK, xml, {
+      }
+
+      // 3. Envia a NFSe
+      const response = await this.httpService.post(webservice.LINK, xml, {
           headers: { 'Content-Type': 'application/xml' },
-        }).toPromise();
-  
-        // 4. Salva o retorno (apenas status e protocolo como exemplo)
-        const nfse = this.nfseRepository.create({
+      }).toPromise();
+
+      // 4. Cria o registro da NFSe
+      nfseRecord = this.nfseRepository.create({
           CnpjPrestador: cnpj,
           Protocolo: response.data.protocolo || 'N/A',
           Status: 'ENVIADO',
+          XmlEnvio: xml, // Armazena o XML enviado
+          DataEnvio: new Date(),
           // Adicione outros campos conforme necessário
-        });
-        
-        await this.nfseRepository.save(nfse);
-  
-        return response.data;
-      } catch (error) {
-        // Log do erro e salva no banco
-        await this.nfseRepository.save({
-          CnpjPrestador: cnpj,
-          Status: 'ERRO',
-          InformacoesComplementares: error.message
-          // Adicione outros campos de erro conforme necessário
-        });
-        
-        throw new Error(`Erro no envio da NFSe: ${error.message}`);
+      });
+      
+      // Salva apenas se tudo der certo
+      await this.nfseRepository.save(nfseRecord);
+
+      return response.data;
+  } catch (error) {
+      // Se já tiver criado o registro (o que não deveria acontecer), atualiza
+      if (nfseRecord) {
+          nfseRecord.Status = 'ERRO';
+          nfseRecord.InformacoesComplementares = error.message.substring(0, 500);
+          await this.nfseRepository.save(nfseRecord);
+      } else {
+          // Cria novo registro apenas se for um erro antes da tentativa de envio
+          await this.nfseRepository.save({
+              CnpjPrestador: cnpj,
+              Status: 'ERRO',
+              InformacoesComplementares: error.message.substring(0, 500),
+              DataEnvio: new Date(),
+              XmlEnvio: xml // Armazena o XML que falhou
+          });
       }
+      
+      this.logger.error(`Erro no envio da NFSe: ${error.message}`, error.stack);
+      throw new HttpException(`Erro no envio da NFSe: ${error.message}`, HttpStatus.BAD_REQUEST);
+  }
 }
   
 private async carregarCertificado(cnpj: string): Promise<{ privateKey: string; publicCert: string }> {

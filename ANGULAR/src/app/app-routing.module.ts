@@ -18,6 +18,7 @@ import { PessoasConsultarComponent } from './Geral/menus/pessoas/pessoas-consult
 import { ComandasIncluirComponent } from './Geral/menus/comandas/comandas-incluir/comandas-incluir.component';
 import { ComandasConsultarComponent } from './Geral/menus/comandas/comandas-consultar/comandas-consultar.component';
 import { WebserviceConsultarComponent } from './Geral/menus/webservice/consultar/webservice-consultar.component';
+import { ConsultarNfseComponent } from './Geral/menus/nfse/consultar/consultar-nfse.component';
 
 const routes: Routes = [
   { path: '', component: PagInicialComponent },
@@ -47,7 +48,7 @@ const routes: Routes = [
         path: 'nfse', 
         children: [
           { path: 'gerar', component: GerarNfseComponent },
-          { path: 'consultar', component: UserConsultarComponent },
+          { path: 'consultar', component: ConsultarNfseComponent },
         ]
       },
       { 
@@ -79,6 +80,7 @@ const routes: Routes = [
           { path: 'consultar', component: WebserviceConsultarComponent },
         ]
       },
+
       
     ]
   }

@@ -1,0 +1,43 @@
+<div class="grid p-fluid p-formgrid">
+  <div class="col-12">
+    <div class="p-inputtext p-component p-element">
+      <h3
+        class="text-center"
+        [ngStyle]="{
+          backgroundColor: 'var(--cyan-800)',
+          color: 'var(--primary-color-text)',
+          borderRadius: 'var(--border-radius)'
+        }"
+      >
+        CONSULTA DE NOTA FISCAL
+      </h3>
+
+      <div class="grid p-fluid p-formgrid p-3">
+
+        <p-table [value]="nfses" [paginator]="true" [rows]="10">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>ID</th>
+              <th>Número do Lote</th>
+              <th>CNPJ Prestador</th>
+              <th>Ações</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-nfse>
+            <tr>
+              <td>{{ nfse.id }}</td>
+              <td>{{ nfse.NumeroLote || '---' }}</td>
+              <td>{{ nfse.CnpjPrestador }}</td>
+              <td>
+                <button pButton type="button" icon="pi pi-search"
+                        class="p-button-text p-button-sm"
+                        (click)="visualizarDetalhes(nfse)">
+                </button>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+</div>

@@ -38,6 +38,7 @@ import { WebserviceConsultarComponent } from './Geral/menus/webservice/consultar
 import { InputTextModule } from 'primeng/inputtext';
 import { CurrencyMaskModule } from 'ng2-currency-mask';
 import { CheckboxModule } from 'primeng/checkbox';
+import { ConsultarNfseComponent } from './Geral/menus/nfse/consultar/consultar-nfse.component';
 
 
 
@@ -55,6 +56,7 @@ import { CheckboxModule } from 'primeng/checkbox';
     UserIncluirComponent,
     UserRelatorioComponent,
     GerarNfseComponent,
+    ConsultarNfseComponent,
     EmpresasIncluirComponent,
     EmpresasConsultarComponent,
     ServicosIncluirComponent,
@@ -63,7 +65,9 @@ import { CheckboxModule } from 'primeng/checkbox';
     PessoasConsultarComponent,
     ComandasIncluirComponent,
     ComandasConsultarComponent,
-    WebserviceConsultarComponent
+    WebserviceConsultarComponent,
+  
+
     
     
         ],
