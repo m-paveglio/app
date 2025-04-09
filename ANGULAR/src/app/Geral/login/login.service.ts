@@ -26,8 +26,12 @@ export class LoginService {
   }
 
   login(credentials: { CPF: string; SENHA: string }): Observable<any> {
-    return this.http.post<{ access_token: string; user: { nome: string } }>(this.apiUrl, credentials).pipe(
-      tap((response) => this.handleLoginSuccess(response.access_token, response.user.nome)),
+    return this.http.post<any>(this.apiUrl, credentials).pipe(
+      tap((response) => {
+        const token = response.access_token;
+        const user = response.user;
+        this.handleLoginSuccess(token, user.nome, user.CPF); // 👈 Passando o CPF
+      }),
       catchError(this.handleError)
     );
   }
@@ -40,10 +44,11 @@ export class LoginService {
     this.isLoggedInSubject.next(false);
   }
   
-  private handleLoginSuccess(token: string, userName: string): void {
+  private handleLoginSuccess(token: string, userName: string, cpf: string): void {
     if (this.isBrowser()) {
-      localStorage.setItem(this.tokenKey, token); // Armazenar o token no localStorage
-      localStorage.setItem(this.userNameKey, userName); // Armazenar o nome do usuário no localStorage
+      localStorage.setItem(this.tokenKey, token);
+      localStorage.setItem(this.userNameKey, userName);
+      localStorage.setItem('cpfUsuarioLogado', cpf); // 👈 CPF salvo com sucesso!
     }
     this.isLoggedInSubject.next(true);
   }
@@ -87,7 +92,10 @@ export class LoginService {
     return this.empresaSelecionada.value; // Retorna o valor atualizado corretamente
   }
 
-
+  getCpfUsuarioLogado(): string | null {
+    return localStorage.getItem('cpfUsuarioLogado');
+  }
+  
   buscarPorCnpj(CNPJ: string): Observable<any> {
     // Ajusta para usar apenas o endpoint /empresa
     const url = `${this.apiConfig.getBaseUrl()}/empresa/${CNPJ}`;
