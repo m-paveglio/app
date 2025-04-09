@@ -36,6 +36,9 @@ export class UserConsultarComponent {
   showForm: boolean = false; // Controla exibição do formulário para novo vínculo
   permissoes: any[] = [];
 
+  senhaEditada: string = '';
+  senhaOriginal: string = ''; 
+
   TIPO_USER = [
     { nome: 'Admin', codigo: '1' },
     { nome: 'Suporte', codigo: '2' },
@@ -88,33 +91,33 @@ export class UserConsultarComponent {
 
   buscarPorCpf() {
     if (!this.isCpfValido(this.CPF)) {
-      this.showError('CPF inválido!');
-      return;
+        this.showError('CPF inválido!');
+        return;
     }
   
     this.userService.buscarPorCpf(this.CPF).subscribe(
-      (data) => {
-        if (data && Object.keys(data).length > 0) {
-          this.resultado = data;
-  
-          // Converte TIPO_USER para exibir o nome correspondente em outra propriedade
-          const tipoUser = this.TIPO_USER.find(t => t.codigo === this.resultado.TIPO_USER);
-          this.resultado.TIPO_USER_nome = tipoUser ? tipoUser.nome : '';
-          this.carregarEmpresasVinculadas();
-  
-          console.log(this.resultado);
-        } else {
-          this.showError('Usuário não existe no banco de dados.');
-          this.resultado = null;
+        (data) => {
+            if (data && Object.keys(data).length > 0) {
+                this.resultado = data;
+                this.senhaOriginal = data.SENHA; // Armazena a senha original
+                this.senhaEditada = ''; // Limpa o campo de edição
+
+                // Converte TIPO_USER para exibir o nome correspondente em outra propriedade
+                const tipoUser = this.TIPO_USER.find(t => t.codigo === this.resultado.TIPO_USER);
+                this.resultado.TIPO_USER_nome = tipoUser ? tipoUser.nome : '';
+                this.carregarEmpresasVinculadas();
+            } else {
+                this.showError('Usuário não existe no banco de dados.');
+                this.resultado = null;
+            }
+        },
+        (error) => {
+            console.error('Erro ao buscar por CPF:', error);
+            this.showError('Erro ao buscar CPF. Por favor, tente novamente.');
+            this.resultado = null;
         }
-      },
-      (error) => {
-        console.error('Erro ao buscar por CPF:', error);
-        this.showError('Erro ao buscar CPF. Por favor, tente novamente.');
-        this.resultado = null;
-      }
     );
-  }
+}
   
   buscarPorNome() {
     this.userService.buscarPorNome(this.nome).subscribe(
@@ -167,28 +170,38 @@ export class UserConsultarComponent {
   );
 }
 
-  salvarUsuario() {
-  const updatePayload = {
-    TIPO_USER: this.resultado.TIPO_USER,
-    CPF: this.resultado.CPF,
-    NOME: this.resultado.NOME,
-    EMAIL: this.resultado.EMAIL,
-    SENHA: this.resultado.SENHA
+salvarUsuario() {
+  const updatePayload: any = {
+      TIPO_USER: this.resultado.TIPO_USER,
+      CPF: this.resultado.CPF,
+      NOME: this.resultado.NOME,
+      EMAIL: this.resultado.EMAIL
+      // Não incluímos SENHA aqui inicialmente
   };
 
+  // Só adiciona a senha ao payload se foi alterada (senhaEditada não está vazia)
+  if (this.senhaEditada) {
+      updatePayload.SENHA = this.senhaEditada;
+  }
+
   this.userService.atualizarUsuario(this.resultado.CPF, updatePayload).subscribe(
-    () => {
-      this.editMode = false;
-      this.showSuccess('Usuário atualizado com sucesso!');
-    },
-    (error) => {
-      console.error('Erro ao atualizar usuário:', error);
-      if (error.error && error.error.message) {
-        this.processarErro(error.error.message);
-      } else {
-        this.showError('Erro ao atualizar usuário');
+      () => {
+          this.editMode = false;
+          // Se a senha foi alterada, atualiza a senhaOriginal
+          if (this.senhaEditada) {
+              this.senhaOriginal = this.senhaEditada;
+          }
+          this.senhaEditada = ''; // Limpa o campo de edição
+          this.showSuccess('Usuário atualizado com sucesso!');
+      },
+      (error) => {
+          console.error('Erro ao atualizar usuário:', error);
+          if (error.error && error.error.message) {
+              this.processarErro(error.error.message);
+          } else {
+              this.showError('Erro ao atualizar usuário');
+          }
       }
-    }
   );
 }
 
@@ -251,20 +264,23 @@ export class UserConsultarComponent {
 
   editarUsuario(cpf: string) {
     this.userService.buscarPorCpf(cpf).subscribe(
-      (data) => {
-        this.resultado = data;
-        this.editMode = true;
-      },
-      (error) => {
-        console.error('Erro ao editar usuário:', error);
-        if (error.error && error.error.message) {
-          this.processarErro(error.error.message);
-        } else {
-          this.showError('Erro ao buscar usuário para edição.');
+        (data) => {
+            this.resultado = data;
+            this.senhaOriginal = data.SENHA; // Armazena a senha original
+            this.senhaEditada = ''; // Limpa o campo de edição
+            this.editMode = true;
+        },
+        (error) => {
+            console.error('Erro ao editar usuário:', error);
+            if (error.error && error.error.message) {
+                this.processarErro(error.error.message);
+            } else {
+                this.showError('Erro ao buscar usuário para edição.');
+            }
         }
-      }
     );
-  }
+}
+
 
   isCnpjValido(cnpjStr: string): boolean {
     return cnpj.isValid(cnpjStr); // Validação usando a biblioteca
@@ -582,7 +598,7 @@ limparFormulario() {
 
 cancelarEdicao() {
   this.editMode = false;
-  // Adicione qualquer lógica necessária para restaurar os dados originais
+  this.senhaEditada = ''; // Limpa o campo de edição
 }
 
 }

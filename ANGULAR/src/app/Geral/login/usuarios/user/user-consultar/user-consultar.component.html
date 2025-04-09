@@ -147,15 +147,15 @@
                 
                                 <!-- Campo Senha -->
                                 <div class="field col-12 md:col-2">
-                                    <span class="p-float-label float-label-fixed">
-                                    
-                                        <input id="resultado-senha" type="password" pinputtext="" class="p-inputtext p-component p-element"
-                                            [ngClass]="{ 'p-filled': !editMode }"
-                                            [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
-                                            [(ngModel)]="resultado.SENHA" name="Senha" [readonly]="!editMode">
-                                            <label for="resultado-senha">Senha</label>
-                                    </span>
-                                </div>
+                                  <span class="p-float-label float-label-fixed">
+                                      <input id="resultado-senha" type="password" pinputtext="" class="p-inputtext p-component p-element"
+                                          [ngClass]="{ 'p-filled': !editMode }"
+                                          [style.backgroundColor]="editMode ? 'white' : 'lightgray'"
+                                          [(ngModel)]="senhaEditada" name="Senha" [readonly]="!editMode"
+                                          [value]="editMode ? senhaEditada : '********'">
+                                      <label for="resultado-senha">Senha</label>
+                                  </span>
+                              </div>
                 
                                 <!-- Botões Editar, Salvar e Excluir -->
                                 <div class="btn-group field col-12 md:col-2 flex flex-wrap gap-3" role="group" aria-label="Edit group">
