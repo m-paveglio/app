@@ -5,15 +5,12 @@ import { NfseService } from './nfse.service';
 export class NfseController {
   constructor(private readonly nfseService: NfseService) {}
 
-  @Post('enviar-lote')
-  async enviarLoteRps(@Body() dados: any) {
-    return this.nfseService.enviarLoteRps(dados);
+
+  @Post('enviar-individual')
+  async enviarNfseIndividual(@Body() dados: any) {
+    return this.nfseService.gerarNfse(dados);
   }
 
-  @Post('consultar-situacao')
-  async consultarSituacao(@Body() dados: { protocolo: string; prestador: any }) {
-    return this.nfseService.consultarSituacaoLote(dados.protocolo, dados.prestador);
-  }
 
 
     @Get('CNPJ/:CNPJ')

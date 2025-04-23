@@ -16,7 +16,7 @@ export class NfseService {
 
   // Método para enviar a NFSe
   enviarNfse(nfseData: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/nfse/enviar-lote`, nfseData);
+    return this.http.post(`${this.apiUrl}/nfse/enviar-individual`, nfseData);
   }
 
   carregarCidades(): Observable<any> {
