@@ -168,190 +168,203 @@
                             </div>
                         </p-tabPanel>
 
-                        <p-tabPanel>
-                            <ng-template pTemplate="header">
-                              <div class="custom-tab-header">
-                                Empresas Vinculadas
-                              </div>
-                            </ng-template>
-                            <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
-                              <!-- Tabela de empresas vinculadas -->
-                              <div class="col-12">
-                                <p-table
-                                  [value]="empresasVinculadas"
-                                  [paginator]="true"
-                                  [rows]="5"
-                                  [tableStyle]="{ 'min-width': '50rem' }"
-                                  [rowsPerPageOptions]="[5, 10, 20]"
-                                >
-                                <ng-template pTemplate="header">
-                                  <tr>
-                                    <th>CNPJ</th>
-                                    <th>IM</th>
-                                    <th>RAZÃO SOCIAL</th>
-                                    <th>Permissão</th>
-                                    <th>Status</th>
-                                    <th>
-                                      <p-button 
-                                        icon="pi pi-plus" 
-                                        class="p-button-success"
-                                        (click)="abrirDialogo()"
-                                      ></p-button>
-                                    </th>
-                                  </tr>
-                                </ng-template>
-                                  <ng-template pTemplate="body" let-empresa>
-                                    <tr>
-                                      <td>{{ empresa.CNPJ | mask:'00.000.000/0000-00' }}</td>
-                                      <td>{{ empresa.IM }}</td>
-                                      <td>{{ empresa.NOME }}</td>
-                                      <td *ngIf="editMode && CNPJ === empresa.CNPJ">
-                                        <p-dropdown
-                                          [(ngModel)]="COD_PERMISSAO"
-                                          [options]="permissoes"
-                                          optionLabel="nome"
-                                          optionValue="codigo"
-                                          placeholder="Selecione uma permissão"
-                                        ></p-dropdown>
-                                      </td>
-                                      <td *ngIf="editMode && CNPJ === empresa.CNPJ">
-                                        <p-dropdown
-                                          [(ngModel)]="USER_STATUS"
-                                          [options]="[
-                                            { label: 'Ativo', value: '1' },
-                                            { label: 'Inativo', value: '0' }
-                                          ]"
-                                          placeholder="Selecione o status"
-                                        ></p-dropdown>
-                                      </td>
-                                      <td *ngIf="!editMode || CNPJ !== empresa.CNPJ">
-                                        {{ getPermissaoNome(empresa.COD_PERMISSAO) }}
-                                      </td>
-                                      <td *ngIf="!editMode || CNPJ !== empresa.CNPJ">
-                                        {{ empresa.USER_STATUS === '1' ? 'Ativo' : 'Inativo' }}
-                                      </td>
-                                      <td>
-                                        <div class="btn-group flex flex-row gap-2" role="group" aria-label="Actions group">
-                                          <!-- Botão Editar -->
-                                          <p-button
-                                            *ngIf="!editMode || CNPJ !== empresa.CNPJ"
-                                            icon="pi pi-pencil"
-                                            severity="info"
-                                            (click)="abrirEdicaoVinculo(empresa)"
-                                          ></p-button>
-                                        
-                                          <!-- Botão Salvar -->
-                                          <p-button
-                                            *ngIf="editMode && CNPJ === empresa.CNPJ"
-                                            icon="pi pi-save"
-                                            severity="success"
-                                            (click)="salvarEdicaoVinculo()"
-                                          ></p-button>
-                                        
-                                          <!-- Botão Cancelar -->
-                                          <p-button
-                                            *ngIf="editMode && CNPJ === empresa.CNPJ"
-                                            icon="pi pi-times"
-                                            severity="danger"
-                                            (click)="cancelarEdicaoVinculo()"
-                                          ></p-button>
-                                        
-                                          <!-- Botão Excluir -->
-                                          <p-button
-                                            *ngIf="!editMode || CNPJ !== empresa.CNPJ"
-                                            icon="pi pi-trash"
-                                            severity="danger"
-                                            (click)="confirmarExclusaoVinculo(empresa.CNPJ)"
-                                          ></p-button>
-                                        </div>
-                                      </td>
-                                    </tr>
-                                    <p-dialog 
-                                    [(visible)]="showForm" 
-                                    header="" 
-                                    [modal]="true" 
-                                    [style]="{ width: '50vw', height: '50vh' }" 
-                                    [closable]="true"
-                                    (onHide)="fecharDialogo()">
+<p-tabPanel>
+  <ng-template pTemplate="header">
+    <div class="custom-tab-header">
+      Empresas Vinculadas
+    </div>
+  </ng-template>
 
-                                <div class="custom-tab-header" style="margin-bottom: 50px;">
-                                 ADICIONAR NOVO VÍNCULO
-                                </div>
-                               
-                                <div class="p-fluid p-formgrid grid">
-                                  <!-- Campo CNPJ -->
-                                  <div class="field col-12 md:col-4">
-                                    <span class="p-float-label float-label-fixed">
-                                      <input
-                                        id="cnpj-input"
-                                        type="text"
-                                        pinputtext=""
-                                        class="p-inputtext p-component p-element"
-                                        mask="00.000.000/0000-00"
-                                        [(ngModel)]="CNPJ"
-                                        name="cnpj"
-                                      />
-                                      <label for="cnpj-input">CNPJ</label>
-                                    </span>
-                                  </div>
-                              
-                                  <!-- Campo Permissão -->
-                                  <div class="field col-12 md:col-4">
-                                    <span class="p-float-label float-label-fixed">
-                                      <p-dropdown
-                                        id="cod-permissao-dropdown"
-                                        [(ngModel)]="COD_PERMISSAO" 
-                                        [options]="permissoes" 
-                                        optionLabel="nome" 
-                                        optionValue="codigo"
-                                        placeholder="Selecione uma permissão"
-                                        name="codPermissao"
-                                      ></p-dropdown>
-                                      <label for="cod-permissao-dropdown">Código de Permissão</label>
-                                    </span>
-                                  </div>
-                              
-                                  <!-- Campo Status -->
-                                  <div class="field col-12 md:col-2">
-                                    <span class="p-float-label float-label-fixed">
-                                      <p-dropdown
-                                        [(ngModel)]="USER_STATUS"
-                                        [options]="[
-                                          { label: 'Ativo', value: '1' },
-                                          { label: 'Inativo', value: '0' }
-                                        ]"
-                                        name="USER_STATUS"
-                                      ></p-dropdown>
-                                      <label for="user-status">Status</label>
-                                    </span>
-                                  </div>
+  <div class="p-fluid p-formgrid grid" style="margin-top: 20px">
+    <!-- Tabela de empresas vinculadas -->
+    <div class="col-12">
+      <p-table
+        [value]="empresasVinculadas"
+        [paginator]="true"
+        [rows]="5"
+        [tableStyle]="{ 'min-width': '50rem' }"
+        [rowsPerPageOptions]="[5, 10, 20]"
+      >
+        <!-- Cabeçalho -->
+        <ng-template pTemplate="header">
+          <tr>
+            <th>CNPJ</th>
+            <th>IM</th>
+            <th>RAZÃO SOCIAL</th>
+            <th>Permissão</th>
+            <th>Status</th>
+            <th>
+              <p-button 
+                icon="pi pi-plus" 
+                class="p-button-success"
+                (click)="abrirDialogo()"
+              ></p-button>
+            </th>
+          </tr>
+        </ng-template>
 
-                                  <div class="btn-group field col-12 md:col-1 flex flex-row gap-3" role="group" aria-label="Third group">
-                                    <!-- Botão Salvar -->
-                                    <p-button 
-                                      icon="pi pi-save"
-                                      severity="success"
-                                      class="p-button-primary"
-                                      (click)="adicionarVinculo()"
-                                    ></p-button>
-                                    <!-- Botão Cancelar -->
-                                    <p-button 
-                                      icon="pi pi-times" 
-                                      severity="danger" 
-                                      class="p-button-danger" 
-                                      (click)="fecharDialogo()"
-                                    ></p-button>
-                                  </div>
-                                </div>
-                              
-                                
-                              </p-dialog>
-                                  </ng-template>
-                                </p-table>
-                              </div>
-                          </div>
-                          
-                        </p-tabPanel>
+        <!-- Corpo -->
+        <ng-template pTemplate="body" let-empresa>
+          <tr>
+            <td>{{ empresa.CNPJ | mask:'00.000.000/0000-00' }}</td>
+            <td>{{ empresa.IM }}</td>
+            <td>{{ empresa.NOME }}</td>
+
+            <!-- Permissão -->
+            <td *ngIf="editMode && CNPJ === empresa.CNPJ">
+              <p-dropdown
+                [(ngModel)]="COD_PERMISSAO"
+                [options]="permissoes"
+                optionLabel="nome"
+                optionValue="codigo"
+                placeholder="Selecione uma permissão"
+              ></p-dropdown>
+            </td>
+            <td *ngIf="!editMode || CNPJ !== empresa.CNPJ">
+              {{ getPermissaoNome(empresa.COD_PERMISSAO) }}
+            </td>
+
+            <!-- Status -->
+            <td *ngIf="editMode && CNPJ === empresa.CNPJ">
+              <p-dropdown
+                [(ngModel)]="USER_STATUS"
+                [options]="[
+                  { label: 'Ativo', value: '1' },
+                  { label: 'Inativo', value: '0' }
+                ]"
+                placeholder="Selecione o status"
+              ></p-dropdown>
+            </td>
+            <td *ngIf="!editMode || CNPJ !== empresa.CNPJ">
+              {{ empresa.USER_STATUS === '1' ? 'Ativo' : 'Inativo' }}
+            </td>
+
+            <!-- Ações -->
+            <td>
+              <div class="btn-group flex flex-row gap-2" role="group" aria-label="Actions group">
+                <!-- Botão Editar -->
+                <p-button
+                  *ngIf="!editMode || CNPJ !== empresa.CNPJ"
+                  icon="pi pi-pencil"
+                  severity="info"
+                  (click)="abrirEdicaoVinculo(empresa)"
+                ></p-button>
+              
+                <!-- Botão Salvar -->
+                <p-button
+                  *ngIf="editMode && CNPJ === empresa.CNPJ"
+                  icon="pi pi-save"
+                  severity="success"
+                  (click)="salvarEdicaoVinculo()"
+                ></p-button>
+              
+                <!-- Botão Cancelar -->
+                <p-button
+                  *ngIf="editMode && CNPJ === empresa.CNPJ"
+                  icon="pi pi-times"
+                  severity="danger"
+                  (click)="cancelarEdicaoVinculo()"
+                ></p-button>
+              
+                <!-- Botão Excluir -->
+                <p-button
+                  *ngIf="!editMode || CNPJ !== empresa.CNPJ"
+                  icon="pi pi-trash"
+                  severity="danger"
+                  (click)="confirmarExclusaoVinculo(empresa.CNPJ)"
+                ></p-button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <!-- Mensagem se a lista estiver vazia -->
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="6" class="text-center p-3">
+              Nenhuma empresa vinculada.
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</p-tabPanel>
+
+<!-- DIALOG FORA DA TABELA -->
+<p-dialog 
+  [(visible)]="showForm" 
+  header="ADICIONAR NOVO VÍNCULO" 
+  [modal]="true" 
+  [style]="{ width: '50vw', height: '50vh' }" 
+  [closable]="true"
+  (onHide)="fecharDialogo()">
+
+  <div class="p-fluid p-formgrid grid">
+    <!-- Campo CNPJ -->
+    <div class="field col-12 md:col-4">
+      <span class="p-float-label float-label-fixed">
+        <input
+          id="cnpj-input"
+          type="text"
+          pInputText
+          mask="00.000.000/0000-00"
+          [(ngModel)]="CNPJ"
+          name="cnpj"
+        />
+        <label for="cnpj-input">CNPJ</label>
+      </span>
+    </div>
+
+    <!-- Campo Permissão -->
+    <div class="field col-12 md:col-4">
+      <span class="p-float-label float-label-fixed">
+        <p-dropdown
+          id="cod-permissao-dropdown"
+          [(ngModel)]="COD_PERMISSAO" 
+          [options]="permissoes" 
+          optionLabel="nome" 
+          optionValue="codigo"
+          placeholder="Selecione uma permissão"
+          name="codPermissao"
+        ></p-dropdown>
+        <label for="cod-permissao-dropdown">Código de Permissão</label>
+      </span>
+    </div>
+
+    <!-- Campo Status -->
+    <div class="field col-12 md:col-2">
+      <span class="p-float-label float-label-fixed">
+        <p-dropdown
+          [(ngModel)]="USER_STATUS"
+          [options]="[
+            { label: 'Ativo', value: '1' },
+            { label: 'Inativo', value: '0' }
+          ]"
+          name="USER_STATUS"
+        ></p-dropdown>
+        <label for="user-status">Status</label>
+      </span>
+    </div>
+
+    <!-- Botões -->
+    <div class="btn-group field col-12 md:col-12 flex flex-row gap-3 justify-content-end">
+      <p-button 
+        icon="pi pi-save"
+        label="Salvar"
+        severity="success"
+        (click)="adicionarVinculo()"
+      ></p-button>
+      <p-button 
+        icon="pi pi-times" 
+        label="Cancelar"
+        severity="danger"
+        (click)="fecharDialogo()"
+      ></p-button>
+    </div>
+  </div>
+</p-dialog>
+
                     </p-tabView>
         </div>
                                 
