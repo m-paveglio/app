@@ -206,3 +206,13 @@
 .custom-gap-12 .grid {
   gap: 12px;
 }
+
+:host ::ng-deep .p-toast .p-toast-message-success {
+  background-color: #4caf50;
+  color: white;
+}
+
+:host ::ng-deep .p-toast .p-toast-message-error {
+  background-color: #f44336;
+  color: white;
+}

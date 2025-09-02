@@ -6,6 +6,7 @@ import { EmpresasService } from '../../../login/usuarios/empresas/empresas.servi
 import { WebserviceService } from '../../webservice/webservice.service';
 import { PessoasService } from '../../pessoas/pessoas.service';
 import { arredondarABNT } from '../arredondamentoAbnt/arredondamento';
+import { Router } from '@angular/router';
 
 interface ITEMLCVinculado {
   COD_ITEM_LC: string;
@@ -265,7 +266,8 @@ EXIGIBILIDADE_ISS = [
     private empresaService: EmpresasService,
     private webserviceService: WebserviceService,
     private pessoasService: PessoasService,
-    private cdRef: ChangeDetectorRef
+    private cdRef: ChangeDetectorRef,
+      private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -744,19 +746,18 @@ calcularValorLiquido() {
     });
   }
 
-  onSubmit(): void {
-    if (!this.empresaSelecionada) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Erro',
-        detail: 'Nenhuma empresa selecionada para emissão da NFSe'
-      });
+ onSubmit(): void {
+  if (!this.empresaSelecionada) {
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Erro',
+      detail: 'Nenhuma empresa selecionada para emissão da NFSe'
+    });
+    return;
+  }
 
-      
-      return;
-    }
-  
-    this.loading = true;
+  this.loading = true;
+
      // Criar cópia dos dados para envio
   const dadosParaEnvio = JSON.parse(JSON.stringify(this.nfseData));
 
@@ -843,21 +844,135 @@ calcularValorLiquido() {
   
     console.log('Dados a serem enviados:', dadosEnvio);
   
-    this.nfseService.enviarNfse(dadosEnvio).subscribe({
-      next: () => {
-        this.isEnvioSucesso = true;
-        this.exibirMensagem = true;
-        this.mensagem = 'NFSe emitida com sucesso!';
-        this.loading = false;
-      },
-      error: (err) => {
-        this.isEnvioSucesso = false;
-        this.exibirMensagem = true;
-        this.mensagem = 'Falha ao emitir NFSe: ' + err.message;
-        this.loading = false;
+this.nfseService.enviarNfse(dadosEnvio).subscribe({
+  next: (response: any) => {
+    this.loading = false;
+
+    // DEBUG: Mostra a resposta completa no console
+    console.log('Resposta da API:', response);
+
+    // Função auxiliar para obter o motivo da rejeição
+    const obterMotivoRejeicao = (resp: any): string => {
+      if (!resp) return 'Motivo não informado';
+      
+      // Primeiro verifica se há uma mensagem de erro direta
+      if (resp.motivo) return resp.motivo;
+      if (resp.message || resp.Mensagem) return resp.message || resp.Mensagem;
+      if (resp.erro) return resp.erro;
+      
+      // Verifica se há erros em array
+      if (Array.isArray(resp.erros) && resp.erros.length > 0) {
+        return resp.erros.map((e: any) => e.mensagem || e.detail || e.Mensagem || e).join('<br>');
       }
+      
+      // Verifica se a própria resposta é um array de erros
+      if (Array.isArray(resp) && resp.length > 0) {
+        return resp.map((e: any) => e.mensagem || e.detail || e.Mensagem || e).join('<br>');
+      }
+      
+      // Tenta extrair do XML se disponível (para respostas de prefeitura)
+      if (resp.xml) {
+        // Extrai mensagens de erro do XML se presente
+        const errorMatch = resp.xml.match(/<Mensagem>([^<]+)<\/Mensagem>/i);
+        if (errorMatch && errorMatch[1]) {
+          return errorMatch[1];
+        }
+        
+        const motivoMatch = resp.xml.match(/<Motivo>([^<]+)<\/Motivo>/i);
+        if (motivoMatch && motivoMatch[1]) {
+          return motivoMatch[1];
+        }
+      }
+      
+      return 'Motivo não informado pela prefeitura';
+    };
+
+    // Se houver um array de erros do servidor (erro de validação antes do envio)
+    if (Array.isArray(response) && response.length > 0) {
+      const mensagemErro = response.map((e: any) => e.mensagem || e.detail || e.Mensagem || e).join('<br>');
+      
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Erro de validação',
+        detail: mensagemErro,
+        life: 7000
+      });
+      
+      // Redireciona para permitir reemissão
+      setTimeout(() => {
+        this.router.navigate(['/dashboard/nfse/consultar']);
+      }, 2000);
+      
+      return;
+    }
+
+    // VERIFICAÇÃO CORRETA - baseada na estrutura real da resposta
+    const isAutorizada = response.success === true;
+
+    if (isAutorizada) {
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Sucesso',
+        detail: 'NFSe emitida com sucesso!',
+        life: 5000
+      });
+
+    } else {
+      // NFSe rejeitada - busca a mensagem de erro correta
+      const motivo = obterMotivoRejeicao(response);
+
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Rejeitada',
+        detail: motivo,
+        life: 7000
+      });
+    }
+
+    // SEMPRE redireciona após 2 segundos
+    setTimeout(() => {
+      this.router.navigate(['/dashboard/nfse/consultar']);
+    }, 2000);
+  },
+  error: (err) => {
+    this.loading = false;
+
+    let mensagemErro = 'Falha ao emitir NFSe';
+
+    // Verifica se vem como array de erros
+    if (Array.isArray(err.error) && err.error.length > 0) {
+      mensagemErro += ': ' + err.error.map((e: any) => e.mensagem || e.detail || e.Mensagem || e).join('<br>');
+    } 
+    // Se vier como objeto com mensagem de erro
+    else if (err.error) {
+      // Tenta extrair a mensagem de erro do objeto de erro
+      const errorObj = err.error;
+      if (errorObj.message || errorObj.Mensagem) {
+        mensagemErro += ': ' + (errorObj.message || errorObj.Mensagem);
+      } else if (errorObj.erro) {
+        mensagemErro += ': ' + errorObj.erro;
+      } else if (typeof errorObj === 'string') {
+        mensagemErro += ': ' + errorObj;
+      }
+    }
+    // Se vier direto na propriedade err.message
+    else if (err.message) {
+      mensagemErro += ': ' + err.message;
+    }
+
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Erro',
+      detail: mensagemErro,
+      life: 7000
     });
+
+    // Redireciona mesmo em caso de erro
+    setTimeout(() => {
+      this.router.navigate(['/dashboard/nfse/consultar']);
+    }, 2000);
   }
+});}
 
   onCidadeIncidenciaChange(event: any): void {
     this.selectedCidadeIncidencia = event.value;

@@ -12,31 +12,80 @@
         CONSULTA DE NOTA FISCAL
       </h3>
 
-      <div class="grid p-fluid p-formgrid p-3">
+      <div class="p-4">
 
-        <p-table [value]="nfses" [paginator]="true" [rows]="10">
+        
+
+        <!-- 📋 Tabela de resultados -->
+        <p-table [value]="nfses"
+                 [paginator]="true"
+                 [rows]="10"
+                 [loading]="loading"
+                 responsiveLayout="scroll">
+
           <ng-template pTemplate="header">
             <tr>
-              <th>ID</th>
-              <th>Número do Lote</th>
-              <th>CNPJ Prestador</th>
-              <th>Ações</th>
+              <th>Número RPS</th>
+              <th>Data Emissão</th>
+              <th>Tomador</th>
+              <th>Valor</th>
+              <th>Status</th>
+              <th style="width: 150px;">Ações</th>
             </tr>
           </ng-template>
+
           <ng-template pTemplate="body" let-nfse>
+  <tr>
+    <td>{{ nfse.NumeroRps }}</td>
+    <td>{{ nfse.DataEmissaoRps | date:'dd/MM/yyyy' }}</td>
+    <td>{{ nfse.RazaoSocialTomador }}</td>
+    <td>{{ nfse.ValorServicos | currency:'BRL' }}</td>
+    <td>{{ nfse.Status }}</td>
+    <td>
+      <button pButton type="button" icon="pi pi-search"
+              class="p-button-text p-button-sm"
+              (click)="visualizarDetalhes(nfse)">
+      </button>
+      <button *ngIf="nfse.Status === 'AUTORIZADA'"
+              pButton type="button" icon="pi pi-times"
+              class="p-button-danger p-button-sm ml-2"
+              (click)="cancelarNfse(nfse)">
+      </button>
+    </td>
+  </tr>
+</ng-template>
+
+          <ng-template pTemplate="emptymessage">
             <tr>
-              <td>{{ nfse.id }}</td>
-              <td>{{ nfse.NumeroLote || '---' }}</td>
-              <td>{{ nfse.CnpjPrestador }}</td>
-              <td>
-                <button pButton type="button" icon="pi pi-search"
-                        class="p-button-text p-button-sm"
-                        (click)="visualizarDetalhes(nfse)">
-                </button>
+              <td colspan="7" class="text-center p-3">
+                Nenhuma NFSe encontrada para os filtros informados.
               </td>
             </tr>
           </ng-template>
         </p-table>
+
+        <!-- 📄 Diálogo de detalhes -->
+        <p-dialog header="Detalhes da NFSe"
+                  [(visible)]="displayDialogDetalhes"
+                  [modal]="true"
+                  [style]="{width: '50vw'}">
+
+          <div *ngIf="selectedNfse">
+            <p><b>Número:</b> {{ selectedNfse.NumeroRps }}</p>
+            <p><b>Série:</b> {{ selectedNfse.SerieRps }}</p>
+            <p><b>Data:</b> {{ selectedNfse.DataEmissaoRps | date:'dd/MM/yyyy' }}</p>
+            <p><b>Tomador:</b> {{ selectedNfse.RazaoSocialTomador }}</p>
+            <p><b>Valor:</b> {{ selectedNfse.ValorServicos | currency:'BRL' }}</p>
+            <p><b>Status:</b> {{ selectedNfse.StatusRps == 1 ? 'Normal' : selectedNfse.StatusRps == 2 ? 'Cancelada' : 'Outros' }}</p>
+            <p><b>CPF/CNPJ Tomador:</b> {{ selectedNfse.CpfTomador || selectedNfse.CnpjTomador }}</p>
+            <p><b>Endereço:</b> {{ selectedNfse.EnderecoTomador }}, {{ selectedNfse.NumeroEnderecoTomador }} {{ selectedNfse.ComplementoEnderecoTomador }} - {{ selectedNfse.BairroTomador }}</p>
+            <p><b>UF:</b> {{ selectedNfse.UfTomador }} | <b>CEP:</b> {{ selectedNfse.CepTomador }}</p>
+            <p><b>Telefone:</b> {{ selectedNfse.TelefoneTomador }}</p>
+            <p><b>Email:</b> {{ selectedNfse.EmailTomador }}</p>
+          </div>
+
+        </p-dialog>
+
       </div>
     </div>
   </div>

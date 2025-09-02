@@ -1327,4 +1327,6 @@ this.nfseService.buscarITEMLC({ codigo }).subscribe({
 });
 }
 
+
+
 }

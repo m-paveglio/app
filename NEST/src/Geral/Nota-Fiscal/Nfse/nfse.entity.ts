@@ -281,4 +281,6 @@ export class NFSE {
   @Column({ type: 'datetime', nullable: true })
   DataConsulta: Date; // Data/hora da última consulta
 
+  @Column({ type: 'text', nullable: true })
+  DadosEnvio: string;
 }

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { catchError, forkJoin, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
 import { ApiConfigService } from '../../../api-config.service';
 
@@ -173,49 +173,31 @@ exportarParaExcel(nfses: any[]): Observable<Blob> {
     catchError(this.handleError)
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   
 
     private handleError(error: any): Observable<never> {
-      let errorMessage = 'Erro desconhecido';
-      if (error.error instanceof ErrorEvent) {
-        // Erro do cliente
-        errorMessage = `Erro: ${error.error.message}`;
-      } else if (error.status) {
-        // Erro do servidor
-        errorMessage = `Erro ${error.status}: ${error.error.message || error.statusText}`;
-      }
-      console.error(errorMessage);
-      return throwError(errorMessage);
+  let errorMessage = 'Erro desconhecido';
+
+  if (error.error instanceof ErrorEvent) {
+    // Erro do cliente
+    errorMessage = `Erro: ${error.error.message}`;
+  } else if (error.status) {
+    // Erro do servidor
+    if (Array.isArray(error.error)) {
+      // Se for array, concatena as mensagens
+      errorMessage = error.error.join('\n');
+    } else if (error.error?.message) {
+      errorMessage = error.error.message;
+    } else if (typeof error.error === 'string') {
+      errorMessage = error.error;
+    } else {
+      errorMessage = `Erro ${error.status}: ${error.statusText}`;
     }
+  }
+
+  console.error(errorMessage);
+  return throwError(() => errorMessage); // Angular 15+ usa throwError como função
+}
   
     private handleSuccess(message: string): void {
       console.log(message); // ou você pode exibir a mensagem de sucesso de outra forma
