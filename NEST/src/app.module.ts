@@ -11,17 +11,18 @@ import { LogradouroModule } from './Geral/Endereco/Logradouro/logradouro.module'
 import { pessoasModule } from './Geral/Pessoas/pessoas.module';
 import { EmpresasModule } from './Login/empresas/empresas.module';
 import { UserEmpresasModule } from './Login/user_empresas/user_empresas.module';
-import { WebserviceModule } from './Geral/Nota-Fiscal/Nfse/webservice/webservice.module';
+import { WebserviceModule } from './Geral/Nota-Fiscal/Nfse/Consultas/webservice/webservice.module';
 import { ServicosModule } from './Geral/Servicos/servicos.module';
 import { NfseModule } from './Geral/Nota-Fiscal/Nfse/nfse.module';
 import { ComandasModule } from './Geral/Comanda/comanda.module';
 import { ComandasXServicoModule } from './Geral/ComandaXservico/comandaXservico.module';
-import { RpsModule } from './Geral/Nota-Fiscal/Nfse/RpsDisponivel/Rps.module';
+import { RpsModule } from './Geral/Nota-Fiscal/Nfse/Consultas/RpsDisponivel/Rps.module';
 import { CnaeModule } from './Geral/Codigos/CNAE/cnae.module';
 import { ItemLCModule } from './Geral/Codigos/ITEM_LC/itemLC.module';
 import { CodigoTributacaoMunicipioModule } from './Geral/Codigos/CodigoTributacaoMunicipio/CodigoTributacaoMunicipio.module';
 import { EmpresaCnaeModule } from './Geral/Codigos/Empresa_Cnae/Empresa-Cnae.module';
 import { EmpresaITEMLCModule } from './Geral/Codigos/Empresa_ITEMLC/Empresa-ITEMLC.module';
+import { ConsultarURLModule } from './Geral/Nota-Fiscal/Nfse/Consultas/ConsultarURL/ConsultarURL.module';
 
  
 
@@ -46,7 +47,8 @@ import { EmpresaITEMLCModule } from './Geral/Codigos/Empresa_ITEMLC/Empresa-ITEM
     ItemLCModule,
     CodigoTributacaoMunicipioModule,
     EmpresaCnaeModule,
-    EmpresaITEMLCModule
+    EmpresaITEMLCModule,
+    ConsultarURLModule
 
     ],
   controllers: [AppController],

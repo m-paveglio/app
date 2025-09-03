@@ -8,9 +8,9 @@ import * as crypto from 'crypto';
 import { Repository } from 'typeorm';
 import { NFSE } from './nfse.entity';
 import { EmpresasService } from 'src/Login/empresas/empresas.service';
-import { WebserviceService } from './webservice/webservice.service';
+import { WebserviceService } from './Consultas/webservice/webservice.service';
 import * as xmldom from 'xmldom';
-import { RpsService } from './RpsDisponivel/rps.service';
+import { RpsService } from './Consultas/RpsDisponivel/rps.service';
 
 interface ErroPadronizado {
   titulo: string;

@@ -7,7 +7,7 @@ import { XmlUtilsService } from './common/xml-utils.service';
 import { DatabaseModule } from 'src/database/database.module';
 import { NFSEProviders } from './nfse.providers';
 import { EmpresasModule } from 'src/Login/empresas/empresas.module';
-import { WebserviceModule } from './webservice/webservice.module';
+import { WebserviceModule } from './Consultas/webservice/webservice.module';
 
 @Module({
   imports: [HttpModule, DatabaseModule, EmpresasModule, WebserviceModule], // Adicione o WebserviceModule aqui

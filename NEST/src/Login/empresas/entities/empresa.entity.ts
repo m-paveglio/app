@@ -1,4 +1,4 @@
-import { Webservice } from 'src/Geral/Nota-Fiscal/Nfse/webservice/entities/webservice.entity';
+import { Webservice } from 'src/Geral/Nota-Fiscal/Nfse/Consultas/webservice/entities/webservice.entity';
 import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
 
 @Entity('EMPRESAS')
