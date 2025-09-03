@@ -11,6 +11,8 @@ import { EmpresasService } from 'src/Login/empresas/empresas.service';
 import { WebserviceService } from './Consultas/webservice/webservice.service';
 import * as xmldom from 'xmldom';
 import { RpsService } from './Consultas/RpsDisponivel/rps.service';
+import { NfseMapper } from './NfseMapper.component';
+
 
 interface ErroPadronizado {
   titulo: string;
@@ -180,164 +182,43 @@ const response = await this.httpService.post(
         },
         httpsAgent,
         timeout: 30000,
+        responseType: 'text', // 👈 garante que vem XML
       }
     ).toPromise();
 
-    this.logger.verbose('Resposta XML bruta da prefeitura:', response.data);
+   const xmlResposta = response.data;
+    this.logger.verbose('Resposta XML bruta da prefeitura:', xmlResposta);
 
     // Só grava se recebeu resposta
-  const erros = this.extrairMensagensErro(response.data);
+  const erros = this.extrairMensagensErro(xmlResposta);
 
   // Filtra mensagens que não são erros de fato
-  const errosReais = erros.filter(e => !e.includes('Motivo não especificado'));
+// 🔹 Se tiver erro, salva como rejeitada
+if (erros.length > 0) {
+  await this.nfseRepository.save({
+    CnpjPrestador: dados.prestador?.cnpj,
+    Status: 'REJEITADA',
+    Erro: erros.join(' | ').substring(0, 500),
+    XmlEnvio: xmlAssinado,
+    XmlResposta: xmlResposta,
+    DataEnvio: new Date(),
+  });
+  return { success: false, erros };
+}
 
-  if (errosReais.length) {
-      // Em caso de rejeição
-await this.nfseRepository.save({
-  // Prestador
-  CnpjPrestador: dados.prestador?.cnpj,
-  CpfPrestador: dados.prestador?.cpf,
-  InscricaoMunicipalPrestador: dados.prestador?.inscricaoMunicipal,
+// 🔹 Se sucesso, mapeia XML com NfseMapper
+const nfseData = await NfseMapper.mapFromXml(xmlResposta);
+if (!nfseData) {
+  this.logger.error('Não foi possível mapear a resposta da NFSe.');
+  throw new Error('Falha ao mapear NFSe');
+}
 
-  // RPS
-  NumeroRps: dados.rpsList?.[0]?.identificacao?.numero,
-  SerieRps: dados.rpsList?.[0]?.identificacao?.serie,
-  TipoRps: dados.rpsList?.[0]?.identificacao?.tipo,
-  DataEmissaoRps: dados.rpsList?.[0]?.dataEmissao,
-  StatusRps: dados.rpsList?.[0]?.status,
-  Competencia: dados.rpsList?.[0]?.competencia,
+// 🔹 Salva a NFSE mapeada no banco
+const nfseEntity = this.nfseRepository.create(nfseData);
+await this.nfseRepository.save(nfseEntity);
 
-  // Valores
-  ValorServicos: dados.rpsList?.[0]?.servico?.valores?.valorServicos,
-  ValorDeducoes: dados.rpsList?.[0]?.servico?.valores?.valorDeducoes,
-  ValorPis: dados.rpsList?.[0]?.servico?.valores?.valorPis,
-  ValorCofins: dados.rpsList?.[0]?.servico?.valores?.valorCofins,
-  ValorInss: dados.rpsList?.[0]?.servico?.valores?.valorInss,
-  ValorIr: dados.rpsList?.[0]?.servico?.valores?.valorIr,
-  ValorCsll: dados.rpsList?.[0]?.servico?.valores?.valorCsll,
-  OutrasRetencoes: dados.rpsList?.[0]?.servico?.valores?.outrasRetencoes,
-  ValTotTributos: dados.rpsList?.[0]?.servico?.valores?.valTotTributos,
-  ValorIss: dados.rpsList?.[0]?.servico?.valores?.valorIss,
-  Aliquota: dados.rpsList?.[0]?.servico?.valores?.aliquota,
-  DescontoIncondicionado: dados.rpsList?.[0]?.servico?.valores?.descontoIncondicionado,
-  DescontoCondicionado: dados.rpsList?.[0]?.servico?.valores?.descontoCondicionado,
+return { success: true, nfse: nfseEntity };
 
-  // Serviço
-  IssRetido: dados.rpsList?.[0]?.servico?.issRetido,
-  ResponsavelRetencao: dados.rpsList?.[0]?.servico?.responsavelRetencao,
-  ItemListaServico: dados.rpsList?.[0]?.servico?.itemListaServico,
-  CodigoCnae: dados.rpsList?.[0]?.servico?.codigoCnae,
-  CodigoTributacaoMunicipio: dados.rpsList?.[0]?.servico?.codigoTributacaoMunicipio,
-  CodigoNbs: dados.rpsList?.[0]?.servico?.valores?.codigoNbs,
-  Discriminacao: dados.rpsList?.[0]?.servico?.discriminacao,
-  CodigoMunicipio: dados.rpsList?.[0]?.servico?.codigoMunicipio,
-  ExigibilidadeISS: dados.rpsList?.[0]?.servico?.exigibilidadeISS,
-  MunicipioIncidencia: dados.rpsList?.[0]?.servico?.municipioIncidencia,
-
-  // Tomador
-  CnpjTomador: dados.rpsList?.[0]?.tomador?.identificacao?.cnpj,
-  CpfTomador: dados.rpsList?.[0]?.tomador?.identificacao?.cpf,
-  InscricaoMunicipalTomador: dados.rpsList?.[0]?.tomador?.identificacao?.inscricaoMunicipal,
-  NifTomador: dados.rpsList?.[0]?.tomador?.nifTomador,
-  RazaoSocialTomador: dados.rpsList?.[0]?.tomador?.razaoSocial,
-  EnderecoTomador: dados.rpsList?.[0]?.tomador?.endereco?.endereco,
-  NumeroEnderecoTomador: dados.rpsList?.[0]?.tomador?.endereco?.numero,
-  ComplementoEnderecoTomador: dados.rpsList?.[0]?.tomador?.endereco?.complemento,
-  BairroTomador: dados.rpsList?.[0]?.tomador?.endereco?.bairro,
-  CodigoMunicipioTomador: dados.rpsList?.[0]?.tomador?.endereco?.codigoMunicipio,
-  UfTomador: dados.rpsList?.[0]?.tomador?.endereco?.uf,
-  CepTomador: dados.rpsList?.[0]?.tomador?.endereco?.cep,
-  TelefoneTomador: dados.rpsList?.[0]?.tomador?.contato?.telefone,
-  EmailTomador: dados.rpsList?.[0]?.tomador?.contato?.email,
-
-  // Regimes
-  OptanteSimplesNacional: dados.rpsList?.[0]?.optanteSimplesNacional,
-  IncentivoFiscal: dados.rpsList?.[0]?.incentivoFiscal,
-  InformacoesComplementares: dados.rpsList?.[0]?.informacoesComplementares,
-
-  // Controle NFSe
-  Status: 'REJEITADA',
-  Erro: erros.join(' | ').substring(0, 500),
-  XmlEnvio: JSON.stringify(dados),
-  XmlResposta: response.data,
-  DataEnvio: new Date(),
-  DadosEnvio: JSON.stringify(dados)
-});
-      return { success: false, erros };
-    } else {
-    // Em caso de sucesso
-await this.nfseRepository.save({
-  // Prestador
-  CnpjPrestador: dados.prestador?.cnpj,
-  CpfPrestador: dados.prestador?.cpf,
-  InscricaoMunicipalPrestador: dados.prestador?.inscricaoMunicipal,
-
-  // RPS
-  NumeroRps: dados.rpsList?.[0]?.identificacao?.numero,
-  SerieRps: dados.rpsList?.[0]?.identificacao?.serie,
-  TipoRps: dados.rpsList?.[0]?.identificacao?.tipo,
-  DataEmissaoRps: dados.rpsList?.[0]?.dataEmissao,
-  StatusRps: dados.rpsList?.[0]?.status,
-  Competencia: dados.rpsList?.[0]?.competencia,
-
-  // Valores
-  ValorServicos: dados.rpsList?.[0]?.servico?.valores?.valorServicos,
-  ValorDeducoes: dados.rpsList?.[0]?.servico?.valores?.valorDeducoes,
-  ValorPis: dados.rpsList?.[0]?.servico?.valores?.valorPis,
-  ValorCofins: dados.rpsList?.[0]?.servico?.valores?.valorCofins,
-  ValorInss: dados.rpsList?.[0]?.servico?.valores?.valorInss,
-  ValorIr: dados.rpsList?.[0]?.servico?.valores?.valorIr,
-  ValorCsll: dados.rpsList?.[0]?.servico?.valores?.valorCsll,
-  OutrasRetencoes: dados.rpsList?.[0]?.servico?.valores?.outrasRetencoes,
-  ValTotTributos: dados.rpsList?.[0]?.servico?.valores?.valTotTributos,
-  ValorIss: dados.rpsList?.[0]?.servico?.valores?.valorIss,
-  Aliquota: dados.rpsList?.[0]?.servico?.valores?.aliquota,
-  DescontoIncondicionado: dados.rpsList?.[0]?.servico?.valores?.descontoIncondicionado,
-  DescontoCondicionado: dados.rpsList?.[0]?.servico?.valores?.descontoCondicionado,
-
-  // Serviço
-  IssRetido: dados.rpsList?.[0]?.servico?.issRetido,
-  ResponsavelRetencao: dados.rpsList?.[0]?.servico?.responsavelRetencao,
-  ItemListaServico: dados.rpsList?.[0]?.servico?.itemListaServico,
-  CodigoCnae: dados.rpsList?.[0]?.servico?.codigoCnae,
-  CodigoTributacaoMunicipio: dados.rpsList?.[0]?.servico?.codigoTributacaoMunicipio,
-  CodigoNbs: dados.rpsList?.[0]?.servico?.valores?.codigoNbs,
-  Discriminacao: dados.rpsList?.[0]?.servico?.discriminacao,
-  CodigoMunicipio: dados.rpsList?.[0]?.servico?.codigoMunicipio,
-  ExigibilidadeISS: dados.rpsList?.[0]?.servico?.exigibilidadeISS,
-  MunicipioIncidencia: dados.rpsList?.[0]?.servico?.municipioIncidencia,
-
-  // Tomador
-  CnpjTomador: dados.rpsList?.[0]?.tomador?.identificacao?.cnpj,
-  CpfTomador: dados.rpsList?.[0]?.tomador?.identificacao?.cpf,
-  InscricaoMunicipalTomador: dados.rpsList?.[0]?.tomador?.identificacao?.inscricaoMunicipal,
-  NifTomador: dados.rpsList?.[0]?.tomador?.nifTomador,
-  RazaoSocialTomador: dados.rpsList?.[0]?.tomador?.razaoSocial,
-  EnderecoTomador: dados.rpsList?.[0]?.tomador?.endereco?.endereco,
-  NumeroEnderecoTomador: dados.rpsList?.[0]?.tomador?.endereco?.numero,
-  ComplementoEnderecoTomador: dados.rpsList?.[0]?.tomador?.endereco?.complemento,
-  BairroTomador: dados.rpsList?.[0]?.tomador?.endereco?.bairro,
-  CodigoMunicipioTomador: dados.rpsList?.[0]?.tomador?.endereco?.codigoMunicipio,
-  UfTomador: dados.rpsList?.[0]?.tomador?.endereco?.uf,
-  CepTomador: dados.rpsList?.[0]?.tomador?.endereco?.cep,
-  TelefoneTomador: dados.rpsList?.[0]?.tomador?.contato?.telefone,
-  EmailTomador: dados.rpsList?.[0]?.tomador?.contato?.email,
-
-  // Regimes
-  OptanteSimplesNacional: dados.rpsList?.[0]?.optanteSimplesNacional,
-  IncentivoFiscal: dados.rpsList?.[0]?.incentivoFiscal,
-  InformacoesComplementares: dados.rpsList?.[0]?.informacoesComplementares,
-
-  // Controle NFSe
-  Status: 'AUTORIZADA',
-  XmlEnvio: JSON.stringify(dados),
-  XmlResposta: response.data,
-  DataEnvio: new Date(),
-  DataAutorizacao: new Date(),
-  DadosEnvio: JSON.stringify(dados)
-});
-      return { success: true, xml: response.data };
-    }
 
   } catch (error) {
       const erroFormatado = this.padronizarErro(error);
