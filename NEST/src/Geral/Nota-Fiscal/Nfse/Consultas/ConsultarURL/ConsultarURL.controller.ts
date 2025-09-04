@@ -1,11 +1,11 @@
 import { Controller, Post, Body, HttpException, HttpStatus } from '@nestjs/common';
 import { ConsultarURLService } from './ConsultarURL.service';
 
-@Controller('consultarurl')
+@Controller('nfse')
 export class ConsultarURLController {
   constructor(private readonly ConsultarURLService: ConsultarURLService) {}
 
-  @Post()
+  @Post('consultarurl')
   async consultar(@Body() body: { cnpj: string; numero: string; serie: string; tipo: number }) {
     try {
       const { cnpj, numero, serie, tipo } = body;

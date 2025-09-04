@@ -23,6 +23,9 @@ import { CodigoTributacaoMunicipioModule } from './Geral/Codigos/CodigoTributaca
 import { EmpresaCnaeModule } from './Geral/Codigos/Empresa_Cnae/Empresa-Cnae.module';
 import { EmpresaITEMLCModule } from './Geral/Codigos/Empresa_ITEMLC/Empresa-ITEMLC.module';
 import { ConsultarURLModule } from './Geral/Nota-Fiscal/Nfse/Consultas/ConsultarURL/ConsultarURL.module';
+import { CancelarNfseModule } from './Geral/Nota-Fiscal/Nfse/Cancelar-Substituir/Cancelar/CancelarNfse.module';
+import { SubstituirNfseModule } from './Geral/Nota-Fiscal/Nfse/Cancelar-Substituir/Substituir/SubstituirNfse.module';
+
 
  
 
@@ -48,7 +51,9 @@ import { ConsultarURLModule } from './Geral/Nota-Fiscal/Nfse/Consultas/Consultar
     CodigoTributacaoMunicipioModule,
     EmpresaCnaeModule,
     EmpresaITEMLCModule,
-    ConsultarURLModule
+    ConsultarURLModule,
+    CancelarNfseModule,
+    SubstituirNfseModule
 
     ],
   controllers: [AppController],

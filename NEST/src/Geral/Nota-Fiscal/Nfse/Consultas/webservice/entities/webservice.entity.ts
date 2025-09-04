@@ -9,6 +9,9 @@ export class Webservice {
   NOME_CIDADE: string;
 
   @Column({ type: 'nvarchar', length: 300, nullable: true  })
+  COD_IBGE: string;
+
+  @Column({ type: 'nvarchar', length: 300, nullable: true  })
   LINK: string;
 
   @Column({ type: 'nvarchar', length: 50, nullable: true })
