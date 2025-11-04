@@ -29,15 +29,13 @@ async function bootstrap() {
   }));
 
   // CORS: Configuração segura
-  app.enableCors({
-    origin: nodeEnv === 'production' 
-      ? corsOrigin // Em produção, usar domínio específico
-      : true, // Em desenvolvimento, permite qualquer origem
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-    credentials: true, // Permite cookies/auth headers
-    maxAge: 3600, // Cache preflight por 1 hora
-  });
+ app.enableCors({
+  origin: corsOrigin?.split(',') || ['http://localhost:4200'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  credentials: true,
+  maxAge: 3600,
+});
 
   // ==========================================
   // VALIDAÇÃO GLOBAL
